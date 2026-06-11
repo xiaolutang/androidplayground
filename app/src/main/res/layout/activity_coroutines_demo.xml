@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#F8F9FA">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <!-- 状态显示区 -->
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            app:cardCornerRadius="12dp"
+            app:cardElevation="4dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="控制台日志"
+                    android:textStyle="bold"
+                    android:textColor="?attr/colorPrimary" />
+
+                <TextView
+                    android:id="@+id/tvLog"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:minLines="5"
+                    android:background="#000000"
+                    android:fontFamily="monospace"
+                    android:padding="8dp"
+                    android:text="> 系统准备绪..."
+                    android:textColor="#00FF00"
+                    android:textSize="12sp" />
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- 基础协程 -->
+        <Button
+            android:id="@+id/btnSimpleLaunch"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="1. 基础协程启动"
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton" />
+
+        <!-- 线程切换 -->
+        <Button
+            android:id="@+id/btnDispatcherSwitch"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="2. 线程切换 (IO 到 主线程)" />
+
+        <!-- 并发请求 -->
+        <Button
+            android:id="@+id/btnAsyncAwait"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="3. 异步并发 (Async/Await)"
+            app:backgroundTint="#6200EE" />
+
+        <!-- 异常处理 -->
+        <Button
+            android:id="@+id/btnExceptionHandling"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="4. 协程异常捕获"
+            app:backgroundTint="#B00020" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:text="Kotlin Flow 数据流"
+            android:textStyle="bold" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:text="进阶挑战：搜索联想 (防抖)"
+            android:textStyle="bold" />
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:hint="输入文字触发实时搜索...">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/etSearch"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <Button
+            android:id="@+id/btnFlowOperators"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="5. Flow 操作符 (Map/Filter)" />
+
+    </LinearLayout>
+</androidx.core.widget.NestedScrollView>

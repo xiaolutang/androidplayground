@@ -37,7 +37,7 @@ status: planned
 7. ✅ INF05 adb_client.py（subprocess + 网络桥）
 8. ✅ INF06 git_client.py
 9. ✅ BF005 KB 存储（stores + retriever + staleness）
-10. ⬜ BF008 Gap 存储 + 解锁价值评分
+10. ✅ BF008 Gap 存储 + 解锁价值评分
 11. ⬜ BF002 复现执行 + ADB 工具层
 12. ⬜ BF003 视觉决策引擎
 13. ⬜ BF004 信号监听器
@@ -343,7 +343,7 @@ git_commit_anchor vs HEAD 差异 → revalidate → 失败标 stale（不删）�
 
 ---
 
-## R001-BF008：Gap 存储 + 解锁价值评分 `⬜ 待处理`
+## R001-BF008：Gap 存储 + 解锁价值评分 `✅ 已完成`
 
 - 文件：`agent/gap/gap_store.py`、`agent/gap/unlock_value_scorer.py`
 - 改动类型：新建
@@ -352,7 +352,7 @@ git_commit_anchor vs HEAD 差异 → revalidate → 失败标 stale（不删）�
 - depends_on: [SCH01, INF03]
 - priority: 4
 - mode: direct
-- status: pending
+- status: completed
 - acceptance_criteria: 缺口 CRUD；7 态迁移；linked_bug_ids 关联；状态只能改不能删（INV-2）
 - decision_refs: [D12]
 - test_tasks:
@@ -360,8 +360,10 @@ git_commit_anchor vs HEAD 差异 → revalidate → 失败标 stale（不删）�
     description: 7 态迁移矩阵；unlock_value = 频率×可修复比例
     scenarios: [状态机矩阵 CapabilityGap]
 
-### BF008.1 unlock_value_scorer `⬜`
+### BF008.1 unlock_value_scorer `✅`
 `estimated_unlock_value = 同类 bug 历史频率 × 补齐后可修复比例`（两因子从 MetricPoint/trajectory 统计）。
+
+**实现摘要**：acceptance_criteria 5/5 通过。GapStore + 7 态迁移矩阵 + INV-2 守护（GapDeleteError）+ linked_bug_ids JSON 关联。UnlockValueScorer 从 MetricPoint 统计 frequency + fix_ratio。10 单测 + 22 集成。全量 269 passed, 4 skipped, ruff All checks passed。evidence: `.dev-flow/R001/evidence/R001-BF008.md`
 
 ---
 

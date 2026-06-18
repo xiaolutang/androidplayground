@@ -42,7 +42,7 @@ status: planned
 12. ⬜ BF003 视觉决策引擎
 13. ⬜ BF004 信号监听器
 14. ⬜ BF006 Playbook 注册中心 + 崩溃型 Playbook
-15. ⬜ BF007 锚点库（D11 能力先建，数据冷启动空）
+15. ✅ BF007 锚点库（D11 能力先建，数据冷启动空）
 16. ⬜ BF001 Bug 上报接入适配器（D8 Sentry 第一适配器）
 17. ⬜ BB001 信息完备度评估（ISM）
 18. ⬜ BB002 症状分类
@@ -473,7 +473,7 @@ MVP 第一个 Playbook：崩溃型（passive=true，被动等信号；hypothesis
 
 ---
 
-## R001-BF007：锚点库（D11 能力先建） `⬜ 待处理`
+## R001-BF007：锚点库（D11 能力先建） `✅ 已完成`
 
 - 文件：`agent/anchor/anchor_library.py`
 - 改动类型：新建
@@ -482,7 +482,7 @@ MVP 第一个 Playbook：崩溃型（passive=true，被动等信号；hypothesis
 - depends_on: [INF03, SCH02]
 - priority: 3
 - mode: direct
-- status: pending
+- status: completed
 - acceptance_criteria: 存储+检索+Schema 能力可用；数据冷启动为空；BF003 降级纯 LLM
 - decision_refs: [D11]
 - test_tasks:
@@ -490,8 +490,10 @@ MVP 第一个 Playbook：崩溃型（passive=true，被动等信号；hypothesis
     description: 锚点匹配；视觉特征向量比对；空库降级
     scenarios: [BB003 探测侧]
 
-### BF007.1 anchor_library `⬜`
+### BF007.1 anchor_library `✅`
 Anchor CRUD + 按 page_id 检索 + visual_features 向量比对。数据空，到公司录入激活（不改代码）。
+
+**实现摘要**：6 AC 全 pass（Mode 2 direct）。AnchorLibrary CRUD + match_by_visual_features（pgvector 余弦）+ is_empty。空库返回 [] + BF003 降级契约。12 单测 + 5 集成（真实 pgvector）。全量 333 passed, 6 skipped, ruff All checks passed。evidence: `.dev-flow/R001/evidence/R001-BF007.md`
 
 ---
 

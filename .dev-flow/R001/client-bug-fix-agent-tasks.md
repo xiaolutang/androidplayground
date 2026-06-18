@@ -41,7 +41,7 @@ status: planned
 11. ✅ BF002 复现执行 + ADB 工具层
 12. ✅ BF003 视觉决策引擎
 13. ✅ BF004 信号监听器
-14. ⬜ BF006 Playbook 注册中心 + 崩溃型 Playbook
+14. ✅ BF006 Playbook 注册中心 + 崩溃型 Playbook
 15. ✅ BF007 锚点库（D11 能力先建，数据冷启动空）
 16. ⬜ BF001 Bug 上报接入适配器（D8 Sentry 第一适配器）
 17. ⬜ BB001 信息完备度评估（ISM）

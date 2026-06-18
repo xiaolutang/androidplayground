@@ -89,6 +89,11 @@ class BugReport(Base):
     # bugly/sentry/...
     source_platform: Mapped[str | None] = mapped_column(String, nullable=True)
 
+    # BF001 幂等 key（平台级唯一 event_id，如 Sentry event_id）
+    # nullable=True：允许无 event_id 的上报进入，由 FF001 router 决定是否拒绝。
+    # 不加 DB unique constraint（nullable + 多平台组合，约束由 FF001 查询逻辑保证）。
+    external_id: Mapped[str | None] = mapped_column(String, nullable=True, index=True)
+
     # 客户端版本（INV-1 必携）
     version_code: Mapped[str | None] = mapped_column(String, nullable=True)
     version_name: Mapped[str | None] = mapped_column(String, nullable=True)

@@ -28,6 +28,8 @@ dependencies = [
     # 通用
     "pydantic==2.13.4",
     "httpx==0.28.1",
+    # .env 加载（R001-INF04）
+    "python-dotenv==1.1.0",
 ]
 
 [project.optional-dependencies]

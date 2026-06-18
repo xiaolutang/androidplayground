@@ -33,8 +33,8 @@ status: planned
 3. ✅ INF03 db.py（SQLAlchemy + pgvector）
 4. ✅ SCH01 核心 Schema（8 + MetricPoint）
 5. ✅ SCH02 边界协议 Schema（ReproStep/Signal/Anchor/DiagnosisReport/ManualFixEntry）
-6. ⬜ INF04 LLMGateway（D2）
-7. ⬜ INF05 adb_client.py（subprocess + 网络桥）
+6. ✅ INF04 LLMGateway（D2）
+7. 🔧 INF05 adb_client.py（subprocess + 网络桥）
 8. ⬜ INF06 git_client.py
 9. ⬜ BF005 KB 存储（stores + retriever + staleness）
 10. ⬜ BF008 Gap 存储 + 解锁价值评分
@@ -223,7 +223,7 @@ ReproStep（BF002 产出/BB008 回归复用）；Signal（四类 signal_type）�
 
 ---
 
-## R001-INF04：LLMGateway `⬜ 待处理`
+## R001-INF04：LLMGateway `✅ 已完成`
 
 - 文件：`agent/infra/llm_gateway.py`
 - 改动类型：新建
@@ -234,7 +234,7 @@ ReproStep（BF002 产出/BB008 回归复用）；Signal（四类 signal_type）�
 - risk_tags: [network]
 - smoke_required: true
 - mode: negotiated
-- status: pending
+- status: completed
 - acceptance_criteria:
   - 按 prompt_type 路由到 text/vision model；OpenAI 兼容协议；超时/非法 JSON 重试 N 次不崩
 - decision_refs: [D2]
@@ -243,13 +243,15 @@ ReproStep（BF002 产出/BB008 回归复用）；Signal（四类 signal_type）�
     description: FakeLLMGateway 按 prompt_type 分发；非法 JSON 重试；超时降级
     scenarios: [vision_decision, symptom_classify, fix_patch, reflection]
 
-### INF04.1 接口与实现 `⬜`
+### INF04.1 接口与实现 `✅`
 ```python
 class LLMGateway(Protocol):
     async def complete(self, prompt_type: Literal["vision_decision","symptom_classify","fix_patch","reflection"], **kw) -> LLMResponse: ...
 # 实现：openai.AsyncOpenAI(base_url=LLM_BASE_URL)；prompt_type→model 映射（INF02）
 ```
 逻辑：1) 按 prompt_type 选 model 2) 调 chat.completions（vision 带 image_url）3) 解析失败重试 FIX_RETRY_MAX 4) 超限/异常抛 LLMError 供调用方降级。
+
+**实现摘要**：8 AC 全 pass（Sprint Contract agreed）。NewAPILLMGateway + FakeLLMGateway + LLMResponse + LLMError + _PROMPT_TYPE_TO_CHANNEL 路由层。17 单测 + 文本链路真实调用（glm-5.1 返回 "收到"）+ 视觉 skip。全量 117 passed, 1 skipped。evidence: `.dev-flow/R001/evidence/R001-INF04.md`
 
 ---
 

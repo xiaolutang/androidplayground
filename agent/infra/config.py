@@ -18,7 +18,13 @@ from __future__ import annotations
 
 import os
 from dataclasses import dataclass, field
+from pathlib import Path
 from typing import Final
+
+from dotenv import load_dotenv
+
+# 加载 agent/.env（显式指定绝对路径，避免工作目录差异导致找不到文件）
+load_dotenv(Path(__file__).resolve().parent.parent / ".env")
 
 # prompt_type → model 默认路由（D2）
 _DEFAULT_LLM_TEXT_MODEL: Final[str] = "glm-5.1"

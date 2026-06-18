@@ -38,7 +38,7 @@ status: planned
 8. ✅ INF06 git_client.py
 9. ✅ BF005 KB 存储（stores + retriever + staleness）
 10. ✅ BF008 Gap 存储 + 解锁价值评分
-11. ⬜ BF002 复现执行 + ADB 工具层
+11. ✅ BF002 复现执行 + ADB 工具层
 12. ⬜ BF003 视觉决策引擎
 13. ⬜ BF004 信号监听器
 14. ⬜ BF006 Playbook 注册中心 + 崩溃型 Playbook
@@ -367,7 +367,7 @@ git_commit_anchor vs HEAD 差异 → revalidate → 失败标 stale（不删）�
 
 ---
 
-## R001-BF002：复现执行 + ADB 工具层 `⬜ 待处理`
+## R001-BF002：复现执行 + ADB 工具层 `✅ 已完成`
 
 - 文件：`agent/reproduce/{emulator_pool,apk_installer,adb_tools,reproduce_runner,screenshot_collector}.py`
 - 改动类型：新建
@@ -378,7 +378,7 @@ git_commit_anchor vs HEAD 差异 → revalidate → 失败标 stale（不删）�
 - risk_tags: [network]
 - smoke_required: true
 - mode: negotiated
-- status: pending
+- status: completed
 - acceptance_criteria:
   - ADB 工具层（tap/swipe/screenshot/install/press）可执行；复现模式确定性跑脚本；启动失败转设施缺口
 - contract_refs: [backend 5.1 BB003 双模式]
@@ -388,14 +388,16 @@ git_commit_anchor vs HEAD 差异 → revalidate → 失败标 stale（不删）�
     description: BF002 独立模拟器集成（手动 --run-emulator）；超时重试；启动失败→设施缺口
     scenarios: [故障注入表]
 
-### BF002.1 adb_tools（工具层，双模式共用） `⬜`
+### BF002.1 adb_tools（工具层，双模式共用） `✅`
 封装 INF05 为统一工具接口：`tap/swipe/input_text/screenshot/install_apk/press_key`。复现脚本与 agent tool-calling 共用。
 
-### BF002.2 reproduce_runner（复现模式） `⬜`
+### BF002.2 reproduce_runner（复现模式） `✅`
 确定性顺序调 adb_tools 跑 Playbook 复现脚本，采集 ReproStep + 信号。BF003 不参与（或仅关键节点校验截图）。
 
-### BF002.3 emulator_pool / apk_installer / screenshot_collector `⬜`
+### BF002.3 emulator_pool / apk_installer / screenshot_collector `✅`
 模拟器启停/分配；APK 安装；截图采集（喂 BF003）。
+
+**实现摘要**：8 AC 全 pass（Sprint Contract agreed，conditional_pass）。adb_tools 7 函数 thin wrapper；emulator_pool 单模拟器 MVP + best-effort GapStore 降级；apk_installer install/launch/uninstall/version；screenshot_collector data_url+file_url 双模式；reproduce_runner 表驱动 dispatch + 默认 abort + logcat fallback。47 单测 + 2 集成（skipif）。全量 316 passed, 6 skipped, ruff All checks passed。evidence: `.dev-flow/R001/evidence/R001-BF002.md`
 
 ---
 

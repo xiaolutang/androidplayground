@@ -35,7 +35,7 @@ status: planned
 5. ✅ SCH02 边界协议 Schema（ReproStep/Signal/Anchor/DiagnosisReport/ManualFixEntry）
 6. ✅ INF04 LLMGateway（D2）
 7. ✅ INF05 adb_client.py（subprocess + 网络桥）
-8. 🔧 INF06 git_client.py
+8. ✅ INF06 git_client.py
 9. ⬜ BF005 KB 存储（stores + retriever + staleness）
 10. ⬜ BF008 Gap 存储 + 解锁价值评分
 11. ⬜ BF002 复现执行 + ADB 工具层
@@ -282,7 +282,7 @@ class LLMGateway(Protocol):
 
 ---
 
-## R001-INF06：git_client.py `⬜ 待处理`
+## R001-INF06：git_client.py `✅ 已完成`
 
 - 文件：`agent/infra/git_client.py`
 - 改动类型：新建
@@ -292,7 +292,7 @@ class LLMGateway(Protocol):
 - priority: 4
 - smoke_required: true
 - mode: direct
-- status: pending
+- status: completed
 - acceptance_criteria: blame/检索/建分支/commit/push 可执行；push 拒绝不破坏状态
 - decision_refs: []
 - test_tasks:
@@ -300,8 +300,10 @@ class LLMGateway(Protocol):
     description: 本地临时 git 仓库 fixture；blame/grep 返回正确；建分支+commit 成功；push 403（权限拒绝）抛错事件且不破坏仓库状态
     scenarios: [关键业务逻辑表 BB009 push 拒绝, 故障注入表 Git push 拒绝]
 
-### INF06.1 git 操作封装 `⬜`
+### INF06.1 git 操作封装 `✅`
 blame、grep 代码、create_branch、commit、push（BB009 用）。push 403 → 抛错事件，不破坏 BugReport。
+
+**实现摘要**：acceptance_criteria 全 pass。GitClient + BlameLine/GrepMatch + GitPushRejectedError（BB009 契约）。纯 subprocess（不引 GitPython）。24 单测（blame/grep/branch/commit/push + 异常分类 + push 拒绝不破坏状态）。全量 174 passed, 4 skipped。evidence: `.dev-flow/R001/evidence/R001-INF06.md`
 
 ---
 

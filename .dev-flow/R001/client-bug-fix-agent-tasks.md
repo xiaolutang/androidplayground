@@ -29,7 +29,7 @@ status: planned
 > 按层依赖排序。数据结构 → 基础设施服务 → M5存储 → M2复现探测 → M1评估 → M3诊断 → M4修复 → M5成长 → 入口/编排/API → 部署 → 集成测试。
 
 1. ✅ INF01 项目骨架与依赖
-2. ⬜ INF02 config.py（预算/阈值/LLM 参数）
+2. ✅ INF02 config.py（预算/阈值/LLM 参数）
 3. ⬜ INF03 db.py（SQLAlchemy + pgvector）
 4. ⬜ SCH01 核心 Schema（8 + MetricPoint）
 5. ⬜ SCH02 边界协议 Schema（ReproStep/Signal/Anchor/DiagnosisReport/ManualFixEntry）
@@ -101,7 +101,7 @@ status: planned
 
 ---
 
-## R001-INF02：config.py `⬜ 待处理`
+## R001-INF02：config.py `✅ 已完成`
 
 - 文件：`agent/infra/config.py`
 - 改动类型：新建
@@ -119,7 +119,7 @@ status: planned
     description: 各参数默认值与 D7 一致；环境变量覆盖优先级；LLM model 按 prompt_type 路由映射
     scenarios: [D7 预算默认值校验, D2 model 路由映射]
 
-### INF02.1 参数定义 `⬜`
+### INF02.1 参数定义 `✅`
 ```python
 # 步数预算（D7 默认值，待校准）
 SINGLE_HYPOTHESIS_STEP_BUDGET = 5

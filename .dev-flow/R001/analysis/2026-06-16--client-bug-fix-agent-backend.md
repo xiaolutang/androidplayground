@@ -79,7 +79,7 @@ agent/
 │   └── screenshot_collector.py
 ├── vision/                              🟢 BF003 视觉决策引擎
 │   └── vision_decision_engine.py        多模态看截图→决策下一步
-├── signal/                              🟢 BF004 信号监听器
+├── signals/                             🟢 BF004 信号监听器
 │   ├── logcat_listener.py
 │   ├── flutter_error_listener.py
 │   ├── process_listener.py

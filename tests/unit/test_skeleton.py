@@ -29,12 +29,12 @@ EXPECTED_PATHS = [
     # vision
     "vision/__init__.py",
     "vision/vision_decision_engine.py",
-    # signal
-    "signal/__init__.py",
-    "signal/logcat_listener.py",
-    "signal/flutter_error_listener.py",
-    "signal/process_listener.py",
-    "signal/visual_signal_detector.py",
+    # signals（复数，避开 stdlib signal 名冲突）
+    "signals/__init__.py",
+    "signals/logcat_listener.py",
+    "signals/flutter_error_listener.py",
+    "signals/process_listener.py",
+    "signals/visual_signal_detector.py",
     # kb
     "kb/__init__.py",
     "kb/stores/__init__.py",

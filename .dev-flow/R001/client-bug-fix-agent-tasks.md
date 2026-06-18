@@ -31,7 +31,7 @@ status: planned
 1. ✅ INF01 项目骨架与依赖
 2. ✅ INF02 config.py（预算/阈值/LLM 参数）
 3. ✅ INF03 db.py（SQLAlchemy + pgvector）
-4. ⬜ SCH01 核心 Schema（8 + MetricPoint）
+4. ✅ SCH01 核心 Schema（8 + MetricPoint）
 5. ⬜ SCH02 边界协议 Schema（ReproStep/Signal/Anchor/DiagnosisReport/ManualFixEntry）
 6. ⬜ INF04 LLMGateway（D2）
 7. ⬜ INF05 adb_client.py（subprocess + 网络桥）
@@ -167,7 +167,7 @@ ADB_HOST = "host.docker.internal"; ADB_PORT = 5037
 
 ---
 
-## R001-SCH01：核心 Schema（8 + MetricPoint） `⬜ 待处理`
+## R001-SCH01：核心 Schema（8 + MetricPoint） `✅ 已完成`
 
 - 文件：`agent/schemas/{bug_report,playbook,trajectory,confidence,fix_patch,capability_gap,kb_entry,metric_point}.py`
 - 改动类型：新建
@@ -186,13 +186,13 @@ ADB_HOST = "host.docker.internal"; ADB_PORT = 5037
     description: BugReport.status 14 态枚举完整 + 唯一；Hypothesis 4 态 + parent_id 自引用可建树；CapabilityGap.status 7 态；ConfidenceScore 三维字段名；KBEntry.root_cause_signals 为 Vector 类型
     scenarios: [INT02 状态机矩阵依赖, 契约测试表枚举值校验]
 
-### SCH01.1 BugReport + 状态枚举 `⬜`
+### SCH01.1 BugReport + 状态枚举 `✅`
 字段见 backend 4.1（含 14 态 status 唯一枚举、clarify_requested、reflow_count）。`STATUS_ALLOWED_REGRESSION_FEEDBACK = {pr_open,draft_pr,concluded,reflected,reflowed}`（regression-feedback 5 态）。
 
-### SCH01.2 Playbook / Trajectory / Hypothesis `⬜`
+### SCH01.2 Playbook / Trajectory / Hypothesis `✅`
 Playbook（symptom_type/detection_actions/hypothesis_space/passive）；Trajectory（root_hypothesis_id/total_step_budget/kb_reads）；Hypothesis 自引用树（parent_id/status: proposed/verifying/confirmed/refuted/overturning_*）。refuted 永久保留（INV-2）。
 
-### SCH01.3 ConfidenceScore / FixPatch / CapabilityGap / KBEntry / MetricPoint `⬜`
+### SCH01.3 ConfidenceScore / FixPatch / CapabilityGap / KBEntry / MetricPoint `✅`
 按 backend 4.1 完整字段。KBEntry.root_cause_signals = Vector(dim)；validity_status=valid/stale/conflicting（D9）。MetricPoint 五维 metric_type + bucket_dim（5.5）。
 
 ---

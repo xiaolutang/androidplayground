@@ -39,7 +39,7 @@ status: planned
 9. ✅ BF005 KB 存储（stores + retriever + staleness）
 10. ✅ BF008 Gap 存储 + 解锁价值评分
 11. ✅ BF002 复现执行 + ADB 工具层
-12. ⬜ BF003 视觉决策引擎
+12. ✅ BF003 视觉决策引擎
 13. ⬜ BF004 信号监听器
 14. ⬜ BF006 Playbook 注册中心 + 崩溃型 Playbook
 15. ✅ BF007 锚点库（D11 能力先建，数据冷启动空）
@@ -401,7 +401,7 @@ git_commit_anchor vs HEAD 差异 → revalidate → 失败标 stale（不删）�
 
 ---
 
-## R001-BF003：视觉决策引擎 `⬜ 待处理`
+## R001-BF003：视觉决策引擎 `✅ 已完成`
 
 - 文件：`agent/vision/vision_decision_engine.py`
 - 改动类型：新建
@@ -412,7 +412,7 @@ git_commit_anchor vs HEAD 差异 → revalidate → 失败标 stale（不删）�
 - risk_tags: [network]
 - smoke_required: true
 - mode: negotiated
-- status: pending
+- status: completed
 - acceptance_criteria:
   - 看截图→决策下一个 ADB tool_call；LLM 失败降级不崩；D11 锚点空时纯 LLM 判断
 - contract_refs: [backend 5.1 双模式②探测/诱发]
@@ -422,8 +422,10 @@ git_commit_anchor vs HEAD 差异 → revalidate → 失败标 stale（不删）�
     description: LLM mock；prompt_type=vision_decision 分发；降级；响应解析失败重试
     scenarios: [故障注入表, 视觉决策 golden set]
 
-### BF003.1 决策接口 `⬜`
+### BF003.1 决策接口 `✅`
 输入截图（+ 可选锚点对照）→ 输出下一个 tool_call（tap/swipe/...）+ 置信度。调 LLMGateway(vision_decision→GLM-5V-Turbo)。锚点库（BF007）为空时纯 LLM（D11 降级）。
+
+**实现摘要**：8 AC 全 pass（Sprint Contract agreed）。VisionDecision dataclass + VisionDecisionEngine（decide async + 锚点对照双模式 + LLM 失败 fallback + 7 action 白名单 + 置信度加权融合）。23 单测 + 2 集成（skipif）。全量 356 passed, 8 skipped, ruff All checks passed。evidence: `.dev-flow/R001/evidence/R001-BF003.md`
 
 ---
 

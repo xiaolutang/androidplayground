@@ -43,7 +43,7 @@ status: planned
 13. ✅ BF004 信号监听器
 14. ✅ BF006 Playbook 注册中心 + 崩溃型 Playbook
 15. ✅ BF007 锚点库（D11 能力先建，数据冷启动空）
-16. ⬜ BF001 Bug 上报接入适配器（D8 Sentry 第一适配器）
+16. ✅ BF001 Bug 上报接入适配器（D8 Sentry 第一适配器）
 17. ⬜ BB001 信息完备度评估（ISM）
 18. ⬜ BB002 症状分类
 19. ⬜ BB006 修复置信度评估

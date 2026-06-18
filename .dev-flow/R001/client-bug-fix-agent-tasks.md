@@ -32,7 +32,7 @@ status: planned
 2. ✅ INF02 config.py（预算/阈值/LLM 参数）
 3. ✅ INF03 db.py（SQLAlchemy + pgvector）
 4. ✅ SCH01 核心 Schema（8 + MetricPoint）
-5. ⬜ SCH02 边界协议 Schema（ReproStep/Signal/Anchor/DiagnosisReport/ManualFixEntry）
+5. ✅ SCH02 边界协议 Schema（ReproStep/Signal/Anchor/DiagnosisReport/ManualFixEntry）
 6. ⬜ INF04 LLMGateway（D2）
 7. ⬜ INF05 adb_client.py（subprocess + 网络桥）
 8. ⬜ INF06 git_client.py
@@ -197,7 +197,7 @@ Playbook（symptom_type/detection_actions/hypothesis_space/passive）；Trajecto
 
 ---
 
-## R001-SCH02：边界协议 Schema `⬜ 待处理`
+## R001-SCH02：边界协议 Schema `✅ 已完成`
 
 - 文件：`agent/schemas/{repro_step,signal,anchor,diagnosis_report,manual_fix_entry}.py`
 - 改动类型：新建
@@ -218,7 +218,7 @@ Playbook（symptom_type/detection_actions/hypothesis_space/passive）；Trajecto
     description: 五个边界 Schema 字段完整性 + 类型断言；Anchor.visual_features 向量类型；ManualFixEntry.trigger_conditions 结构（pattern 检索用）
     scenarios: [契约测试表边界 Schema, BB015 写 pattern 契约依赖]
 
-### SCH02.1 五个边界 Schema `⬜`
+### SCH02.1 五个边界 Schema `✅`
 ReproStep（BF002 产出/BB008 回归复用）；Signal（四类 signal_type）；Anchor（visual_features Vector）；DiagnosisReport（JSON+markdown）；ManualFixEntry（BB015→KB pattern）。
 
 ---

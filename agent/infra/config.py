@@ -53,6 +53,10 @@ _ENV_ADB_BIN = "ADB_BIN"
 _ENV_ADB_ACTION_TIMEOUT = "ADB_ACTION_TIMEOUT"
 _ENV_ADB_RETRY_MAX = "ADB_RETRY_MAX"
 
+_ENV_EMULATOR_BOOT_TIMEOUT = "EMULATOR_BOOT_TIMEOUT"
+_ENV_EMULATOR_BIN = "EMULATOR_BIN"
+_ENV_SCREENSHOT_FORMAT = "SCREENSHOT_FORMAT"
+
 
 def _get_int(env_key: str, default: int) -> int:
     """读取环境变量为 int，失败回退 default（容忍空白与非法值）。"""
@@ -120,6 +124,14 @@ class Settings:
     # ADB 重试上限（连接错不重试，命令错/超时重试）
     ADB_RETRY_MAX: int = 2
 
+    # ---- Emulator（BF002）----
+    # emulator boot 完成超时（秒），env 可覆盖
+    EMULATOR_BOOT_TIMEOUT: int = 120
+    # emulator 二进制路径（空表示走解析：env → SDK 固定路径 → which）
+    EMULATOR_BIN: str = ""
+    # 截图产出格式（data_url / file_url），控制 screenshot_collector 产出形态
+    SCREENSHOT_FORMAT: str = "data_url"
+
     # ---- DB（D4 同库 PG+pgvector）----
     DATABASE_URL: str = "postgresql+psycopg://localhost:5432/bugfix_agent"
 
@@ -156,6 +168,10 @@ def get_settings() -> Settings:
         ADB_BIN=_get_str(_ENV_ADB_BIN, ""),
         ADB_ACTION_TIMEOUT=_get_int(_ENV_ADB_ACTION_TIMEOUT, 10),
         ADB_RETRY_MAX=_get_int(_ENV_ADB_RETRY_MAX, 2),
+        # Emulator
+        EMULATOR_BOOT_TIMEOUT=_get_int(_ENV_EMULATOR_BOOT_TIMEOUT, 120),
+        EMULATOR_BIN=_get_str(_ENV_EMULATOR_BIN, ""),
+        SCREENSHOT_FORMAT=_get_str(_ENV_SCREENSHOT_FORMAT, "data_url"),
         # DB
         DATABASE_URL=_get_str(
             _ENV_DATABASE_URL,
@@ -217,6 +233,10 @@ ADB_BIN: str = settings.ADB_BIN
 ADB_ACTION_TIMEOUT: int = settings.ADB_ACTION_TIMEOUT
 ADB_RETRY_MAX: int = settings.ADB_RETRY_MAX
 
+EMULATOR_BOOT_TIMEOUT: int = settings.EMULATOR_BOOT_TIMEOUT
+EMULATOR_BIN: str = settings.EMULATOR_BIN
+SCREENSHOT_FORMAT: str = settings.SCREENSHOT_FORMAT
+
 DATABASE_URL: str = settings.DATABASE_URL
 
 
@@ -243,5 +263,8 @@ __all__ = [
     "ADB_BIN",
     "ADB_ACTION_TIMEOUT",
     "ADB_RETRY_MAX",
+    "EMULATOR_BOOT_TIMEOUT",
+    "EMULATOR_BIN",
+    "SCREENSHOT_FORMAT",
     "DATABASE_URL",
 ]

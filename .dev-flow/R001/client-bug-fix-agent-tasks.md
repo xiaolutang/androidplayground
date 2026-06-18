@@ -429,21 +429,22 @@ git_commit_anchor vs HEAD 差异 → revalidate → 失败标 stale（不删）�
 
 ---
 
-## R001-BF004：信号监听器 `⬜ 待处理`
+## R001-BF004：信号监听器 `✅ 已完成`
 
-- 文件：`agent/signal/{logcat_listener,flutter_error_listener,process_listener,visual_signal_detector}.py`
+- 文件：`agent/signals/{logcat_listener,flutter_error_listener,process_listener,visual_signal_detector,router}.py`
 - 改动类型：新建
 - domain: backend
 - task_layer: foundation
 - depends_on: [INF05, SCH02]
 - priority: 4
 - mode: direct
-- status: pending
+- status: done
 - acceptance_criteria: 四类信号（logcat/flutter_error/process/visual）解析 + 路由给 BB003/BB004
 - test_tasks:
   - type: unit
     description: 四类信号 fixture 解析；路由正确
     scenarios: [关键业务逻辑表 BB004 消费侧]
+- **实现摘要**：6 AC 全 pass（Mode 2 direct 验收）。四类信号监听器（logcat/flutter_error/process/visual）+ SignalRouter 路由。19 单测全 pass，全量 375 passed / 8 skipped，ruff All checks passed。evidence: `.dev-flow/R001/evidence/R001-BF004.md`
 
 ### BF004.1 四类 listener `⬜`
 logcat/Flutter error（channel）/进程（崩溃/ANR）/视觉（白屏/Loading，配合 BF003+BF007）。产 Signal 喂 BB003。

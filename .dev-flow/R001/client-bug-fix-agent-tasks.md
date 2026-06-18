@@ -34,8 +34,8 @@ status: planned
 4. ✅ SCH01 核心 Schema（8 + MetricPoint）
 5. ✅ SCH02 边界协议 Schema（ReproStep/Signal/Anchor/DiagnosisReport/ManualFixEntry）
 6. ✅ INF04 LLMGateway（D2）
-7. 🔧 INF05 adb_client.py（subprocess + 网络桥）
-8. ⬜ INF06 git_client.py
+7. ✅ INF05 adb_client.py（subprocess + 网络桥）
+8. 🔧 INF06 git_client.py
 9. ⬜ BF005 KB 存储（stores + retriever + staleness）
 10. ⬜ BF008 Gap 存储 + 解锁价值评分
 11. ⬜ BF002 复现执行 + ADB 工具层
@@ -255,7 +255,7 @@ class LLMGateway(Protocol):
 
 ---
 
-## R001-INF05：adb_client.py `⬜ 待处理`
+## R001-INF05：adb_client.py `✅ 已完成`
 
 - 文件：`agent/infra/adb_client.py`
 - 改动类型：新建
@@ -266,7 +266,7 @@ class LLMGateway(Protocol):
 - risk_tags: [network]
 - smoke_required: true
 - mode: negotiated
-- status: pending
+- status: completed
 - acceptance_criteria:
   - 经 `adb -H host.docker.internal -P 5037` 连宿主 adb server；tap/swipe/screenshot/install 可执行
 - decision_refs: [D3, D10]
@@ -275,8 +275,10 @@ class LLMGateway(Protocol):
     description: 宿主起 adb server + 模拟器后，adb_client 六个动作（tap/swipe/input_text/screenshot/install_apk/press_key）可执行；动作超时触发重试；连不上 adb server 抛错不崩
     scenarios: [D10 adb 网络桥验证, BF002 独立集成依赖, 故障注入表 ADB 动作超时]
 
-### INF05.1 subprocess adb 封装 `⬜`
+### INF05.1 subprocess adb 封装 `✅`
 封装 `subprocess` 调 adb（网络桥参数）；暴露 `tap/swipe/input_text/screenshot/install_apk/press_key`，超时重试。BF002 工具层（BF002）复用此底座。
+
+**实现摘要**：8 AC 全 pass（Sprint Contract agreed）。ADBClient + 三段式二进制解析 + 本地/网络桥自适应 + 6 动作 + 4 异常子类 + 连接错不重试。33 单测 + 3 集成 skip（无设备）。全量 150 passed, 4 skipped。evidence: `.dev-flow/R001/evidence/R001-INF05.md`
 
 ---
 

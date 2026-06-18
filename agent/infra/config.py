@@ -49,6 +49,9 @@ _ENV_KB_COLD_START_N = "KB_COLD_START_N"
 
 _ENV_ADB_HOST = "ADB_HOST"
 _ENV_ADB_PORT = "ADB_PORT"
+_ENV_ADB_BIN = "ADB_BIN"
+_ENV_ADB_ACTION_TIMEOUT = "ADB_ACTION_TIMEOUT"
+_ENV_ADB_RETRY_MAX = "ADB_RETRY_MAX"
 
 
 def _get_int(env_key: str, default: int) -> int:
@@ -107,8 +110,15 @@ class Settings:
     KB_COLD_START_N: int = 10
 
     # ---- ADB 网络桥（D10）----
-    ADB_HOST: str = "host.docker.internal"
+    # ADB_HOST="" 表示本地直跑（不加 -H/-P）；非空走网络桥（容器经 host.docker.internal）
+    ADB_HOST: str = ""
     ADB_PORT: int = 5037
+    # ADB 二进制路径（空表示走三段式解析：env → which → 平台固定路径）
+    ADB_BIN: str = ""
+    # ADB 动作默认超时（秒），env 可覆盖
+    ADB_ACTION_TIMEOUT: int = 10
+    # ADB 重试上限（连接错不重试，命令错/超时重试）
+    ADB_RETRY_MAX: int = 2
 
     # ---- DB（D4 同库 PG+pgvector）----
     DATABASE_URL: str = "postgresql+psycopg://localhost:5432/bugfix_agent"
@@ -141,8 +151,11 @@ def get_settings() -> Settings:
         KB_STALE_DEMOTE=_get_float(_ENV_KB_STALE_DEMOTE, 0.5),
         KB_COLD_START_N=_get_int(_ENV_KB_COLD_START_N, 10),
         # ADB
-        ADB_HOST=_get_str(_ENV_ADB_HOST, "host.docker.internal"),
+        ADB_HOST=_get_str(_ENV_ADB_HOST, ""),
         ADB_PORT=_get_int(_ENV_ADB_PORT, 5037),
+        ADB_BIN=_get_str(_ENV_ADB_BIN, ""),
+        ADB_ACTION_TIMEOUT=_get_int(_ENV_ADB_ACTION_TIMEOUT, 10),
+        ADB_RETRY_MAX=_get_int(_ENV_ADB_RETRY_MAX, 2),
         # DB
         DATABASE_URL=_get_str(
             _ENV_DATABASE_URL,
@@ -200,6 +213,9 @@ KB_COLD_START_N: int = settings.KB_COLD_START_N
 
 ADB_HOST: str = settings.ADB_HOST
 ADB_PORT: int = settings.ADB_PORT
+ADB_BIN: str = settings.ADB_BIN
+ADB_ACTION_TIMEOUT: int = settings.ADB_ACTION_TIMEOUT
+ADB_RETRY_MAX: int = settings.ADB_RETRY_MAX
 
 DATABASE_URL: str = settings.DATABASE_URL
 
@@ -224,5 +240,8 @@ __all__ = [
     "KB_COLD_START_N",
     "ADB_HOST",
     "ADB_PORT",
+    "ADB_BIN",
+    "ADB_ACTION_TIMEOUT",
+    "ADB_RETRY_MAX",
     "DATABASE_URL",
 ]

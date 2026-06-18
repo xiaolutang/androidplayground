@@ -34,6 +34,9 @@ def test_defaults_match_skeleton(monkeypatch):
         "KB_COLD_START_N",
         "ADB_HOST",
         "ADB_PORT",
+        "ADB_BIN",
+        "ADB_ACTION_TIMEOUT",
+        "ADB_RETRY_MAX",
     ]
     for k in env_keys:
         monkeypatch.delenv(k, raising=False)
@@ -58,9 +61,13 @@ def test_defaults_match_skeleton(monkeypatch):
     assert s.KB_STALE_DEMOTE == 0.5
     assert s.KB_COLD_START_N == 10
 
-    # ADB 网络桥（D10）
-    assert s.ADB_HOST == "host.docker.internal"
+    # ADB 网络桥（D10）：默认空串=本地直跑，容器跑通过 env 注入 host.docker.internal
+    assert s.ADB_HOST == ""
     assert s.ADB_PORT == 5037
+    # ADB INF05 新增字段
+    assert s.ADB_BIN == ""
+    assert s.ADB_ACTION_TIMEOUT == 10
+    assert s.ADB_RETRY_MAX == 2
 
     # DB（D4）
     assert s.DATABASE_URL == "postgresql+psycopg://localhost:5432/bugfix_agent"

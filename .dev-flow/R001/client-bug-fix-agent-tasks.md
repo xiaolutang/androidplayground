@@ -30,7 +30,7 @@ status: planned
 
 1. ✅ INF01 项目骨架与依赖
 2. ✅ INF02 config.py（预算/阈值/LLM 参数）
-3. ⬜ INF03 db.py（SQLAlchemy + pgvector）
+3. ✅ INF03 db.py（SQLAlchemy + pgvector）
 4. ⬜ SCH01 核心 Schema（8 + MetricPoint）
 5. ⬜ SCH02 边界协议 Schema（ReproStep/Signal/Anchor/DiagnosisReport/ManualFixEntry）
 6. ⬜ INF04 LLMGateway（D2）
@@ -142,7 +142,7 @@ ADB_HOST = "host.docker.internal"; ADB_PORT = 5037
 
 ---
 
-## R001-INF03：db.py `⬜ 待处理`
+## R001-INF03：db.py `✅ 已完成`
 
 - 文件：`agent/infra/db.py`
 - 改动类型：新建

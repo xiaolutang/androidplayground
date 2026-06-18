@@ -1,0 +1,50 @@
+[build-system]
+requires = ["setuptools>=80", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "client-bug-fix-agent"
+version = "0.1.0"
+description = "Client bug fix agent backend (LangGraph + FastAPI)."
+requires-python = ">=3.11"
+license = { text = "MIT" }
+authors = [{ name = "androidplayground" }]
+
+# 版本号均经 `pip index versions <pkg> -i https://pypi.tuna.tsinghua.edu.cn/simple` 确认为当前最新稳定版
+dependencies = [
+    # 核心编排（D1）
+    "langgraph==1.2.5",
+    # API 层
+    "fastapi==0.137.2",
+    "uvicorn==0.49.0",
+    # 数据层（同库 D4，pgvector 既为 Python 客户端包亦对应 PG 扩展）
+    "sqlalchemy==2.0.51",
+    "pgvector==0.4.2",
+    "psycopg[binary]==3.3.4",
+    # LLM（OpenAI 兼容协议对接 New API 网关）
+    "openai==2.43.0",
+    # ADB 工具层
+    "adbutils==2.12.0",
+    # 通用
+    "pydantic==2.13.4",
+    "httpx==0.28.1",
+]
+
+[project.optional-dependencies]
+test = [
+    "pytest==9.1.0",
+    "testcontainers[postgres]==4.14.2",
+]
+
+[tool.setuptools]
+# pyproject.toml 位于 agent/ 目录内；告诉 setuptools 包 "agent" 的源码在上一级目录下的 agent/
+package-dir = { "" = ".." }
+
+[tool.setuptools.packages.find]
+# 从 pyproject.toml 的上一级（仓库根）发现 agent 包
+where = [".."]
+include = ["agent*"]
+
+[tool.pytest.ini_options]
+testpaths = ["../tests"]
+pythonpath = [".."]

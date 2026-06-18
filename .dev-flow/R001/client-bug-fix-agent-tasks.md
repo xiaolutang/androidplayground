@@ -36,7 +36,7 @@ status: planned
 6. ✅ INF04 LLMGateway（D2）
 7. ✅ INF05 adb_client.py（subprocess + 网络桥）
 8. ✅ INF06 git_client.py
-9. ⬜ BF005 KB 存储（stores + retriever + staleness）
+9. ✅ BF005 KB 存储（stores + retriever + staleness）
 10. ⬜ BF008 Gap 存储 + 解锁价值评分
 11. ⬜ BF002 复现执行 + ADB 工具层
 12. ⬜ BF003 视觉决策引擎
@@ -307,7 +307,7 @@ blame、grep 代码、create_branch、commit、push（BB009 用）。push 403 �
 
 ---
 
-## R001-BF005：KB 存储（三层 + 检索 + 陈旧） `⬜ 待处理`
+## R001-BF005：KB 存储（三层 + 检索 + 陈旧） `✅ 已完成`
 
 - 文件：`agent/kb/stores/{trajectory_store,negative_knowledge_store,pattern_store}.py`、`agent/kb/retriever.py`、`agent/kb/staleness_checker.py`
 - 改动类型：新建
@@ -316,7 +316,7 @@ blame、grep 代码、create_branch、commit、push（BB009 用）。push 403 �
 - depends_on: [SCH01, INF03]
 - priority: 5
 - mode: negotiated
-- status: pending
+- status: completed
 - acceptance_criteria:
   - 三层检索（symptom_type 预过滤 + pgvector 排序）；stale 降权×0.5 不删；conflicting 成组返回；冷启动 top_k<0.5 → degraded=true
   - **权限**：pattern 层仅允许 BB015 写入，其他模块写应被拒绝（INV-3/AP-3）
@@ -327,17 +327,19 @@ blame、grep 代码、create_branch、commit、push（BB009 用）。push 403 �
     description: 真实 PG+pgvector 三层检索；stale/conflicting 过滤；冷启动降级；非 BB015 写 pattern 拒绝
     scenarios: [test 关键业务逻辑表 KBRetriever, 负向知识反查]
 
-### BF005.1 stores 三层 `⬜`
+### BF005.1 stores 三层 `✅`
 各层 CRUD；pattern_store 写入做调用方校验（仅 ManualFixRecorder）。
 
-### BF005.2 KBRetriever（5.3 算法） `⬜`
+### BF005.2 KBRetriever（5.3 算法） `✅`
 两阶段：预过滤（symptom_type+layer）→ pgvector 排序。stale×0.5；conflicting 成组（附 conflicting_entry_ids）；git_anchor 差异大 → 标 stale。输出 `List<{entry,similarity,validity_status,conflicting_with?}>` + `degraded:bool`。
 
-### BF005.3 StalenessChecker `⬜`
+### BF005.3 StalenessChecker `✅`
 git_commit_anchor vs HEAD 差异 → revalidate → 失败标 stale（不删）。
 
-### BF005.4 负向知识反查（BB004 用） `⬜`
+### BF005.4 负向知识反查（BB004 用） `✅`
 输入候选假设 → 检索 negative_knowledge → 相似度 >0.85 剪枝 / 0.6-0.85 降权×0.3 / <0.6 不影响。
+
+**实现摘要**：9 AC 全 pass（Sprint Contract agreed）。三层 store + KBRetriever 两阶段 + StalenessChecker 注入式 + negate_hypotheses 三档。权限校验（KBPermissionError 不继承 PermissionError）。32 单测 + 31 集成（真实 pgvector）。全量 237 passed, 4 skipped, ruff All checks passed。evidence: `.dev-flow/R001/evidence/R001-BF005.md`
 
 ---
 

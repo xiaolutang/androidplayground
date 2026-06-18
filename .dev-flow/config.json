@@ -1,0 +1,9 @@
+{
+  "active_rc": "R001",
+  "design_diagram_colors": {
+    "NEW": "#4CAF50",
+    "MODIFIED": "#2196F3",
+    "UNCHANGED": "#9E9E9E",
+    "DELETED": "#F44336"
+  }
+}

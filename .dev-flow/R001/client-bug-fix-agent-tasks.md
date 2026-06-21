@@ -843,7 +843,7 @@ Anchor CRUD + 按 page_id 检索 + visual_features 向量比对。数据空，�
 
 ---
 
-## R001-ORB01：Orchestrator（LangGraph 状态机） `⬜ 待处理`
+## R001-ORB01：Orchestrator（LangGraph 状态机） `✅ 已完成`
 
 - 文件：`agent/orchestrator.py`
 - 改动类型：新建

@@ -686,7 +686,7 @@ Anchor CRUD + 按 page_id 检索 + visual_features 向量比对。数据空，�
 
 ---
 
-## R001-BB007：自动修复器 `🔧 进行中`
+## R001-BB007：自动修复器 `✅ 已完成`
 
 - 文件：`agent/fix/auto_fixer.py`
 - 改动类型：新建
@@ -712,7 +712,7 @@ Anchor CRUD + 按 page_id 检索 + visual_features 向量比对。数据空，�
 
 ---
 
-## R001-BB008：回归验证器（三关 + Tier 分级） `🔧 进行中`
+## R001-BB008：回归验证器（三关 + Tier 分级） `✅ 已完成`
 
 - 文件：`agent/fix/regression_verifier.py`
 - 改动类型：新建
@@ -778,7 +778,7 @@ Anchor CRUD + 按 page_id 检索 + visual_features 向量比对。数据空，�
 
 ---
 
-## R001-BB011：回流管理 `🔧 进行中`
+## R001-BB011：回流管理 `✅ 已完成`
 
 - 文件：`agent/gap_mgmt/reflow_manager.py`
 - 改动类型：新建
@@ -801,7 +801,7 @@ Anchor CRUD + 按 page_id 检索 + visual_features 向量比对。数据空，�
 
 ---
 
-## R001-BB013：反思 agent `🔧 进行中`
+## R001-BB013：反思 agent `✅ 已完成`
 
 - 文件：`agent/reflection/reflection_agent.py`
 - 改动类型：新建
@@ -822,7 +822,7 @@ Anchor CRUD + 按 page_id 检索 + visual_features 向量比对。数据空，�
 
 ---
 
-## R001-BB015：人工修复录入器 `🔧 进行中`
+## R001-BB015：人工修复录入器 `✅ 已完成`
 
 - 文件：`agent/gap_mgmt/manual_fix_recorder.py`
 - 改动类型：新建

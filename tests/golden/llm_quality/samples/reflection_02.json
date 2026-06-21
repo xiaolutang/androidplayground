@@ -1,0 +1,13 @@
+{
+  "sample_id": "reflection_02",
+  "prompt_type": "reflection",
+  "bug_report_summary": "Reflection on timeout: fix patch took too long, LLM produced oversized diff.",
+  "root_cause_location": "app/src/main/java/com/example/MyAdapter.java:78",
+  "symptom_type": "crash",
+  "expected_schema": {
+    "negative_knowledge": "str (lesson learned)",
+    "root_cause": "str (root cause analysis)"
+  },
+  "expected_key_fields": ["negative_knowledge", "root_cause"],
+  "ground_truth_patch_keywords": ["timeout", "token_limit", "diff"]
+}

@@ -1,0 +1,13 @@
+{
+  "sample_id": "reflection_05",
+  "prompt_type": "reflection",
+  "bug_report_summary": "Reflection on compile error: patch introduced syntax error in generated code.",
+  "root_cause_location": "app/src/main/java/com/example/MyViewModel.java:22",
+  "symptom_type": "crash",
+  "expected_schema": {
+    "negative_knowledge": "str (lesson learned)",
+    "root_cause": "str (root cause analysis)"
+  },
+  "expected_key_fields": ["negative_knowledge", "root_cause"],
+  "ground_truth_patch_keywords": ["compile", "syntax", "generated"]
+}

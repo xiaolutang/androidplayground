@@ -1,0 +1,13 @@
+{
+  "sample_id": "reflection_01",
+  "prompt_type": "reflection",
+  "bug_report_summary": "Reflection on failed fix attempt: patch caused regression in another test.",
+  "root_cause_location": "app/src/main/java/com/example/MainActivity.java:142",
+  "symptom_type": "crash",
+  "expected_schema": {
+    "negative_knowledge": "str (lesson learned)",
+    "root_cause": "str (root cause analysis)"
+  },
+  "expected_key_fields": ["negative_knowledge", "root_cause"],
+  "ground_truth_patch_keywords": ["regression", "side_effect", "test"]
+}

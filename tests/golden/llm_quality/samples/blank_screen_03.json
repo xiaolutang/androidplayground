@@ -1,0 +1,14 @@
+{
+  "sample_id": "blank_screen_03",
+  "prompt_type": "fix_patch",
+  "bug_report_summary": "Blank screen in Fragment: onCreateView returns null instead of inflated view.",
+  "root_cause_location": "app/src/main/java/com/example/BlankFragment.java:42",
+  "symptom_type": "blank_screen",
+  "expected_schema": {
+    "patch_content": "str (unified diff)",
+    "files_changed": "list[str]",
+    "strategy": "str"
+  },
+  "expected_key_fields": ["patch_content", "files_changed"],
+  "ground_truth_patch_keywords": ["onCreateView", "inflate", "null"]
+}

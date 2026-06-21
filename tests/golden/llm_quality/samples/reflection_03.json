@@ -1,0 +1,13 @@
+{
+  "sample_id": "reflection_03",
+  "prompt_type": "reflection",
+  "bug_report_summary": "Reflection on wrong fix: LLM addressed symptom not root cause.",
+  "root_cause_location": "app/src/main/java/com/example/MyFragment.java:55",
+  "symptom_type": "crash",
+  "expected_schema": {
+    "negative_knowledge": "str (lesson learned)",
+    "root_cause": "str (root cause analysis)"
+  },
+  "expected_key_fields": ["negative_knowledge", "root_cause"],
+  "ground_truth_patch_keywords": ["symptom", "root_cause", "analysis"]
+}

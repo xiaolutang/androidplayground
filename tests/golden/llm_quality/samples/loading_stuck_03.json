@@ -1,0 +1,14 @@
+{
+  "sample_id": "loading_stuck_03",
+  "prompt_type": "fix_patch",
+  "bug_report_summary": "Splash screen stuck: handler.postDelayed with wrong delay unit (seconds vs ms).",
+  "root_cause_location": "app/src/main/java/com/example/SplashActivity.java:25",
+  "symptom_type": "loading_stuck",
+  "expected_schema": {
+    "patch_content": "str (unified diff)",
+    "files_changed": "list[str]",
+    "strategy": "str"
+  },
+  "expected_key_fields": ["patch_content", "files_changed"],
+  "ground_truth_patch_keywords": ["postDelayed", "delay", "Handler"]
+}

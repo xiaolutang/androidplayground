@@ -1,0 +1,14 @@
+{
+  "sample_id": "crash_npe_03",
+  "prompt_type": "fix_patch",
+  "bug_report_summary": "NullPointerException when accessing context.getString() in Fragment after detach.",
+  "root_cause_location": "app/src/main/java/com/example/MyFragment.java:55",
+  "symptom_type": "crash",
+  "expected_schema": {
+    "patch_content": "str (unified diff)",
+    "files_changed": "list[str]",
+    "strategy": "str"
+  },
+  "expected_key_fields": ["patch_content", "files_changed"],
+  "ground_truth_patch_keywords": ["context", "isDetached", "getString"]
+}

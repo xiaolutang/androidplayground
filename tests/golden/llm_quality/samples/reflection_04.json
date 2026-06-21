@@ -1,0 +1,13 @@
+{
+  "sample_id": "reflection_04",
+  "prompt_type": "reflection",
+  "bug_report_summary": "Reflection on empty diff: LLM returned empty patch_content for complex multi-file bug.",
+  "root_cause_location": "app/src/main/java/com/example/MyReceiver.java:30",
+  "symptom_type": "crash",
+  "expected_schema": {
+    "negative_knowledge": "str (lesson learned)",
+    "root_cause": "str (root cause analysis)"
+  },
+  "expected_key_fields": ["negative_knowledge", "root_cause"],
+  "ground_truth_patch_keywords": ["empty", "multi-file", "complex"]
+}

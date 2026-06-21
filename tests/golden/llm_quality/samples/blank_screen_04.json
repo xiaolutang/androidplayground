@@ -1,0 +1,14 @@
+{
+  "sample_id": "blank_screen_04",
+  "prompt_type": "fix_patch",
+  "bug_report_summary": "Empty RecyclerView displayed: adapter set before data load completes.",
+  "root_cause_location": "app/src/main/java/com/example/ListActivity.java:60",
+  "symptom_type": "blank_screen",
+  "expected_schema": {
+    "patch_content": "str (unified diff)",
+    "files_changed": "list[str]",
+    "strategy": "str"
+  },
+  "expected_key_fields": ["patch_content", "files_changed"],
+  "ground_truth_patch_keywords": ["adapter", "notifyDataSetChanged", "data"]
+}

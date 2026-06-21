@@ -1,0 +1,14 @@
+{
+  "sample_id": "crash_npe_01",
+  "prompt_type": "fix_patch",
+  "bug_report_summary": "NullPointerException in MainActivity.onResume() when user_data is null after logout.",
+  "root_cause_location": "app/src/main/java/com/example/MainActivity.java:142",
+  "symptom_type": "crash",
+  "expected_schema": {
+    "patch_content": "str (unified diff)",
+    "files_changed": "list[str]",
+    "strategy": "str"
+  },
+  "expected_key_fields": ["patch_content", "files_changed"],
+  "ground_truth_patch_keywords": ["user_data", "null", "onResume"]
+}

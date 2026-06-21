@@ -451,7 +451,7 @@ logcat/Flutter error（channel）/进程（崩溃/ANR）/视觉（白屏/Loading
 
 ---
 
-## R001-BF006：Playbook 注册中心 + 崩溃型 Playbook `⬜ 待处理`
+## R001-BF006：Playbook 注册中心 + 崩溃型 Playbook `✅ 已完成`
 
 - 文件：`agent/playbook/{registry,schema}.py`、`agent/playbook/definitions/crash_playbook.py`
 - 改动类型：新建
@@ -500,7 +500,7 @@ Anchor CRUD + 按 page_id 检索 + visual_features 向量比对。数据空，�
 
 ---
 
-## R001-BF001：Bug 上报接入适配器 `⬜ 待处理`
+## R001-BF001：Bug 上报接入适配器 `✅ 已完成`
 
 - 文件：`agent/intake/bug_report_adapter.py`、`agent/intake/adapters/sentry_adapter.py`、`agent/intake/adapters/bugly_adapter.py`（占位）
 - 改动类型：新建
@@ -524,7 +524,7 @@ Anchor CRUD + 按 page_id 检索 + visual_features 向量比对。数据空，�
 
 ---
 
-## R001-BB001：信息完备度评估（ISM） `⬜ 待处理`
+## R001-BB001：信息完备度评估（ISM） `✅ 已完成`
 
 - 文件：`agent/assessment/info_sufficiency_evaluator.py`
 - 改动类型：新建
@@ -547,7 +547,7 @@ Anchor CRUD + 按 page_id 检索 + visual_features 向量比对。数据空，�
 
 ---
 
-## R001-BB002：症状分类 `⬜ 待处理`
+## R001-BB002：症状分类 `✅ 已完成`
 
 - 文件：`agent/assessment/symptom_classifier.py`
 - 改动类型：新建
@@ -568,7 +568,7 @@ Anchor CRUD + 按 page_id 检索 + visual_features 向量比对。数据空，�
 
 ---
 
-## R001-BB006：修复置信度评估 `⬜ 待处理`
+## R001-BB006：修复置信度评估 `✅ 已完成`
 
 - 文件：`agent/assessment/confidence_evaluator.py`
 - 改动类型：新建
@@ -591,7 +591,7 @@ Anchor CRUD + 按 page_id 检索 + visual_features 向量比对。数据空，�
 
 ---
 
-## R001-BB003：Playbook 执行器（双模式） `⬜ 待处理`
+## R001-BB003：Playbook 执行器（双模式） `✅ 已完成`
 
 - 文件：`agent/diagnosis/playbook_executor.py`
 - 改动类型：新建
@@ -619,7 +619,7 @@ Anchor CRUD + 按 page_id 检索 + visual_features 向量比对。数据空，�
 
 ---
 
-## R001-BB004：假设树引擎 `⬜ 待处理`
+## R001-BB004：假设树引擎 `✅ 已完成`
 
 - 文件：`agent/diagnosis/hypothesis_engine.py`
 - 改动类型：新建
@@ -644,7 +644,7 @@ Anchor CRUD + 按 page_id 检索 + visual_features 向量比对。数据空，�
 
 ---
 
-## R001-BB005：根因定位 `⬜ 待处理`
+## R001-BB005：根因定位 `✅ 已完成`
 
 - 文件：`agent/diagnosis/root_cause_locator.py`
 - 改动类型：新建
@@ -665,7 +665,7 @@ Anchor CRUD + 按 page_id 检索 + visual_features 向量比对。数据空，�
 
 ---
 
-## R001-BB012：诊断报告生成器 `⬜ 待处理`
+## R001-BB012：诊断报告生成器 `✅ 已完成`
 
 - 文件：`agent/report/diagnosis_report_generator.py`
 - 改动类型：新建
@@ -686,7 +686,7 @@ Anchor CRUD + 按 page_id 检索 + visual_features 向量比对。数据空，�
 
 ---
 
-## R001-BB007：自动修复器 `⬜ 待处理`
+## R001-BB007：自动修复器 `🔧 进行中`
 
 - 文件：`agent/fix/auto_fixer.py`
 - 改动类型：新建
@@ -712,7 +712,7 @@ Anchor CRUD + 按 page_id 检索 + visual_features 向量比对。数据空，�
 
 ---
 
-## R001-BB008：回归验证器（三关 + Tier 分级） `⬜ 待处理`
+## R001-BB008：回归验证器（三关 + Tier 分级） `🔧 进行中`
 
 - 文件：`agent/fix/regression_verifier.py`
 - 改动类型：新建
@@ -736,7 +736,7 @@ Anchor CRUD + 按 page_id 检索 + visual_features 向量比对。数据空，�
 
 ---
 
-## R001-BB009：PR 提交器 `⬜ 待处理`
+## R001-BB009：PR 提交器 `✅ 已完成`
 
 - 文件：`agent/fix/pr_submitter.py`
 - 改动类型：新建
@@ -757,7 +757,7 @@ Anchor CRUD + 按 page_id 检索 + visual_features 向量比对。数据空，�
 
 ---
 
-## R001-BB010：缺口诊断器 `⬜ 待处理`
+## R001-BB010：缺口诊断器 `✅ 已完成`
 
 - 文件：`agent/gap_mgmt/gap_diagnoser.py`
 - 改动类型：新建
@@ -778,7 +778,7 @@ Anchor CRUD + 按 page_id 检索 + visual_features 向量比对。数据空，�
 
 ---
 
-## R001-BB011：回流管理 `⬜ 待处理`
+## R001-BB011：回流管理 `🔧 进行中`
 
 - 文件：`agent/gap_mgmt/reflow_manager.py`
 - 改动类型：新建
@@ -801,7 +801,7 @@ Anchor CRUD + 按 page_id 检索 + visual_features 向量比对。数据空，�
 
 ---
 
-## R001-BB013：反思 agent `⬜ 待处理`
+## R001-BB013：反思 agent `🔧 进行中`
 
 - 文件：`agent/reflection/reflection_agent.py`
 - 改动类型：新建
@@ -822,7 +822,7 @@ Anchor CRUD + 按 page_id 检索 + visual_features 向量比对。数据空，�
 
 ---
 
-## R001-BB015：人工修复录入器 `⬜ 待处理`
+## R001-BB015：人工修复录入器 `🔧 进行中`
 
 - 文件：`agent/gap_mgmt/manual_fix_recorder.py`
 - 改动类型：新建

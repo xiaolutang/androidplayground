@@ -67,7 +67,7 @@ status: planned
 37. ⬜ INT02 状态机迁移矩阵测试
 38. ⬜ INT03 BF002 模拟器独立集成（手动触发）
 39. ⬜ INT04 golden set + 开放参数验收基线
-40. ⬜ 最后 — 编译验证 + 全测试路径
+40. ✅ 最后 — 编译验证 + 全测试路径
 
 ---
 
@@ -868,7 +868,7 @@ Anchor CRUD + 按 page_id 检索 + visual_features 向量比对。数据空，�
 
 ---
 
-## R001-FF001：report_router `⬜ 待处理`
+## R001-FF001：report_router `✅ 已完成`
 
 - 文件：`agent/api/routers/report_router.py`、`agent/api/dtos/`
 - 改动类型：新建
@@ -891,7 +891,7 @@ GET /reports、/reports/{id}、/reports/{id}/trajectory、/reports/{id}/clarify-
 
 ---
 
-## R001-FF002：gap_router `⬜ 待处理`
+## R001-FF002：gap_router `✅ 已完成`
 
 - 文件：`agent/api/routers/gap_router.py`
 - 改动类型：新建
@@ -910,7 +910,7 @@ GET /reports、/reports/{id}、/reports/{id}/trajectory、/reports/{id}/clarify-
 
 ---
 
-## R001-ENT01：main.py（FastAPI 入口） `⬜ 待处理`
+## R001-ENT01：main.py（FastAPI 入口） `✅ 已完成`
 
 - 文件：`agent/main.py`
 - 改动类型：新建
@@ -932,7 +932,7 @@ GET /reports、/reports/{id}、/reports/{id}/trajectory、/reports/{id}/clarify-
 
 ---
 
-## R001-DEP01：docker-compose + Dockerfile + Makefile `⬜ 待处理`
+## R001-DEP01：docker-compose + Dockerfile + Makefile `✅ 已完成`
 
 - 文件：`docker-compose.yml`、`Dockerfile`、`Makefile`
 - 改动类型：新建
@@ -954,7 +954,7 @@ compose：postgres(pgvector) + agent(含 adb client) + frontend。Dockerfile age
 
 ---
 
-## R001-INT01：backend 集成测试 `⬜ 待处理`
+## R001-INT01：backend 集成测试 `✅ 已完成`
 
 - 文件：`tests/integration/`、`tests/conftest.py`（FakeLLMGateway/FakeReproduceEngine/FakeADBTools）
 - 改动类型：新建
@@ -976,7 +976,7 @@ FakeLLMGateway（按 prompt_type 分发）、FakeReproduceEngine（复现模式�
 
 ---
 
-## R001-INT02：状态机迁移矩阵测试 `⬜ 待处理`
+## R001-INT02：状态机迁移矩阵测试 `✅ 已完成`
 
 - 文件：`tests/state_machine/`
 - 改动类型：新建
@@ -994,7 +994,7 @@ FakeLLMGateway（按 prompt_type 分发）、FakeReproduceEngine（复现模式�
 
 ---
 
-## R001-INT03：BF002 模拟器独立集成（手动） `⬜ 待处理`
+## R001-INT03：BF002 模拟器独立集成（手动） `✅ 已完成`
 
 - 文件：`tests/integration_bf002/`
 - 改动类型：新建
@@ -1012,7 +1012,7 @@ FakeLLMGateway（按 prompt_type 分发）、FakeReproduceEngine（复现模式�
 
 ---
 
-## R001-INT04：golden set + 开放参数验收基线 `⬜ 待处理`
+## R001-INT04：golden set + 开放参数验收基线 `✅ 已完成`
 
 - 文件：`tests/golden/llm_quality/`、`tests/golden/vision/`、验收基线报告脚本
 - 改动类型：新建

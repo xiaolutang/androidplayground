@@ -1,0 +1,67 @@
+# R001-DEP01：docker build 上下文排除清单
+#
+# 目的：
+# - 减少上下文体积（加速 docker compose build）
+# - 避免敏感信息/缓存/IDE 配置进入镜像
+
+# VCS
+.git
+.gitignore
+.gitattributes
+
+# Python 缓存 + 虚拟环境
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.venv/
+venv/
+.python-version
+
+# 测试 / lint 缓存
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.coverage
+htmlcov/
+tests/
+
+# IDE / 工具
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# dev-flow 流程产物
+.dev-flow/
+
+# Android / Gradle 构建产物（与 Python agent 无关）
+.gradle/
+build/
+app/
+flutter_logic/
+gradle/
+gradlew
+gradlew.bat
+build.gradle.kts
+settings.gradle.kts
+gradle.properties
+local.properties
+.kotlin/
+
+# 环境变量与密钥（仅 .env.example 允许，.env 禁止）
+agent/.env
+
+# 文档
+docs/
+*.md
+
+# Dockerfile 自身（已在 build context 中使用）
+Dockerfile
+docker-compose.yml
+Makefile
+.dockerignore
+
+# macOS / 系统文件
+.DS_Store
+Thumbs.db

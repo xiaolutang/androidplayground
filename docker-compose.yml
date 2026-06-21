@@ -1,0 +1,80 @@
+# R001-DEP01：三容器编排（postgres + agent + frontend）
+#
+# 依据：
+# - Sprint Contract R001-DEP01（mode: direct）
+# - 技术决策 D10（容器经 host.docker.internal:5037 连宿主 adb server）
+# - config.py 环境变量命名（DATABASE_URL / ADB_HOST / ADB_PORT / NEW_API_BASE_URL）
+#
+# 使用：
+#   make up          # 启动宿主 adb server + 模拟器，再 docker compose up -d
+#   make down        # docker compose down
+#   make logs        # docker compose logs -f
+#
+# 说明：
+# - postgres 使用 pgvector/pgvector:pg16 镜像（内置 vector 扩展）
+# - agent 通过 extra_hosts: host.docker.internal:host-gateway 经宿主 adb server
+#   连接模拟器（D10）
+# - 开发模式 volume 挂载 agent/ 代码，修改即时生效
+# - frontend 为 MVP 占位（nginx:alpine 静态页面）
+
+services:
+  postgres:
+    image: pgvector/pgvector:pg16
+    container_name: bugfix-postgres
+    environment:
+      POSTGRES_USER: bugfix
+      POSTGRES_PASSWORD: bugfix_dev
+      POSTGRES_DB: bugfix_agent
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U bugfix -d bugfix_agent"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+    restart: unless-stopped
+
+  agent:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: bugfix-agent
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      # 覆盖 config.py 默认 DATABASE_URL，指向 compose 内 postgres 服务
+      DATABASE_URL: "postgresql+psycopg://bugfix:bugfix_dev@postgres:5432/bugfix_agent"
+      # D10：经 host.docker.internal 走宿主 adb server
+      ADB_HOST: "host.docker.internal"
+      ADB_PORT: "5037"
+      # LLM 网关（从 .env 由 docker compose 自动读取 NEW_API_*）
+      NEW_API_BASE_URL: "${NEW_API_BASE_URL:-http://host.docker.internal:13000/v1}"
+      NEW_API_API_KEY: "${NEW_API_API_KEY:-}"
+    ports:
+      - "8000:8000"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    volumes:
+      # 开发模式：代码挂载（修改即时生效，不必重建镜像）
+      - ./agent:/app/agent:cached
+    restart: unless-stopped
+
+  frontend:
+    image: nginx:alpine
+    container_name: bugfix-frontend
+    depends_on:
+      - agent
+    ports:
+      - "3000:80"
+    volumes:
+      # 占位：如有前端构建产物挂入 /usr/share/nginx/html
+      - ./frontend:/usr/share/nginx/html:ro
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+    driver: local

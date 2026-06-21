@@ -28,7 +28,6 @@ from agent.infra.llm_gateway import (
     LLMGateway,
     LLMResponse,
     NewAPILLMGateway,
-    _PROMPT_TYPE_TO_CHANNEL,
 )
 
 

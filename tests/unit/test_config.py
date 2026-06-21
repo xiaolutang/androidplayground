@@ -11,7 +11,7 @@
 import pytest
 
 from agent.infra import config as cfg
-from agent.infra.config import Settings, get_llm_model, get_settings
+from agent.infra.config import get_llm_model, get_settings
 
 
 # test_tasks #1：默认值校验 -----------------------------------------------

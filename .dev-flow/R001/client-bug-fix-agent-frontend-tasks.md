@@ -6,7 +6,7 @@ requirement_cycle: R001
 workflow:
   evaluate_provider: codex
   mode: auto
-status: completed
+status: archived
 ---
 
 # 客户端 Bug 修复 Agent — 前端任务清单
@@ -29,22 +29,22 @@ status: completed
 
 > 按层依赖排序。骨架 → 类型 → 服务层 → 工具 → Hooks → 通用组件 → 领域组件 → 路由入口 → Mock 层 → 测试。
 
-1. ⬜ FE01 项目骨架与依赖
-2. ⬜ FE02 types/ 类型定义（report/gap/api）
-3. ⬜ FE03 services/apiClient.ts（统一 fetch + 错误码映射）
-4. ⬜ FE04 services/ 领域 API（reportApi/gapApi/clarifyApi）
-5. ⬜ FE05 utils/（format + treeBuilder）
-6. ⬜ FE06 hooks/（useReport/useGaps/useClarify/useRegressionFeedback）
-7. ⬜ FE07 components/common/（PageContainer + StatusBadge）
-8. ⬜ FE08 components/report/（ReportHeader/HypothesisTree/FixPatchCard/TrajectoryTimeline/RegressionFeedbackForm）
-9. ⬜ FE09 components/gap/（GapList + GapUnblockAction）
-10. ⬜ FE10 components/clarify/（ClarifyForm）
-11. ⬜ FE11 main.tsx + App.tsx（Provider + 路由表 + 侧边导航）
-12. ⬜ FE12 routes/（ReportListPage/ReportDetailPage/GapViewPage/ClarifyPage）
-13. ⬜ FE13 mocks/（handlers + server + browser）
-14. ⬜ FE14 handlers.spec.ts 契约守护测试
-15. ⬜ FE15 组件 + utils 单测
-16. ⬜ 最后 — 编译验证 + 全测试路径
+1. ✅ FE01 项目骨架与依赖
+2. ✅ FE02 types/ 类型定义（report/gap/api）
+3. ✅ FE03 services/apiClient.ts（统一 fetch + 错误码映射）
+4. ✅ FE04 services/ 领域 API（reportApi/gapApi/clarifyApi）
+5. ✅ FE05 utils/（format + treeBuilder）
+6. ✅ FE06 hooks/（useReport/useGaps/useClarify/useRegressionFeedback）
+7. ✅ FE07 components/common/（PageContainer + StatusBadge）
+8. ✅ FE08 components/report/（ReportHeader/HypothesisTree/FixPatchCard/TrajectoryTimeline/RegressionFeedbackForm）
+9. ✅ FE09 components/gap/（GapList + GapUnblockAction）
+10. ✅ FE10 components/clarify/（ClarifyForm）
+11. ✅ FE11 main.tsx + App.tsx（Provider + 路由表 + 侧边导航）
+12. ✅ FE12 routes/（ReportListPage/ReportDetailPage/GapViewPage/ClarifyPage）
+13. ✅ FE13 mocks/（handlers + server + browser）
+14. ✅ FE14 handlers.spec.ts 契约守护测试
+15. ✅ FE15 组件 + utils 单测
+16. ✅ 最后 — 编译验证 + 全测试路径
 
 ---
 
@@ -73,7 +73,7 @@ status: completed
 - contract_refs: []
 - blocked_files: []
 
-### FE01.1 package.json `⬜`
+### FE01.1 package.json `✅`
 
 依赖与脚本。版本号见 frontend design 第 6 节第三方依赖清单（均经 `npm view <pkg> version` 确认）。
 
@@ -114,7 +114,7 @@ status: completed
 }
 ```
 
-### FE01.2 vite.config.ts `⬜`
+### FE01.2 vite.config.ts `✅`
 
 ```ts
 import { defineConfig } from 'vite';
@@ -137,11 +137,11 @@ export default defineConfig({
 });
 ```
 
-### FE01.3 tsconfig.json `⬜`
+### FE01.3 tsconfig.json `✅`
 
 严格模式。`strict: true`，`noUncheckedIndexedAccess: true`，paths 别名 `@/* → src/*`。
 
-### FE01.4 index.html + 空 main.tsx 占位 `⬜`
+### FE01.4 index.html + 空 main.tsx 占位 `✅`
 
 Vite 入口 HTML 挂载 `#root`；main.tsx 暂留 `<h1>boot ok</h1>` 占位（FE11 替换为真实 Provider 树）。
 
@@ -173,7 +173,7 @@ Vite 入口 HTML 挂载 `#root`；main.tsx 暂留 `<h1>boot ok</h1>` 占位（FE
 - contract_refs: [contracts/openapi.json]
 - blocked_files: []
 
-### FE02.1 report.ts `⬜`
+### FE02.1 report.ts `✅`
 
 ```ts
 // 与 backend 4.1 Schema 一一对应，snake_case 保留
@@ -271,7 +271,7 @@ export interface ClarifyOption {
 }
 ```
 
-### FE02.2 gap.ts `⬜`
+### FE02.2 gap.ts `✅`
 
 ```ts
 export type CapabilityGapStatus =
@@ -297,7 +297,7 @@ export interface UnblockRequest {
 }
 ```
 
-### FE02.3 api.ts `⬜`
+### FE02.3 api.ts `✅`
 
 通用分页 DTO、错误响应 DTO。
 
@@ -344,7 +344,7 @@ export interface ApiError {
 - contract_refs: []
 - blocked_files: []
 
-### FE03.1 apiClient 实现 `⬜`
+### FE03.1 apiClient 实现 `✅`
 
 ```ts
 import { ApiError } from '@/types/api';
@@ -393,7 +393,7 @@ export async function apiClient<T>(
 - contract_refs: [contracts/openapi.json]
 - blocked_files: []
 
-### FE04.1 reportApi.ts `⬜`
+### FE04.1 reportApi.ts `✅`
 
 ```ts
 export const reportApi = {
@@ -415,7 +415,7 @@ export const reportApi = {
 };
 ```
 
-### FE04.2 gapApi.ts `⬜`
+### FE04.2 gapApi.ts `✅`
 
 ```ts
 export const gapApi = {
@@ -431,7 +431,7 @@ export const gapApi = {
 };
 ```
 
-### FE04.3 clarifyApi.ts `⬜`
+### FE04.3 clarifyApi.ts `✅`
 
 ```ts
 export const clarifyApi = {
@@ -475,7 +475,7 @@ export const clarifyApi = {
 - contract_refs: []
 - blocked_files: []
 
-### FE05.1 format.ts `⬜`
+### FE05.1 format.ts `✅`
 
 ```ts
 // DTO 层不改名，仅 UI 展示层在此做文案别名
@@ -506,7 +506,7 @@ export function formatGapValue(v: number): string {
 // 其余：时间格式化、tier 文案、status 文案...
 ```
 
-### FE05.2 treeBuilder.ts `⬜`
+### FE05.2 treeBuilder.ts `✅`
 
 ```ts
 import type { TreeDataNode } from 'antd';
@@ -548,7 +548,7 @@ export function buildHypothesisTree(hypotheses: Hypothesis[]): TreeDataNode[] {
 - contract_refs: []
 - blocked_files: []
 
-### FE06.1 useReport.ts `⬜`
+### FE06.1 useReport.ts `✅`
 
 ```ts
 export const reportKeys = {
@@ -571,7 +571,7 @@ export function useTrajectory(id: string) {
 }
 ```
 
-### FE06.2 useGaps.ts `⬜`
+### FE06.2 useGaps.ts `✅`
 
 ```ts
 export function useGaps() {
@@ -587,7 +587,7 @@ export function useUnblockGap() {
 }
 ```
 
-### FE06.3 useClarify.ts `⬜`
+### FE06.3 useClarify.ts `✅`
 
 ```ts
 export function useClarifyOptions(reportId: string) {
@@ -606,7 +606,7 @@ export function useSubmitClarify(reportId: string) {
 }
 ```
 
-### FE06.4 useRegressionFeedback.ts `⬜`
+### FE06.4 useRegressionFeedback.ts `✅`
 
 ```ts
 export function useRegressionFeedback(reportId: string) {
@@ -653,7 +653,7 @@ export function useRegressionFeedback(reportId: string) {
 - contract_refs: []
 - blocked_files: []
 
-### FE07.1 PageContainer.tsx `⬜`
+### FE07.1 PageContainer.tsx `✅`
 
 ```tsx
 interface Props<T> {
@@ -670,7 +670,7 @@ interface Props<T> {
 // 正常 → children(data)
 ```
 
-### FE07.2 StatusBadge.tsx `⬜`
+### FE07.2 StatusBadge.tsx `✅`
 
 ```tsx
 // BugReport 14 态 + Tier 1-4 渲染
@@ -708,11 +708,11 @@ export function StatusBadge({ status, tier }: { status?: BugReportStatus; tier?:
 - contract_refs: [contracts/openapi.json]
 - blocked_files: []
 
-### FE08.1 ReportHeader.tsx `⬜`
+### FE08.1 ReportHeader.tsx `✅`
 
 渲染 BugReport 状态/tier/置信度/版本。复用 StatusBadge。ConfidenceScore 三维 → 「信息/验证/模式」短标签（format.ts）。
 
-### FE08.2 HypothesisTree.tsx `⬜`
+### FE08.2 HypothesisTree.tsx `✅`
 
 ```tsx
 interface Props { hypotheses: Hypothesis[]; }
@@ -721,7 +721,7 @@ interface Props { hypotheses: Hypothesis[]; }
 // 四态→三色（proposed/verifying 灰、confirmed 绿、refuted 红保留）
 ```
 
-### FE08.3 FixPatchCard.tsx `⬜`
+### FE08.3 FixPatchCard.tsx `✅`
 
 ```tsx
 interface Props { patch: FixPatch; }
@@ -730,14 +730,14 @@ interface Props { patch: FixPatch; }
 // target_file 标题
 ```
 
-### FE08.4 TrajectoryTimeline.tsx `⬜`
+### FE08.4 TrajectoryTimeline.tsx `✅`
 
 ```tsx
 interface Props { events: TrajectoryEvent[]; }
 // antd <Timeline> 渲染事件序列
 ```
 
-### FE08.5 RegressionFeedbackForm.tsx `⬜`
+### FE08.5 RegressionFeedbackForm.tsx `✅`
 
 ```tsx
 interface Props {
@@ -783,7 +783,7 @@ interface Props {
 - contract_refs: []
 - blocked_files: []
 
-### FE09.1 GapList.tsx `⬜`
+### FE09.1 GapList.tsx `✅`
 
 ```tsx
 interface Props { gaps: CapabilityGap[]; }
@@ -793,7 +793,7 @@ interface Props { gaps: CapabilityGap[]; }
 // 注：排序由后端保证（gapApi.list 默认降序）；前端不做二次排序，仅展示
 ```
 
-### FE09.2 GapUnblockAction.tsx `⬜`
+### FE09.2 GapUnblockAction.tsx `✅`
 
 ```tsx
 interface Props { gap: CapabilityGap; }
@@ -833,7 +833,7 @@ interface Props { gap: CapabilityGap; }
 - contract_refs: []
 - blocked_files: []
 
-### FE10.1 ClarifyForm.tsx `⬜`
+### FE10.1 ClarifyForm.tsx `✅`
 
 ```tsx
 interface Props {
@@ -875,7 +875,7 @@ interface Props {
 - contract_refs: []
 - blocked_files: []
 
-### FE11.1 main.tsx `⬜`
+### FE11.1 main.tsx `✅`
 
 ```tsx
 // 1. dev 模式 + VITE_USE_MOCK !== 'false' → 动态 import('../mocks/browser') 启用 MSW
@@ -889,7 +889,7 @@ interface Props {
 //    </QueryClientProvider>
 ```
 
-### FE11.2 App.tsx + 路由表 `⬜`
+### FE11.2 App.tsx + 路由表 `✅`
 
 ```tsx
 // 用 React Router 7.18 库模式 createBrowserRouter
@@ -934,7 +934,7 @@ const router = createBrowserRouter([
 - contract_refs: [contracts/openapi.json]
 - blocked_files: []
 
-### FE12.1 ReportListPage.tsx `⬜`
+### FE12.1 ReportListPage.tsx `✅`
 
 ```tsx
 // URL search params: page/page_size/status/tier（可分享/刷新保持）
@@ -943,7 +943,7 @@ const router = createBrowserRouter([
 // 行点击 → navigate(`/reports/${id}`)
 ```
 
-### FE12.2 ReportDetailPage.tsx `⬜`
+### FE12.2 ReportDetailPage.tsx `✅`
 
 ```tsx
 // useParams<{ id }>()
@@ -955,13 +955,13 @@ const router = createBrowserRouter([
 // report.clarify_requested → 显示追问入口（跳 /reports/:id/clarify）
 ```
 
-### FE12.3 GapViewPage.tsx `⬜`
+### FE12.3 GapViewPage.tsx `✅`
 
 ```tsx
 // useGaps() → PageContainer → <GapList gaps={data} />
 ```
 
-### FE12.4 ClarifyPage.tsx `⬜`
+### FE12.4 ClarifyPage.tsx `✅`
 
 ```tsx
 // useParams<{ id }>()
@@ -995,7 +995,7 @@ const router = createBrowserRouter([
 - contract_refs: [contracts/openapi.json]
 - blocked_files: []
 
-### FE13.1 handlers.ts `⬜`
+### FE13.1 handlers.ts `✅`
 
 ```ts
 import { http, HttpResponse } from 'msw';
@@ -1031,7 +1031,7 @@ export const handlers = [
 ];
 ```
 
-### FE13.2 server.ts `⬜`
+### FE13.2 server.ts `✅`
 
 ```ts
 import { setupServer } from 'msw/node';
@@ -1043,7 +1043,7 @@ export const server = setupServer(...handlers);
 // afterAll: server.close()
 ```
 
-### FE13.3 browser.ts `⬜`
+### FE13.3 browser.ts `✅`
 
 ```ts
 import { setupWorker } from 'msw/browser';
@@ -1079,7 +1079,7 @@ export const worker = setupWorker(...handlers);
 - contract_refs: [contracts/openapi.json]
 - blocked_files: []
 
-### FE14.1 test/setup.ts `⬜`
+### FE14.1 test/setup.ts `✅`
 
 ```ts
 import '@testing-library/jest-dom';
@@ -1090,7 +1090,7 @@ afterEach(() => server.resetHandlers());
 afterAll(() => server.close());
 ```
 
-### FE14.2 handlers.spec.ts `⬜`
+### FE14.2 handlers.spec.ts `✅`
 
 对每个 handler 发起请求 + 断言响应 Schema。关键断言：
 
@@ -1127,11 +1127,11 @@ afterAll(() => server.close());
 - contract_refs: []
 - blocked_files: []
 
-### FE15.1 utils 单测 `⬜`
+### FE15.1 utils 单测 `✅`
 
 format.ts 映射断言 + treeBuilder.ts 构建（含 10 层嵌套 / 100+ 节点 / 空树）。
 
-### FE15.2 组件单测 `⬜`
+### FE15.2 组件单测 `✅`
 
 用 @testing-library/react 渲染：
 
@@ -1143,7 +1143,7 @@ format.ts 映射断言 + treeBuilder.ts 构建（含 10 层嵌套 / 100+ 节点 
 - PageContainer：三态
 - StatusBadge：14 态 + tier 1-4
 
-### FE15.3 hooks 单测 `⬜`
+### FE15.3 hooks 单测 `✅`
 
 用 @testing-library/react-hooks + QueryClientProvider wrapper：
 
@@ -1181,7 +1181,7 @@ format.ts 映射断言 + treeBuilder.ts 构建（含 10 层嵌套 / 100+ 节点 
 - contract_refs: []
 - blocked_files: []
 
-### FE16.1 验证命令序列 `⬜`
+### FE16.1 验证命令序列 `✅`
 
 ```bash
 cd frontend
@@ -1192,7 +1192,7 @@ npm run test:coverage # 覆盖率 ≥80%
 npm run dev          # 手动冒烟三页面 + 三态 + 四色映射 + allowed 5 态
 ```
 
-### FE16.2 联调切换 `⬜`
+### FE16.2 联调切换 `✅`
 
 ```bash
 # 切真实后端（联调阶段）

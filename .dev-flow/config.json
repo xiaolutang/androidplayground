@@ -1,5 +1,13 @@
 {
-  "active_rc": "R001",
+  "active_rc": null,
+  "archived_requirement_cycles": [
+    {
+      "rc_id": "R001",
+      "name": "客户端 Bug 自动修复 Agent",
+      "archived_at": "2026-06-26",
+      "status": "archived"
+    }
+  ],
   "design_diagram_colors": {
     "NEW": "#4CAF50",
     "MODIFIED": "#2196F3",

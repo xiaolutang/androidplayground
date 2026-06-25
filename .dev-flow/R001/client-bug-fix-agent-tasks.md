@@ -6,7 +6,7 @@ requirement_cycle: R001
 workflow:
   evaluate_provider: codex
   mode: auto
-status: planned
+status: archived
 ---
 
 # 客户端 Bug 修复 Agent — 后端任务清单
@@ -48,25 +48,25 @@ status: planned
 18. ✅ BB002 症状分类
 19. ✅ BB006 修复置信度评估
 20. ✅ BB003 Playbook 执行器（双模式）
-21. ⬜ BB004 假设树引擎（换方向/回溯/步数预算）
-22. ⬜ BB005 根因定位
-23. ⬜ BB012 诊断报告生成器
-24. ⬜ BB007 自动修复器
-25. ⬜ BB008 回归验证器（三关 + Tier 分级）
-26. ⬜ BB009 PR 提交器
-27. ⬜ BB010 缺口诊断器
-28. ⬜ BB011 回流管理
-29. ⬜ BB013 反思 agent
-30. ⬜ BB015 人工修复录入器
-31. ⬜ ORB01 Orchestrator（LangGraph 状态机）
-32. ⬜ FF001 report_router
-33. ⬜ FF002 gap_router
-34. ⬜ ENT01 main.py（FastAPI 入口）
-35. ⬜ DEP01 docker-compose + Dockerfile + Makefile
-36. ⬜ INT01 backend 集成测试（API + Testcontainers）
-37. ⬜ INT02 状态机迁移矩阵测试
-38. ⬜ INT03 BF002 模拟器独立集成（手动触发）
-39. ⬜ INT04 golden set + 开放参数验收基线
+21. ✅ BB004 假设树引擎（换方向/回溯/步数预算）
+22. ✅ BB005 根因定位
+23. ✅ BB012 诊断报告生成器
+24. ✅ BB007 自动修复器
+25. ✅ BB008 回归验证器（三关 + Tier 分级）
+26. ✅ BB009 PR 提交器
+27. ✅ BB010 缺口诊断器
+28. ✅ BB011 回流管理
+29. ✅ BB013 反思 agent
+30. ✅ BB015 人工修复录入器
+31. ✅ ORB01 Orchestrator（LangGraph 状态机）
+32. ✅ FF001 report_router
+33. ✅ FF002 gap_router
+34. ✅ ENT01 main.py（FastAPI 入口）
+35. ✅ DEP01 docker-compose + Dockerfile + Makefile
+36. ✅ INT01 backend 集成测试（API + Testcontainers）
+37. ✅ INT02 状态机迁移矩阵测试
+38. ✅ INT03 BF002 模拟器独立集成（手动触发）
+39. ✅ INT04 golden set + 开放参数验收基线
 40. ✅ 最后 — 编译验证 + 全测试路径
 
 ---
@@ -161,7 +161,7 @@ ADB_HOST = "host.docker.internal"; ADB_PORT = 5037
     description: Testcontainers 起 PG+pgvector；CREATE EXTENSION vector 成功；Vector 类型可读写
     scenarios: [D4 存储层基础设施]
 
-### INF03.1 引擎与 session `⬜`
+### INF03.1 引擎与 session `✅`
 - `create_engine`（同步）/ `async_sessionmaker`；启动时 `CREATE EXTENSION IF NOT EXISTS vector`
 - pgvector Python 侧：`from pgvector.sqlalchemy import Vector`
 
@@ -446,7 +446,7 @@ git_commit_anchor vs HEAD 差异 → revalidate → 失败标 stale（不删）�
     scenarios: [关键业务逻辑表 BB004 消费侧]
 - **实现摘要**：6 AC 全 pass（Mode 2 direct 验收）。四类信号监听器（logcat/flutter_error/process/visual）+ SignalRouter 路由。19 单测全 pass，全量 375 passed / 8 skipped，ruff All checks passed。evidence: `.dev-flow/R001/evidence/R001-BF004.md`
 
-### BF004.1 四类 listener `⬜`
+### BF004.1 四类 listener `✅`
 logcat/Flutter error（channel）/进程（崩溃/ANR）/视觉（白屏/Loading，配合 BF003+BF007）。产 Signal 喂 BB003。
 
 ---
@@ -468,10 +468,10 @@ logcat/Flutter error（channel）/进程（崩溃/ANR）/视觉（白屏/Loading
     description: Schema 校验；按症状检索
     scenarios: [BB003 依赖]
 
-### BF006.1 registry/schema `⬜`
+### BF006.1 registry/schema `✅`
 Playbook Schema（SCH01）；registry 按 symptom_type 检索。
 
-### BF006.2 crash_playbook `⬜`
+### BF006.2 crash_playbook `✅`
 MVP 第一个 Playbook：崩溃型（passive=true，被动等信号；hypothesis_space 含崩溃假设种子）。其余 4 类（blank/loading/no_response/data_error）建空定义占位，MVP 后补。
 
 ---
@@ -519,7 +519,7 @@ Anchor CRUD + 按 page_id 检索 + visual_features 向量比对。数据空，�
     description: Sentry/Bugly/Crashlytics fixture 归一化；versionCode 必携；幂等
     scenarios: [关键业务逻辑表 BF001, API 表 POST /webhook]
 
-### BF001.1 抽象基类 + Sentry 适配器 `⬜`
+### BF001.1 抽象基类 + Sentry 适配器 `✅`
 `BugReportAdapter.normalize(raw) -> BugReport`；Sentry 第一适配器完整实现；bugly_adapter 占位。event_id 幂等表。
 
 ---
@@ -542,7 +542,7 @@ Anchor CRUD + 按 page_id 检索 + visual_features 向量比对。数据空，�
     description: 三档打分；阈值边界；临界追问
     scenarios: [关键业务逻辑表 BB001]
 
-### BB001.1 ISM `⬜`
+### BB001.1 ISM `✅`
 输入 BugReport → 打分（completeness_score）+ gaps（A/B/C/D）。完备→进 BB002；临界→clarify_requested=true；不足→degraded。追问候选从 KB 派生（BF005）。
 
 ---
@@ -563,7 +563,7 @@ Anchor CRUD + 按 page_id 检索 + visual_features 向量比对。数据空，�
     description: 五类分类；raw_report 字段映射
     scenarios: [关键业务逻辑表 BB002]
 
-### BB002.1 分类器 `⬜`
+### BB002.1 分类器 `✅`
 调 LLMGateway(symptom_classify→glm-5.1)。输出 symptom_type（5 类）。
 
 ---
@@ -586,7 +586,7 @@ Anchor CRUD + 按 page_id 检索 + visual_features 向量比对。数据空，�
     description: 三维→Tier 阈值稳定；KB 模式命中影响
     scenarios: [关键业务逻辑表 BB006]
 
-### BB006.1 ConfidenceEvaluator `⬜`
+### BB006.1 ConfidenceEvaluator `✅`
 三维打分（dim_info_completeness/dim_verification_feasibility/dim_patternability）+ kb_pattern_hit → tier（1-4）。产出 ConfidenceScore。
 
 ---
@@ -612,7 +612,7 @@ Anchor CRUD + 按 page_id 检索 + visual_features 向量比对。数据空，�
     description: 复现模式 mock（FakeReproduceEngine）；探测模式 mock（FakeADBTools 预设截图序列）；步数耗尽→缺口
     scenarios: [关键业务逻辑表 BB003/BB004, 故障注入]
 
-### BB003.1 双模式编排 `⬜`
+### BB003.1 双模式编排 `✅`
 - 复现模式：Playbook 有脚本 → reproduce_runner 确定性跑，BF003 不参与
 - 探测/诱发模式：Playbook 无明确脚本 → 起 LangGraph loop，BF003 看截图→决策 tool_call→BF002 执行→BF004 采信号→循环，命中信号或步数耗尽止
 - 输出复现证据（ReproStep 序列 + 信号）喂 BB004
@@ -639,7 +639,7 @@ Anchor CRUD + 按 page_id 检索 + visual_features 向量比对。数据空，�
     description: 4 态迁移；换方向/回溯/overturning；refuted 不删；步数耗尽转缺口；负向反查
     scenarios: [关键业务逻辑表 BB004 换方向, 状态机矩阵 Hypothesis]
 
-### BB004.1 假设树状态机 `⬜`
+### BB004.1 假设树状态机 `✅`
 封装回溯/根因回退/步数预算（内部闭环，不外泄 Orchestrator）。confirmed 被 fixing/regression 信号推翻 → rootcause.overturned（fixing→located）。全局步数耗尽 → 转缺口诊断。
 
 ---
@@ -660,7 +660,7 @@ Anchor CRUD + 按 page_id 检索 + visual_features 向量比对。数据空，�
     description: 堆栈/日志/视觉锚点→代码位置；无匹配转缺口
     scenarios: [BB005 补充断言]
 
-### BB005.1 定位器 `⬜`
+### BB005.1 定位器 `✅`
 命中信号（堆栈帧/日志关键词/视觉锚点）→ git blame/检索 → root_cause_location(file:line)。
 
 ---
@@ -681,7 +681,7 @@ Anchor CRUD + 按 page_id 检索 + visual_features 向量比对。数据空，�
     description: 双格式输出；字段缺失降级
     scenarios: [BB012 补充断言]
 
-### BB012.1 报告生成 `⬜`
+### BB012.1 报告生成 `✅`
 聚合 BugReport + Trajectory + ConfidenceScore + Gaps → DiagnosisReport（json/markdown）。Tier3/4 主产出。
 
 ---
@@ -707,7 +707,7 @@ Anchor CRUD + 按 page_id 检索 + visual_features 向量比对。数据空，�
     description: 三策略优先级；Tier2 is_draft；strategy_chain
     scenarios: [关键业务逻辑表 BB007]
 
-### BB007.1 AutoFixer `⬜`
+### BB007.1 AutoFixer `✅`
 按可解决性优先级：template（KB pattern 套用）→ llm（LLMGateway fix_patch→glm-5.1 直生成）→ history_calibration（KB 历史校准）。产出 FixPatch（is_draft 由 tier 决定）。
 
 ---
@@ -731,7 +731,7 @@ Anchor CRUD + 按 page_id 检索 + visual_features 向量比对。数据空，�
     description: Tier1 三关；Tier2 轻量；fail 分流（根因错/补丁错）
     scenarios: [关键业务逻辑表 BB008, Tier1/Tier2 行]
 
-### BB008.1 三关验证 + Tier 分级 `⬜`
+### BB008.1 三关验证 + Tier 分级 `✅`
 复现序列回归（复用 BF002 reproduce_runner + ReproStep）、既有测试、静态检查。fail 分类：根因错 → BB004 根因回退；补丁错 → BB007 换策略重试（F4a，最多 FIX_RETRY_MAX）。
 
 ---
@@ -752,7 +752,7 @@ Anchor CRUD + 按 page_id 检索 + visual_features 向量比对。数据空，�
     description: Tier1/Tier2 分流；push 拒绝不破坏状态
     scenarios: [关键业务逻辑表 BB009, 故障注入]
 
-### BB009.1 PRSubmitter `⬜`
+### BB009.1 PRSubmitter `✅`
 建分支 + commit + push（git_client）→ 提 PR。**禁止自主合并**（INV-2，人在闸门）。
 
 ---
@@ -773,7 +773,7 @@ Anchor CRUD + 按 page_id 检索 + visual_features 向量比对。数据空，�
     description: 四类缺口识别
     scenarios: [关键业务逻辑表 BB010]
 
-### BB010.1 GapDiagnoser `⬜`
+### BB010.1 GapDiagnoser `✅`
 步数耗尽/降级 → 识别四类 gap_type → 写 CapabilityGap。
 
 ---
@@ -796,7 +796,7 @@ Anchor CRUD + 按 page_id 检索 + visual_features 向量比对。数据空，�
     description: 补齐回流（断言发出 bug.reflowed 事件 + 事件载荷含 bug_report_id/reflow_count）；超限 wont_reflow（不发事件）；regression 回流（路径 B 发事件）
     scenarios: [关键业务逻辑表 BB011, 状态矩阵 regression-feedback]
 
-### BB011.1 ReflowManager `⬜`
+### BB011.1 ReflowManager `✅`
 两条回流路径：A（gap_pending 补齐→发 `bug.reflowed` 事件，ORB01 监听后 `gap_pending→received` 重跑）；B（concluded/reflected + regression → 发 `bug.reflowed` 事件 → ORB01 监听后 `→reflowed→received`）。reflow_count 上限保护，超限不发事件转 wont_reflow。**解耦方式**：BB011 只产事件，不调 ORB01；ORB01 依赖 BB011（订阅其事件），无反向依赖，消除循环。
 
 ---
@@ -817,7 +817,7 @@ Anchor CRUD + 按 page_id 检索 + visual_features 向量比对。数据空，�
     description: 负向知识提取；命中线索；权限校验（不写 pattern）
     scenarios: [BB013 补充断言]
 
-### BB013.1 ReflectionAgent `⬜`
+### BB013.1 ReflectionAgent `✅`
 独立读 trajectory → LLMGateway(reflection→glm-5.1) → 写 KBRetriever（negative_knowledge 层）。
 
 ---
@@ -838,7 +838,7 @@ Anchor CRUD + 按 page_id 检索 + visual_features 向量比对。数据空，�
     description: 人修→pattern；非 BB015 写 pattern 拒绝
     scenarios: [关键业务逻辑表 BB015, INV-3]
 
-### BB015.1 ManualFixRecorder `⬜`
+### BB015.1 ManualFixRecorder `✅`
 抓取人修 commit patch → 引导填 root_cause/trigger_conditions → 写 KBEntry(pattern)。
 
 ---
@@ -863,7 +863,7 @@ Anchor CRUD + 按 page_id 检索 + visual_features 向量比对。数据空，�
     description: 真实 LangGraph 编排主链（LLM/模拟器 mock）；14 态迁移
     scenarios: [状态机矩阵 BugReport, 集成测试]
 
-### ORB01.1 LangGraph 状态机 `⬜`
+### ORB01.1 LangGraph 状态机 `✅`
 节点：归一化→ISM→分类→Playbook 选择→BB003→BB004→BB005→BB006 分流→（Tier1: BB007→BB008→BB009 普通 PR | Tier2: BB007 draft→BB009 draft | Tier3/4: BB010 缺口）。终态反思 BB013。步数预算耗尽→BB010。
 
 ---
@@ -886,7 +886,7 @@ Anchor CRUD + 按 page_id 检索 + visual_features 向量比对。数据空，�
     description: 9 端点集成；regression-feedback 28 case（14态×2 outcome）
     scenarios: [API 端点测试表, regression-feedback 状态矩阵]
 
-### FF001.1 端点实现 `⬜`
+### FF001.1 端点实现 `✅`
 GET /reports、/reports/{id}、/reports/{id}/trajectory、/reports/{id}/clarify-options；POST /reports/{id}/clarify、/reports/{id}/regression-feedback、/webhook/{platform}。regression-feedback 按 outcome + 状态分支（4.3 语义）。
 
 ---
@@ -927,7 +927,7 @@ GET /reports、/reports/{id}、/reports/{id}/trajectory、/reports/{id}/clarify-
     description: uvicorn 启动 + 9 端点路由可达 + /openapi.json 导出含全部端点定义（契约源 artifact）
     scenarios: [契约源导出, INT01 API 集成依赖]
 
-### ENT01.1 FastAPI 入口 `⬜`
+### ENT01.1 FastAPI 入口 `✅`
 挂载 FF001/FF002 + /webhook；启动建表 + pgvector；`app.openapi()` 导出 OpenAPI artifact（test 契约源）。
 
 ---
@@ -949,7 +949,7 @@ GET /reports、/reports/{id}、/reports/{id}/trajectory、/reports/{id}/clarify-
     description: make up 一键启动；三容器健康检查；agent 容器内 `adb -H host.docker.internal -P 5037 devices` 能列出宿主模拟器
     scenarios: [D10 部署验证, 全链路冒烟前置]
 
-### DEP01.1 三容器 compose + adb 桥 `⬜`
+### DEP01.1 三容器 compose + adb 桥 `✅`
 compose：postgres(pgvector) + agent(含 adb client) + frontend。Dockerfile agent 镜像。Makefile `up`：adb server + 模拟器 → compose up。
 
 ---
@@ -971,7 +971,7 @@ compose：postgres(pgvector) + agent(含 adb client) + frontend。Dockerfile age
     description: API 端点测试表全量；regression-feedback 14态×2 outcome=28 case
     scenarios: [API 端点测试表, regression-feedback 状态矩阵]
 
-### INT01.1 conftest mock + Testcontainers `⬜`
+### INT01.1 conftest mock + Testcontainers `✅`
 FakeLLMGateway（按 prompt_type 分发）、FakeReproduceEngine（复现模式）、FakeADBTools（探测模式预设截图序列）；Testcontainers 每 test 独立 schema。
 
 ---
@@ -1030,12 +1030,12 @@ FakeLLMGateway（按 prompt_type 分发）、FakeReproduceEngine（复现模式�
     description: 三类基线报告产出——LLM patch 命中率报告（N=20 样本，Schema 合规率≥95% + 关键字段命中率≥80%）；置信度校准报告（reliability diagram + Brier score 记录在案）；视觉决策 golden 报告（人工造截图，冷启动≥50%）
     scenarios: [开放参数验收口径表全行, 高风险项替代验收方案 LLM 质量+视觉准确率]
 
-### INT04.1 golden set + 基线报告 `⬜`
+### INT04.1 golden set + 基线报告 `✅`
 每 prompt_type 20+ 标注样本（真实 LLM 跑，断言 Schema 合规率+关键字段命中率）；视觉 golden（人工造截图样本，锚点空）；置信度 reliability diagram + Brier。MVP 验收=方法可执行+基线报告产出（非数值达标）。
 
 ---
 
-## 最后：编译验证 + 全测试路径 `⬜ 待处理`
+## 最后：编译验证 + 全测试路径 `✅ 待处理`
 
 - `pip install -e agent/ && pytest tests/unit tests/integration tests/state_machine -v`
 - `cd frontend && npm run build && vitest run`（前端任务见 frontend-tasks）

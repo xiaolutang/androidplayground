@@ -10,8 +10,10 @@ import { apiClient } from './apiClient';
 import type { CapabilityGap, UnblockRequest } from '@/types/gap';
 
 export const gapApi = {
-  list(): Promise<CapabilityGap[]> {
-    return apiClient<CapabilityGap[]>('/gaps');
+  async list(): Promise<CapabilityGap[]> {
+    // 后端 /gaps 返回 {items, total, page, page_size} 分页结构，此处解包
+    const res = await apiClient<{ items: CapabilityGap[] }>('/gaps');
+    return res.items;
   },
 
   unblock(id: string, body: UnblockRequest): Promise<CapabilityGap> {

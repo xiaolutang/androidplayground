@@ -9,12 +9,6 @@ export default defineConfig({
       '@': '/src',
     },
   },
-  server: {
-    proxy: {
-      '/reports': 'http://localhost:8000',
-      '/gaps': 'http://localhost:8000',
-    },
-  },
   test: {
     environment: 'jsdom',
     setupFiles: ['./src/test/setup.ts'],

@@ -162,4 +162,31 @@ def create_app(
 # ---------------------------------------------------------------------------
 # 模块级 app 实例（供 uvicorn 直接引用：uvicorn agent.main:app）
 # ---------------------------------------------------------------------------
-app = create_app()
+def _wire_production_deps() -> dict[str, Any]:
+    """从环境装配生产依赖（DB-backed GapStore + BugReportDbRepository + SessionLocal）。
+
+    失败时返回空 dict，由 create_app 用各参数默认值（None）启动，
+    保留「无 DB 调试模式」兼容性。
+    """
+    try:
+        from agent.gap.gap_store import GapStore
+        from agent.gap_mgmt.reflow_manager import ReflowManager
+        from agent.infra.db import SessionLocal
+        from agent.infra.db_repositories import MetricPointDbRepository
+        from agent.intake.bug_report_db_store import BugReportDbRepository
+
+        return {
+            "gap_store": GapStore(SessionLocal),
+            "reflow_manager": ReflowManager(),
+            "bug_report_repo": BugReportDbRepository(SessionLocal),
+            "metric_point_repo": MetricPointDbRepository(SessionLocal),
+            "session_factory": SessionLocal,
+            "clarify_option_provider": lambda rid: [],
+            "webhook_platforms": {"sentry", "crashlytics", "bugly"},
+        }
+    except Exception as exc:  # pragma: no cover
+        logger.warning("Production deps wiring failed: %s", exc)
+        return {}
+
+
+app = create_app(**_wire_production_deps())

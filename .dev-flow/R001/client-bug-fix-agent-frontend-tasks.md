@@ -6,7 +6,7 @@ requirement_cycle: R001
 workflow:
   evaluate_provider: codex
   mode: auto
-status: planned
+status: completed
 ---
 
 # 客户端 Bug 修复 Agent — 前端任务清单
@@ -48,7 +48,7 @@ status: planned
 
 ---
 
-## R001-FE01：项目骨架与依赖 `⬜ 待处理`
+## R001-FE01：项目骨架与依赖 `✅ 已完成`
 
 - 文件：`frontend/package.json`、`frontend/vite.config.ts`、`frontend/tsconfig.json`、`frontend/index.html`
 - 改动类型：新建
@@ -147,7 +147,7 @@ Vite 入口 HTML 挂载 `#root`；main.tsx 暂留 `<h1>boot ok</h1>` 占位（FE
 
 ---
 
-## R001-FE02：types/ 类型定义 `⬜ 待处理`
+## R001-FE02：types/ 类型定义 `✅ 已完成`
 
 - 文件：`frontend/src/types/report.ts`、`frontend/src/types/gap.ts`、`frontend/src/types/api.ts`
 - 改动类型：新建
@@ -319,7 +319,7 @@ export interface ApiError {
 
 ---
 
-## R001-FE03：services/apiClient.ts `⬜ 待处理`
+## R001-FE03：services/apiClient.ts `✅ 已完成`
 
 - 文件：`frontend/src/services/apiClient.ts`
 - 改动类型：新建
@@ -369,7 +369,7 @@ export async function apiClient<T>(
 
 ---
 
-## R001-FE04：services/ 领域 API `⬜ 待处理`
+## R001-FE04：services/ 领域 API `✅ 已完成`
 
 - 文件：`frontend/src/services/reportApi.ts`、`frontend/src/services/gapApi.ts`、`frontend/src/services/clarifyApi.ts`
 - 改动类型：新建
@@ -449,7 +449,7 @@ export const clarifyApi = {
 
 ---
 
-## R001-FE05：utils/ `⬜ 待处理`
+## R001-FE05：utils/ `✅ 已完成`
 
 - 文件：`frontend/src/utils/format.ts`、`frontend/src/utils/treeBuilder.ts`
 - 改动类型：新建
@@ -524,7 +524,7 @@ export function buildHypothesisTree(hypotheses: Hypothesis[]): TreeDataNode[] {
 
 ---
 
-## R001-FE06：hooks/ `⬜ 待处理`
+## R001-FE06：hooks/ `✅ 已完成`
 
 - 文件：`frontend/src/hooks/useReport.ts`、`frontend/src/hooks/useGaps.ts`、`frontend/src/hooks/useClarify.ts`、`frontend/src/hooks/useRegressionFeedback.ts`
 - 改动类型：新建
@@ -629,7 +629,7 @@ export function useRegressionFeedback(reportId: string) {
 
 ---
 
-## R001-FE07：components/common/ `⬜ 待处理`
+## R001-FE07：components/common/ `✅ 已完成`
 
 - 文件：`frontend/src/components/common/PageContainer.tsx`、`frontend/src/components/common/StatusBadge.tsx`
 - 改动类型：新建
@@ -682,7 +682,7 @@ export function StatusBadge({ status, tier }: { status?: BugReportStatus; tier?:
 
 ---
 
-## R001-FE08：components/report/ `⬜ 待处理`
+## R001-FE08：components/report/ `✅ 已完成`
 
 - 文件：`frontend/src/components/report/ReportHeader.tsx`、`HypothesisTree.tsx`、`FixPatchCard.tsx`、`TrajectoryTimeline.tsx`、`RegressionFeedbackForm.tsx`
 - 改动类型：新建
@@ -759,7 +759,7 @@ interface Props {
 
 ---
 
-## R001-FE09：components/gap/ `⬜ 待处理`
+## R001-FE09：components/gap/ `✅ 已完成`
 
 - 文件：`frontend/src/components/gap/GapList.tsx`、`GapUnblockAction.tsx`
 - 改动类型：新建
@@ -809,7 +809,7 @@ interface Props { gap: CapabilityGap; }
 
 ---
 
-## R001-FE10：components/clarify/ClarifyForm.tsx `⬜ 待处理`
+## R001-FE10：components/clarify/ClarifyForm.tsx `✅ 已完成`
 
 - 文件：`frontend/src/components/clarify/ClarifyForm.tsx`
 - 改动类型：新建
@@ -851,7 +851,7 @@ interface Props {
 
 ---
 
-## R001-FE11：main.tsx + App.tsx `⬜ 待处理`
+## R001-FE11：main.tsx + App.tsx `✅ 已完成`
 
 - 文件：`frontend/src/main.tsx`、`frontend/src/App.tsx`
 - 改动类型：新建
@@ -908,7 +908,7 @@ const router = createBrowserRouter([
 
 ---
 
-## R001-FE12：routes/ `⬜ 待处理`
+## R001-FE12：routes/ `✅ 已完成`
 
 - 文件：`frontend/src/routes/ReportListPage.tsx`、`ReportDetailPage.tsx`、`GapViewPage.tsx`、`ClarifyPage.tsx`
 - 改动类型：新建
@@ -970,7 +970,7 @@ const router = createBrowserRouter([
 
 ---
 
-## R001-FE13：mocks/ MSW mock 层 `⬜ 待处理`
+## R001-FE13：mocks/ MSW mock 层 `✅ 已完成`
 
 - 文件：`frontend/src/mocks/handlers.ts`、`frontend/src/mocks/server.ts`、`frontend/src/mocks/browser.ts`
 - 改动类型：新建
@@ -1055,7 +1055,7 @@ export const worker = setupWorker(...handlers);
 
 ---
 
-## R001-FE14：handlers.spec.ts 契约守护测试 `⬜ 待处理`
+## R001-FE14：handlers.spec.ts 契约守护测试 `✅ 已完成`
 
 - 文件：`frontend/src/mocks/handlers.spec.ts`、`frontend/src/test/setup.ts`
 - 改动类型：新建
@@ -1101,7 +1101,7 @@ afterAll(() => server.close());
 
 ---
 
-## R001-FE15：组件 + utils 单测 `⬜ 待处理`
+## R001-FE15：组件 + utils 单测 `✅ 已完成`
 
 - 文件：`frontend/src/components/**/*.spec.tsx`、`frontend/src/utils/*.spec.ts`、`frontend/src/hooks/*.spec.tsx`
 - 改动类型：新建
@@ -1153,7 +1153,7 @@ format.ts 映射断言 + treeBuilder.ts 构建（含 10 层嵌套 / 100+ 节点 
 
 ---
 
-## R001-FE16：最后 — 编译验证 + 测试路径 `⬜ 待处理`
+## R001-FE16：最后 — 编译验证 + 测试路径 `✅ 已完成`
 
 - 文件：无（验证步骤）
 - 改动类型：配置

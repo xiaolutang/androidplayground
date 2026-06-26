@@ -96,6 +96,8 @@ class SmartFocusTraversalPolicy extends FocusTraversalPolicy
   ///   候选 scope 是 startScope 的后代 → 触发三层降级
   /// - 从内层 scope 向外层 scope 移动（如右内容区→左导航）：
   ///   候选 scope 不是 startScope 的后代 → 直接聚焦候选
+  ///
+  /// @visibleForTesting 包装见 [isDescendantScopeForTest]。
   bool _isDescendantScope(FocusScopeNode candidate, FocusScopeNode ancestor) {
     FocusNode? node = candidate.parent;
     while (node != null) {
@@ -237,6 +239,28 @@ class SmartFocusTraversalPolicy extends FocusTraversalPolicy
   ) {
     return _orderedPolicy.sortDescendants(descendants, currentNode);
   }
+
+  // ─────────────────────────────────────────────────────────────────────
+  // 以下为 @visibleForTesting 包装方法，仅用于单元测试直接调用
+  // _findDirectionalCandidate / _isDescendantScope（私有方法）。
+  // inDirection 本身已是 public @override，测试可直接调用，无需包装。
+  // 不改策略逻辑，仅暴露内部方法给测试断言。
+  // ─────────────────────────────────────────────────────────────────────
+
+  /// @visibleForTesting 包装：调用 [_findDirectionalCandidate]。
+  @visibleForTesting
+  FocusNode? findDirectionalCandidateForTest(
+    FocusScopeNode scope,
+    FocusNode anchor,
+    TraversalDirection direction,
+  ) =>
+      _findDirectionalCandidate(scope, anchor, direction);
+
+  /// @visibleForTesting 包装：调用 [_isDescendantScope]。
+  @visibleForTesting
+  bool isDescendantScopeForTest(
+          FocusScopeNode candidate, FocusScopeNode ancestor) =>
+      _isDescendantScope(candidate, ancestor);
 
   /// 清空指定 scope 的记忆（调试浮层"重置记忆"按钮触发）。
   ///

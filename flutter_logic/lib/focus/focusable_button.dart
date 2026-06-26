@@ -37,6 +37,15 @@ class FocusableButton extends StatefulWidget {
 class _FocusableButtonState extends State<FocusableButton> {
   late final FocusNode _focusNode;
 
+  /// 测试用：标记 dispose() 是否被调用。
+  /// 通过 [isDisposed] getter 暴露给测试断言，验证 FF004 确实在 unmount 时调了 dispose。
+  bool _disposed = false;
+
+  /// @visibleForTesting：返回 [_disposed]，用于测试断言 dispose 被真正调用。
+  /// 测试须在 widget unmount 前拿到 State 引用（unmount 后 tester.state() 会抛异常）。
+  @visibleForTesting
+  bool get isDisposed => _disposed;
+
   @override
   void initState() {
     super.initState();
@@ -61,6 +70,7 @@ class _FocusableButtonState extends State<FocusableButton> {
 
   @override
   void dispose() {
+    _disposed = true;
     _focusNode.dispose();
     super.dispose();
   }

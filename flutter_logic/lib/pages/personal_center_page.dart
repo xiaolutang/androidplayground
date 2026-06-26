@@ -10,11 +10,17 @@ import '../debug/focus_debug_overlay.dart';
 /// - 场景 B：跨区域来回切换，焦点回到上次位置（记忆层）
 /// - 场景 C：动态删除当前焦点节点，按方向键焦点不丢失（兜底层）
 ///
-/// 布局：左导航（OrderedTraversalPolicy）+ 右内容区（SmartFocusTraversalPolicy）。
+/// 布局：左导航 + 右内容区，共用一个 [FocusTraversalGroup]
+/// （[SmartFocusTraversalPolicy]）。
 ///
-/// **关键**：每个 [FocusTraversalGroup] 都配对了独立的 [FocusScope]，
-/// 这是 FF003 [SmartFocusTraversalPolicy] 记忆层正常工作的前提——
-/// [FocusScopeNode.focusedChild] 由 [FocusScope] 维护。
+/// **关键**（FB007 修复）：
+/// - 整个 body 外层包一个 [FocusTraversalGroup]（[SmartFocusTraversalPolicy]），
+///   子区域**不**各自创建独立 group。
+///   这样 `FocusTraversalGroup.of()` 始终返回外层 SmartFocusTraversalPolicy，
+///   `nearestScope.traversalDescendants` 包含所有区域的节点，
+///   方向键候选搜索能跨越区域边界。
+/// - 右内容区保留独立 [FocusScope]（不配 [FocusTraversalGroup]），
+///   为 [SmartFocusTraversalPolicy] 记忆层提供 [FocusScopeNode.focusedChild]。
 ///
 /// **FB007 测试入口**：通过 [onDeleteCurrentFocus] public 方法暴露删除逻辑，
 /// 集成测试可用 `pageKey.currentState!.onDeleteCurrentFocus()` 注入删除动作。
@@ -40,9 +46,9 @@ class PersonalCenterDemoPageState extends State<PersonalCenterDemoPage> {
   /// 当前 primaryFocus 的 debugLabel，驱动调试浮层显示。
   String _primaryFocusLabel = 'null';
 
-  /// 右侧内容区的 SmartFocusTraversalPolicy 实例引用。
-  /// onResetMemory 回调通过此引用调用 [SmartFocusTraversalPolicy.resetMemory]。
-  final SmartFocusTraversalPolicy _rightPolicy = SmartFocusTraversalPolicy();
+  /// 外层 FocusTraversalGroup 的 SmartFocusTraversalPolicy 实例。
+  /// 整个 body 共用此 policy，负责方向键的跨 scope 智能降级。
+  final SmartFocusTraversalPolicy _parentPolicy = SmartFocusTraversalPolicy();
 
   /// 右侧 FocusScope 的 GlobalKey，用于获取 [FocusScopeNode]。
   final GlobalKey _rightScopeKey = GlobalKey();
@@ -105,7 +111,7 @@ class PersonalCenterDemoPageState extends State<PersonalCenterDemoPage> {
   void _onResetMemory() {
     final BuildContext? ctx = _rightScopeKey.currentContext;
     if (ctx == null) return;
-    _rightPolicy.resetMemory(FocusScope.of(ctx));
+    _parentPolicy.resetMemory(FocusScope.of(ctx));
   }
 
   /// 打印右侧 scope 的 rect（调试浮层"打印 Rect"回调）。
@@ -119,46 +125,48 @@ class PersonalCenterDemoPageState extends State<PersonalCenterDemoPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('个人中心')),
-      body: Stack(
-        children: [
-          Row(
-            children: [
-              // ── 左导航（窄列）──
-              // policy: OrderedTraversalPolicy（默认 Tab 顺序，不参与跨区域智能降级）
-              // 配对 FocusScope：让左导航拥有独立的 focusedChild 记忆。
-              Expanded(
-                flex: 1,
-                child: FocusScope(
-                  child: FocusTraversalGroup(
-                    policy: OrderedTraversalPolicy(),
-                    child: Container(
-                      color: Colors.grey.withValues(alpha: 0.05),
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 16, vertical: 24),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: const <Widget>[
-                          FocusableButton(label: '个人中心'),
-                          SizedBox(height: 12),
-                          FocusableButton(label: '设置'),
-                          SizedBox(height: 12),
-                          FocusableButton(label: '关于'),
-                        ],
-                      ),
+      // ── 外层 FocusTraversalGroup（FB007 修复）──
+      // 整个 body 共用一个 SmartFocusTraversalPolicy：
+      // 左导航 + 右内容区的 FocusNode 都属于同一个 FocusTraversalGroup，
+      // `FocusTraversalGroup.of()` 始终返回此 policy。
+      // 左导航的 nearestScope 是外层（根）scope，包含所有节点，
+      // 方向键候选搜索能跨越区域边界找到右侧节点。
+      body: FocusTraversalGroup(
+        policy: _parentPolicy,
+        child: Stack(
+          children: [
+            Row(
+              children: [
+                // ── 左导航（窄列）──
+                // 不创建独立 FocusScope 和 FocusTraversalGroup：
+                // 左导航的 FocusNode 直接属于外层 group + 外层 scope。
+                Expanded(
+                  flex: 1,
+                  child: Container(
+                    color: Colors.grey.withValues(alpha: 0.05),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 16, vertical: 24),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: const <Widget>[
+                        FocusableButton(label: '个人中心', autofocus: true),
+                        SizedBox(height: 12),
+                        FocusableButton(label: '设置'),
+                        SizedBox(height: 12),
+                        FocusableButton(label: '关于'),
+                      ],
                     ),
                   ),
                 ),
-              ),
-              // ── 右内容区（宽列）──
-              // policy: SmartFocusTraversalPolicy（三层降级核心）
-              // 配对 FocusScope：SmartFocusTraversalPolicy 的记忆层依赖
-              // FocusScopeNode.focusedChild，必须有独立 FocusScope 才能工作。
-              Expanded(
-                flex: 2,
-                child: FocusScope(
-                  key: _rightScopeKey,
-                  child: FocusTraversalGroup(
-                    policy: _rightPolicy,
+                // ── 右内容区（宽列）──
+                // 保留独立 FocusScope（为 SmartFocusTraversalPolicy 记忆层服务），
+                // 但不创建独立 FocusTraversalGroup。
+                // 当方向键候选落在右侧 scope 时，_isCrossScope 检测到跨 scope，
+                // 触发 _smartRequestFocus(rightScope) 执行三层降级。
+                Expanded(
+                  flex: 2,
+                  child: FocusScope(
+                    key: _rightScopeKey,
                     child: Container(
                       padding: const EdgeInsets.symmetric(
                           horizontal: 32, vertical: 24),
@@ -178,21 +186,21 @@ class PersonalCenterDemoPageState extends State<PersonalCenterDemoPage> {
                     ),
                   ),
                 ),
-              ),
-            ],
-          ),
-          // ── 调试浮层（D7：底部叠加，不抢焦点）──
-          Positioned(
-            right: 12,
-            bottom: 12,
-            child: FocusDebugOverlay(
-              primaryFocusLabel: _primaryFocusLabel,
-              onDeleteCurrentFocus: onDeleteCurrentFocus,
-              onResetMemory: _onResetMemory,
-              onPrintRect: _onPrintRect,
+              ],
             ),
-          ),
-        ],
+            // ── 调试浮层（D7：底部叠加，不抢焦点）──
+            Positioned(
+              right: 12,
+              bottom: 12,
+              child: FocusDebugOverlay(
+                primaryFocusLabel: _primaryFocusLabel,
+                onDeleteCurrentFocus: onDeleteCurrentFocus,
+                onResetMemory: _onResetMemory,
+                onPrintRect: _onPrintRect,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

@@ -33,7 +33,7 @@ status: planned
 4. ✅ R002-FF005 — SmartFocusTraversalPolicy 单元测试（依赖 FF003，验证三层降级 5 条分支）
 5. 🔧 R002-FF006 — FocusableButton widget 测试（依赖 FF004，验证高亮 + enabled + dispose）
 6. ✅ R002-FB005 — PersonalCenterDemoPage 页面组装 + main.dart 入口改造（依赖 FF003 + FF004 + FB006）
-7. ⬜ R002-FB007 — 焦点 demo 三场景集成测试（依赖 FB005 + FF005 + FF006，自动化验证 A/B/C）
+7. ✅ R002-FB007 — 焦点 demo 三场景集成测试（依赖 FB005 + FF005 + FF006，自动化验证 A/B/C）
 8. ⬜ 最后 — 编译验证 + `flutter test` 全量 + 三场景手动验证（依赖 FB007）
 
 ---
@@ -770,7 +770,7 @@ class MyApp extends StatelessWidget {
 
 ---
 
-## R002-FB007：focus_demo_test.dart — 三场景集成测试 `⬜ 待处理`
+## R002-FB007：focus_demo_test.dart — 三场景集成测试 `✅ 已完成`
 
 > 测试目标：FB005 PersonalCenterDemoPage。本任务不新增功能节点，自动化验证 analysis 中定义的三场景 A/B/C。依赖 FF005（单元测试）+ FF006（widget 测试）保证底层正确性。
 

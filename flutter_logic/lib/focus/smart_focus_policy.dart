@@ -4,22 +4,23 @@ import 'package:flutter/widgets.dart';
 ///
 /// 挂在 [FocusTraversalGroup.policy] 上，方向键触发时被 Flutter 焦点系统回调。
 ///
-/// ## 触发机制（R002-FF003 修复后）
+/// ## 触发机制（R002-FB007 修复后）
 ///
 /// Flutter SDK 方向键的实际调用链：
 /// 1. `FocusNode.focusInDirection()` →
 ///    `FocusTraversalGroup.of(context).inDirection(this, direction)`
-/// 2. `DirectionalFocusTraversalPolicyMixin.inDirection()` 默认实现：
-///    - `focusedChild == null` → 调用 `findFirstFocusInDirection()`（几何排序）
-///    - `focusedChild != null` → 走 `_sortAndFilterHorizontally/Vertically`
-///      （几何就近）
-/// 3. **两条路径都不调用 `findFirstFocus()`**
+/// 2. `FocusTraversalGroup.of(context)` 返回**最近**祖先 group 的 policy
 ///
-/// 因此，本类重写 [inDirection] 来拦截方向键事件：
+/// **关键**：为了让方向键跨区域工作，整个页面应共用一个 [FocusTraversalGroup]
+/// （挂载本 policy），子区域用 [FocusScope] 隔离记忆但**不**各自创建独立 group。
+/// 这样 `FocusTraversalGroup.of()` 始终返回本 policy，`nearestScope` 包含
+/// 所有区域的节点，方向键候选搜索能跨越区域边界。
+///
+/// 本类重写 [inDirection] 来拦截方向键事件：
 /// - 先在方向轴上做几何排序找候选目标节点。
-/// - 检查候选是否与当前焦点跨越了 [FocusTraversalGroup] 边界。
-/// - 若**跨 group**：对目标 group 的 scope 执行三层降级（记忆>优先级>兜底）。
-/// - 若**同 group 内**：直接聚焦候选，保持几何就近。
+/// - 检查候选是否与当前焦点跨越了 [FocusScope] 边界。
+/// - 若**跨 scope**：对目标 scope 执行三层降级（记忆>优先级>兜底）。
+/// - 若**同 scope 内**：直接聚焦候选，保持几何就近。
 ///
 /// ## 三层降级顺序
 /// 1. **记忆层**：复用 [FocusScopeNode.focusedChild]（SDK 自动维护的上次焦点子节点）。
@@ -88,68 +89,75 @@ class SmartFocusTraversalPolicy extends FocusTraversalPolicy
     return null;
   }
 
-  /// 获取 [FocusNode] 所属的 [FocusTraversalGroup] 的 policy 实例。
+  /// 判断 [candidate] scope 是否是 [ancestor] scope 的后代。
   ///
-  /// 通过 [FocusTraversalGroup.maybeOf] 查询节点 context 所在的 group。
-  /// 返回 null 表示节点没有 context 或没有祖先 group。
-  /// 两个节点如果返回相同的 policy 实例（[identical]），则它们在同一 group。
-  FocusTraversalPolicy? _groupPolicyOf(FocusNode node) {
-    final BuildContext? ctx = node.context;
-    if (ctx == null) return null;
-    return FocusTraversalGroup.maybeOf(ctx);
+  /// 用于区分方向键移动方向：
+  /// - 从外层 scope 向内层 scope 移动（如左导航→右内容区）：
+  ///   候选 scope 是 startScope 的后代 → 触发三层降级
+  /// - 从内层 scope 向外层 scope 移动（如右内容区→左导航）：
+  ///   候选 scope 不是 startScope 的后代 → 直接聚焦候选
+  bool _isDescendantScope(FocusScopeNode candidate, FocusScopeNode ancestor) {
+    FocusNode? node = candidate.parent;
+    while (node != null) {
+      if (identical(node, ancestor)) return true;
+      node = node.parent;
+    }
+    return false;
   }
 
-  /// 判断两个 [FocusNode] 是否属于不同的 [FocusTraversalGroup]。
-  bool _isCrossGroup(FocusNode a, FocusNode b) {
-    final FocusTraversalPolicy? policyA = _groupPolicyOf(a);
-    final FocusTraversalPolicy? policyB = _groupPolicyOf(b);
-    if (policyA == null || policyB == null) return false;
-    return !identical(policyA, policyB);
-  }
-
-  /// 方向键入口：检测跨 [FocusTraversalGroup] 边界的移动并触发三层降级。
-  ///
-  /// 采用方案 A：自行实现方向键几何排序，在排序结果上检测是否跨 group。
-  /// 这样完全避免 super 污染 [FocusScopeNode.focusedChild] 记忆的问题。
+  /// 方向键入口：检测跨 [FocusScope] 边界的移动并触发三层降级。
   ///
   /// 策略：
   /// 1. 确定基准节点（[FocusScopeNode.focusedChild] 优先，否则用 currentNode）。
-  /// 2. 在 nearestScope 的 traversalDescendants 中，按方向过滤+几何排序找候选。
-  /// 3. 若候选与基准跨 group：对候选的 scope 执行 [_smartRequestFocus]。
-  /// 4. 若同 group：直接聚焦候选（保持几何就近）。
-  /// 5. 若无候选：fallback 到 super.inDirection。
+  /// 2. 从 nearestScope 开始，逐级向上搜索父 scope 的 traversalDescendants，
+  ///    按方向过滤+几何排序找候选。这确保跨 scope（如左导航↔右内容区）的方向键
+  ///    能找到目标区域的节点。
+  /// 3. 若候选与基准跨 scope：对候选的 scope 执行 [_smartRequestFocus]（记忆>优先级>兜底）。
+  /// 4. 若同 scope：直接聚焦候选（保持几何就近）。
+  /// 5. 若无候选（所有层级都找不到）：fallback 到 super.inDirection。
   @override
   bool inDirection(FocusNode currentNode, TraversalDirection direction) {
-    final FocusScopeNode? scope = currentNode.nearestScope;
-    if (scope == null) {
+    final FocusScopeNode? startScope = currentNode.nearestScope;
+    if (startScope == null) {
       return super.inDirection(currentNode, direction);
     }
 
     // 确定基准节点：优先用 focusedChild，否则用 currentNode
-    final FocusNode? focusedChild = scope.focusedChild;
+    final FocusNode? focusedChild = startScope.focusedChild;
     final FocusNode anchor =
         (focusedChild != null && focusedChild.canRequestFocus)
             ? focusedChild
             : currentNode;
 
-    // 按方向做几何过滤+排序，找候选目标
-    final FocusNode? candidate =
-        _findDirectionalCandidate(scope, anchor, direction);
+    // 从 nearestScope 开始逐级向上搜索候选
+    // 这保证跨 scope 的方向键能找到目标区域的节点
+    FocusScopeNode? scope = startScope;
+    while (scope != null) {
+      final FocusNode? candidate =
+          _findDirectionalCandidate(scope, anchor, direction);
 
-    if (candidate != null) {
-      if (_isCrossGroup(anchor, candidate)) {
-        // 跨 group：对候选的 scope 执行三层降级
-        final FocusScopeNode? targetScope = candidate.nearestScope;
-        if (targetScope != null) {
-          return _smartRequestFocus(targetScope);
+      if (candidate != null) {
+        final FocusScopeNode? candidateScope = candidate.nearestScope;
+        if (candidateScope != null &&
+            candidateScope != startScope &&
+            _isDescendantScope(candidateScope, startScope)) {
+          // 候选在 startScope 的子 scope 中（如左导航→右内容区）：
+          // 对候选的 scope 执行三层降级（记忆>优先级>兜底）
+          return _smartRequestFocus(candidateScope);
         }
+        // 同 scope 或候选在祖先 scope（如右内容区→左导航）：
+        // 直接聚焦候选（几何就近），不走三层降级
+        candidate.requestFocus();
+        return true;
       }
-      // 同 group：直接聚焦候选（几何就近）
-      candidate.requestFocus();
-      return true;
+
+      // 当前 scope 内无候选，向上到父 scope 继续搜索
+      // enclosingScope 会跳过非 scope 的中间 FocusNode，
+      // 直接找到祖先链中的下一个 FocusScopeNode
+      scope = scope.enclosingScope;
     }
 
-    // 无候选（例如已在边缘）：交给 super 处理边缘情况
+    // 所有层级都无候选（例如已在边缘）：交给 super 处理边缘情况
     return super.inDirection(currentNode, direction);
   }
 

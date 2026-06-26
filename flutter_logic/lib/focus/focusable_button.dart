@@ -18,12 +18,16 @@ class FocusableButton extends StatefulWidget {
   /// 是否启用。false 时 [FocusNode.canRequestFocus] 置 false，按钮不可聚焦。
   final bool enabled;
 
+  /// 是否自动获取焦点。true 时挂载后自动 requestFocus。
+  final bool autofocus;
+
   const FocusableButton({
     super.key,
     required this.label,
     this.order,
     this.onTap,
     this.enabled = true,
+    this.autofocus = false,
   });
 
   @override
@@ -69,6 +73,7 @@ class _FocusableButtonState extends State<FocusableButton> {
       },
       child: Focus(
         focusNode: _focusNode,
+        autofocus: widget.autofocus,
         child: Builder(
           builder: (context) {
             final bool focused = Focus.of(context).hasFocus;

@@ -4,12 +4,13 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
 import 'package:flutter_logic/pages/personal_center_page.dart';
 
-/// R002-FB007：焦点 demo 三场景集成测试
+/// R002-FB007：焦点 demo 集成测试
 ///
 /// 验证 PersonalCenterDemoPage 的三层降级焦点策略：
 /// - 场景 A：首次进入右侧内容区，焦点落在 [NumericFocusOrder(1.0)] 的"会员签到"
 /// - 场景 B：跨区域来回切换，焦点回到上次位置（记忆层）
 /// - 场景 C：动态删除当前焦点节点，按方向键焦点不丢失（兜底层）
+/// - 场景 D：左导航垂直方向键不跨区域（FIX001 列聚类隔离）
 ///
 /// **FB007 修复后**：
 /// - Finding 1 已修复：左导航第一项 `FocusableButton(autofocus: true)`
@@ -29,7 +30,7 @@ void main() {
     await tester.pumpAndSettle();
   }
 
-  group('焦点 demo 三场景', () {
+  group('焦点 demo 四场景', () {
     /// 场景 A：首次从左导航按右键进入右侧内容区，焦点应精准落在优先级最高的"会员签到"。
     ///
     /// 验证点：
@@ -157,6 +158,36 @@ void main() {
         ['账户信息', '退出登录'].contains(label),
         isTrue,
         reason: '焦点应落在右侧剩余按钮上（账户信息/退出登录），实际落在: $label',
+      );
+    });
+
+    /// 场景 D：左导航垂直方向键不跨区域（FIX001 列聚类隔离）。
+    ///
+    /// 验证点：
+    /// 1. 左导航内部按上下键，焦点只在左导航 3 个按钮间移动
+    /// 2. 不会因几何就近跳到右内容区（同行 Y 距离=0 的节点）
+    testWidgets('场景 D：左导航垂直键不跨区域（FIX001 列隔离）', (tester) async {
+      await pumpApp(tester);
+
+      // 初始焦点在"个人中心"
+      expect(FocusManager.instance.primaryFocus?.debugLabel, '个人中心');
+
+      // 按下键 → 应到"设置"（同列），不跳右内容区
+      await tester.sendKeyEvent(LogicalKeyboardKey.arrowDown);
+      await tester.pumpAndSettle();
+      expect(
+        FocusManager.instance.primaryFocus?.debugLabel,
+        '设置',
+        reason: '左导航按下键应到同列下一个按钮，不跳到右内容区',
+      );
+
+      // 再按下键 → 应到"关于"（同列），不跳右内容区
+      await tester.sendKeyEvent(LogicalKeyboardKey.arrowDown);
+      await tester.pumpAndSettle();
+      expect(
+        FocusManager.instance.primaryFocus?.debugLabel,
+        '关于',
+        reason: '左导航连续按下键应在同列内移动',
       );
     });
   });

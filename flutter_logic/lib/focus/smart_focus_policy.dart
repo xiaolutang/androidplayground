@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 
 /// 自定义焦点遍历策略：记忆 > 优先级 > 物理兜底三层降级。

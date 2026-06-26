@@ -219,6 +219,16 @@ class SmartFocusTraversalPolicy extends FocusTraversalPolicy
 
       if (!forward) continue;
 
+      // 列聚类：垂直方向键时，只保留与 anchor 在 X 轴上有水平重叠的候选。
+      // 防止左导航上下键跳到右内容区（同行 Y 距离=0 会胜出同列下一行）。
+      // 用区间相交判断（非中心点），宽窄不同的按钮也能正确聚类。
+      if (direction == TraversalDirection.up ||
+          direction == TraversalDirection.down) {
+        if (r.left >= anchorRect.right || r.right <= anchorRect.left) {
+          continue;
+        }
+      }
+
       // 选方向轴距离最小的；若相同，选正交轴距离最小的
       if (primary < bestPrimary ||
           (primary == bestPrimary && secondary < bestSecondary)) {

@@ -488,6 +488,51 @@ void main() {
 
       expect(candidate, isNull);
     });
+
+    // ─── FIX001: 垂直方向列聚类隔离 ───
+    //
+    // 防止左导航上下键跳到右内容区：垂直方向键时，候选必须与 anchor
+    // 在 X 轴上有水平重叠（同一列），否则跳过。
+
+    testWidgets('FIX001: 垂直方向列隔离 — 左列下键不跳到右列', (tester) async {
+      final harness = await buildDirectionalHarness(
+        tester,
+        layout: [
+          // 左列
+          (label: 'L1', left: 0, top: 0, w: 100, h: 40),
+          (label: 'L2', left: 0, top: 100, w: 100, h: 40),
+          // 右列（与左列同行，X 区间不重叠）
+          (label: 'R1', left: 200, top: 0, w: 100, h: 40),
+          (label: 'R2', left: 200, top: 100, w: 100, h: 40),
+        ],
+      );
+
+      // L1 按下键 → 候选应为 L2（同列），非 R2（同行 Y 距离=0 但不同列）
+      final candidate = harness.policy.findDirectionalCandidateForTest(
+        harness.scopeRef, harness.nodes[0], TraversalDirection.down,
+      );
+      expect(candidate?.debugLabel, 'L2',
+          reason: '垂直方向应只在同列内搜索，不跳到右列');
+    });
+
+    testWidgets('FIX001: 水平方向不受列隔离 — 左列右键仍找到右列', (tester) async {
+      final harness = await buildDirectionalHarness(
+        tester,
+        layout: [
+          (label: 'L1', left: 0, top: 0, w: 100, h: 40),
+          (label: 'L2', left: 0, top: 100, w: 100, h: 40),
+          (label: 'R1', left: 200, top: 0, w: 100, h: 40),
+          (label: 'R2', left: 200, top: 100, w: 100, h: 40),
+        ],
+      );
+
+      // L1 按右键 → 候选应为 R1（水平方向不受 X 重叠过滤）
+      final candidate = harness.policy.findDirectionalCandidateForTest(
+        harness.scopeRef, harness.nodes[0], TraversalDirection.right,
+      );
+      expect(candidate?.debugLabel, 'R1',
+          reason: '水平方向不受列隔离过滤');
+    });
   });
 
   group('Finding 5.3: inDirection 入口逻辑', () {

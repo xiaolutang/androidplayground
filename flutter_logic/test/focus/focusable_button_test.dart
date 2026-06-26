@@ -15,7 +15,7 @@ void main() {
 
   /// 从当前 widget 树中取出 FocusableButton 内部的 FocusNode。
   ///
-  /// FF004 实现把 `_focusNode' 赋给 [Focus.focusNode]，并令其 debugLabel = widget.label。
+  /// FF004 实现把 `_focusNode` 赋给 [Focus.focusNode]，并令其 debugLabel = widget.label。
   /// 这里直接通过 widget 引用相等匹配 FocusableButton 内部的 Focus，
   /// 避免外层 FocusScope / Actions 引入的其他 Focus 节点干扰。
   FocusNode nodeOf(WidgetTester tester, String label) {
@@ -32,17 +32,19 @@ void main() {
     return focuses.single.focusNode!;
   }
 
-  /// 从 widget 树中取 FocusableButton 内部的 AnimatedContainer 的 BoxDecoration。
-  /// 用 AnimatedContainer 作为查找锚点；FocusableButton 内 widget 树中只有 1 个 AnimatedContainer。
-  BoxDecoration? decorationOf(WidgetTester tester, String label) {
+  /// 从 widget 树中取 FocusableButton 内部 AnimatedContainer 的 BoxDecoration。
+  //
+  // 假设：widget 树中只有一个 FocusableButton（本测试 4 个场景均满足）。
+  // 多 button 场景需要扩展为按 label 过滤。
+  BoxDecoration? decorationOf(WidgetTester tester) {
     final Iterable<AnimatedContainer> widgets = tester.widgetList<AnimatedContainer>(
       find.descendant(
         of: find.byType(FocusableButton),
         matching: find.byType(AnimatedContainer),
       ),
     );
-    // 取与 label 对应那个 button 的：这里假设只有一个 FocusableButton
-    expect(widgets, hasLength(1));
+    expect(widgets, hasLength(1),
+        reason: 'decorationOf 仅支持单 FocusableButton 场景');
     return widgets.single.decoration as BoxDecoration?;
   }
 
@@ -59,7 +61,7 @@ void main() {
       await tester.pumpAndSettle();
 
       // 断言 1：边框颜色为蓝色，宽度为 2
-      final BoxDecoration? deco = decorationOf(tester, 'Confirm');
+      final BoxDecoration? deco = decorationOf(tester);
       expect(deco, isNotNull);
       final Border? border = deco?.border as Border?;
       expect(border, isNotNull);
@@ -109,7 +111,7 @@ void main() {
       expect(buttonNode.hasFocus, isFalse);
 
       // 断言 1：边框颜色为透明（FF004 实现中始终有 Border.all，颜色为 transparent）
-      final BoxDecoration? deco = decorationOf(tester, 'Target');
+      final BoxDecoration? deco = decorationOf(tester);
       expect(deco, isNotNull);
       final Border? border = deco?.border as Border?;
       expect(border, isNotNull);

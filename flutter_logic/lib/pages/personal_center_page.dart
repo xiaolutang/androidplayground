@@ -23,13 +23,10 @@ import '../debug/focus_debug_overlay.dart';
 ///   为 [SmartFocusTraversalPolicy] 记忆层提供 [FocusScopeNode.focusedChild]。
 ///
 /// **FB007 测试入口**：通过 [onDeleteCurrentFocus] public 方法暴露删除逻辑，
-/// 集成测试可用 `pageKey.currentState!.onDeleteCurrentFocus()` 注入删除动作。
+/// 集成测试可用 `tester.state` 拿到 `PersonalCenterDemoPageState` 后调用
+/// [onDeleteCurrentFocus] 注入删除动作。
 class PersonalCenterDemoPage extends StatefulWidget {
-  /// GlobalKey，供 FB007 集成测试通过 currentState 调用 public 方法。
-  /// 用法：`final pageKey = GlobalKey<PersonalCenterDemoPageState>();`
-  final GlobalKey<PersonalCenterDemoPageState>? pageKey;
-
-  const PersonalCenterDemoPage({this.pageKey, super.key});
+  const PersonalCenterDemoPage({super.key});
 
   @override
   State<PersonalCenterDemoPage> createState() => PersonalCenterDemoPageState();
@@ -66,11 +63,7 @@ class PersonalCenterDemoPageState extends State<PersonalCenterDemoPage> {
   }
 
   void _onFocusChange() {
-    if (!mounted) return;
-    setState(() {
-      _primaryFocusLabel =
-          FocusManager.instance.primaryFocus?.debugLabel ?? 'null';
-    });
+    _refreshFocusLabel();
   }
 
   /// **删除当前持有焦点的按钮**（场景 C 注入入口）。
@@ -81,8 +74,8 @@ class PersonalCenterDemoPageState extends State<PersonalCenterDemoPage> {
   /// 3. 用 [WidgetsBinding.instance.addPostFrameCallback] 确保节点 dispose
   ///    在下一帧完成后才返回，保证后续方向键操作时焦点树已稳定。
   ///
-  /// **FB007 测试入口**：此方法为 public，集成测试通过
-  /// `pageKey.currentState!.onDeleteCurrentFocus()` 调用。
+  /// **FB007 测试入口**：此方法为 public，集成测试通过 `tester.state`
+  /// 取 `PersonalCenterDemoPageState` 后调用此方法。
   @visibleForTesting
   void onDeleteCurrentFocus() {
     final String? current = FocusManager.instance.primaryFocus?.debugLabel;
@@ -99,26 +92,44 @@ class PersonalCenterDemoPageState extends State<PersonalCenterDemoPage> {
     // 确保 setState 完成的下一帧，FocusNode dispose 已生效。
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
-      // 触发一次 setState 刷新调试浮层的 primaryFocusLabel
-      setState(() {
-        _primaryFocusLabel =
-            FocusManager.instance.primaryFocus?.debugLabel ?? 'null';
-      });
+      // FocusNode dispose 会触发 FocusManager 通知 _onFocusChange；
+      // 此处的 setState 作为双保险（应对 listener 时序遗漏）。
+      _refreshFocusLabel();
     });
   }
 
   /// 重置右侧 scope 的焦点记忆（调试浮层"重置记忆"回调）。
   void _onResetMemory() {
-    final BuildContext? ctx = _rightScopeKey.currentContext;
-    if (ctx == null) return;
-    _parentPolicy.resetMemory(FocusScope.of(ctx));
+    final FocusScopeNode? scope = _rightScopeNode;
+    if (scope == null) return;
+    _parentPolicy.resetMemory(scope);
   }
 
   /// 打印右侧 scope 的 rect（调试浮层"打印 Rect"回调）。
   void _onPrintRect() {
+    final FocusScopeNode? scope = _rightScopeNode;
+    if (scope == null) return;
+    debugPrint('[FocusDebug] 右侧 scope.rect = ${scope.rect}');
+  }
+
+  /// 取右侧 FocusScope 节点（若未挂载返回 null）。
+  FocusScopeNode? get _rightScopeNode {
     final BuildContext? ctx = _rightScopeKey.currentContext;
-    if (ctx == null) return;
-    debugPrint('[FocusDebug] 右侧 scope.rect = ${FocusScope.of(ctx).rect}');
+    return ctx == null ? null : FocusScope.of(ctx);
+  }
+
+  /// 用最新的 primaryFocus.debugLabel 刷新调试浮层（空值过滤）。
+  //
+  // FocusManager 的 listener 通知粒度较粗，可能在 primaryFocus 实际未变时触发；
+  // 此处短路避免无效 setState 导致整树重建。
+  void _refreshFocusLabel() {
+    if (!mounted) return;
+    final String next =
+        FocusManager.instance.primaryFocus?.debugLabel ?? 'null';
+    if (next == _primaryFocusLabel) return;
+    setState(() {
+      _primaryFocusLabel = next;
+    });
   }
 
   @override

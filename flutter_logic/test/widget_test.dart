@@ -24,5 +24,11 @@ void main() {
     expect(find.text('删除当前焦点'), findsOneWidget);
     expect(find.text('重置记忆'), findsOneWidget);
     expect(find.text('打印 Rect'), findsOneWidget);
+
+    // 初始焦点：左导航首项 autofocus → "个人中心"
+    // （场景 A/B/C 的前置条件；SDK 升级或配置变更最易在此处回归）
+    expect(FocusManager.instance.primaryFocus?.debugLabel, '个人中心');
+    // 浮层接线：浮层显示了 primaryFocusLabel
+    expect(find.text('Focus: 个人中心'), findsOneWidget);
   });
 }

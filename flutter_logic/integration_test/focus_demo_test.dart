@@ -145,7 +145,8 @@ void main() {
         reason: '删除当前焦点后，方向键应找到兜底节点',
       );
 
-      // 验证：焦点落到一个仍存在的可用节点
+      // 验证：焦点落到一个右侧剩余可用节点（场景 C 验证点：
+      // analysis 流程图明确"焦点落到账户信息"，不应跳回左导航）
       final String? label = FocusManager.instance.primaryFocus?.debugLabel;
       expect(
         label,
@@ -153,9 +154,9 @@ void main() {
         reason: '会员签到已被删除，不应再获得焦点',
       );
       expect(
-        ['账户信息', '退出登录', '个人中心', '设置', '关于'].contains(label),
+        ['账户信息', '退出登录'].contains(label),
         isTrue,
-        reason: '焦点应落到一个仍存在的可用节点上，实际落在: $label',
+        reason: '焦点应落在右侧剩余按钮上（账户信息/退出登录），实际落在: $label',
       );
     });
   });

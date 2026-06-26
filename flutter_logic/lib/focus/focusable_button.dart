@@ -41,15 +41,21 @@ class _FocusableButtonState extends State<FocusableButton> {
   void initState() {
     super.initState();
     _focusNode = FocusNode(debugLabel: widget.label);
+    _focusNode.canRequestFocus = widget.enabled;
   }
 
   @override
   void didUpdateWidget(covariant FocusableButton oldWidget) {
     super.didUpdateWidget(oldWidget);
     // label 变化时更新 debugLabel，便于调试浮层辨识
-    // canRequestFocus 同步由 build() 负责，此处不重复
     if (oldWidget.label != widget.label) {
       _focusNode.debugLabel = widget.label;
+    }
+    // enabled 变化时同步 canRequestFocus。
+    // 放在 didUpdateWidget 而非 build()：build 应是纯函数，
+    // 且每次 rebuild 无条件赋值会触发 FocusNode 内部 notifyListeners。
+    if (oldWidget.enabled != widget.enabled) {
+      _focusNode.canRequestFocus = widget.enabled;
     }
   }
 
@@ -61,9 +67,6 @@ class _FocusableButtonState extends State<FocusableButton> {
 
   @override
   Widget build(BuildContext context) {
-    // 同步 enabled → canRequestFocus（初始值/外部变更均覆盖）
-    _focusNode.canRequestFocus = widget.enabled;
-
     // 用 Actions + ActivateIntent 处理回车 / 确认键（无障碍激活标准方式）
     Widget button = Actions(
       actions: <Type, Action<Intent>>{

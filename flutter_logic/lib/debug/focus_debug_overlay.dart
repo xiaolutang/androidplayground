@@ -84,28 +84,24 @@ class FocusDebugOverlay extends StatelessWidget {
     );
   }
 
-  /// 构建一个不抢焦点的调试按钮。
+  /// 构建一个调试按钮。
+  //
+  // 不需再包 Focus(canRequestFocus: false)：外层 build() 已用
+  // Focus(descendantsAreFocusable: false) 禁止整个浮层子树获取焦点。
   Widget _debugButton(String label, VoidCallback onTap) {
-    return Focus(
-      canRequestFocus: false,
-      child: Builder(
-        builder: (context) {
-          return InkWell(
-            onTap: onTap,
-            borderRadius: BorderRadius.circular(4),
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-              decoration: BoxDecoration(
-                color: Colors.white24,
-                borderRadius: BorderRadius.circular(4),
-              ),
-              child: Text(
-                label,
-                style: const TextStyle(color: Colors.white, fontSize: 11),
-              ),
-            ),
-          );
-        },
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(4),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+        decoration: BoxDecoration(
+          color: Colors.white24,
+          borderRadius: BorderRadius.circular(4),
+        ),
+        child: Text(
+          label,
+          style: const TextStyle(color: Colors.white, fontSize: 11),
+        ),
       ),
     );
   }

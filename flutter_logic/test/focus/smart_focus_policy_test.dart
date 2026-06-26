@@ -4,12 +4,20 @@ import 'package:flutter_logic/focus/smart_focus_policy.dart';
 
 /// SmartFocusTraversalPolicy 三层降级逻辑单元测试。
 ///
+/// **测试层级声明**：本文件仅验证 [_smartRequestFocus] / [_findFirstFocusableChild]
+/// / [resetMemory] 的**纯逻辑分支**（通过 `@visibleForTesting` 包装直接调用）。
+/// 方向键端到端路径（含 `inDirection` / `_findDirectionalCandidate` /
+/// `_isDescendantScope`）的覆盖归 FB007 集成测试
+/// （`integration_test/focus_demo_test.dart`，真实 `sendKeyEvent`）。
+///
 /// 覆盖 5 条分支：
 /// 1. 记忆命中：focusedChild 有效 → 直接复用
 /// 2. 优先级命中：focusedChild=null → 命中 NumericFocusOrder(1.0)
 /// 3. 记忆失效：focusedChild 对应节点 dispose / canRequestFocus=false → 跳过记忆走优先级
 /// 4. 优先级全失效 → 走 DFS 兜底
 /// 5. 极端兜底：无任何可用节点 → scope 自身持有焦点
+///
+/// **NumericFocusOrder 语义**：order 值越小优先级越高（1.0 = 最高）。
 void main() {
   /// 构建测试 harness：
   /// - 外层 FocusTraversalGroup 挂载 [SmartFocusTraversalPolicy]
@@ -244,6 +252,11 @@ void main() {
     );
   });
 
+  // ─────────────────────────────────────────────────────────────────────
+  // 以下为 `_findFirstFocusableChild` 算法层独立测试。
+  // 与"分支4 DFS 兜底衔接测试"互补：分支4 验证"优先级层 miss → DFS 兜底"的
+  // 衔接路径；此处直接验证 DFS 算法本身的"跳过不可聚焦 + 全 disabled 返回 null"行为。
+  // ─────────────────────────────────────────────────────────────────────
   group('SmartFocusTraversalPolicy 辅助方法', () {
     testWidgets(
       'findFirstFocusableChild — DFS 遍历找第一个可聚焦节点',

@@ -31,7 +31,7 @@ status: planned
 2. ✅ R002-FF004 — FocusableButton 可聚焦按钮（无依赖，可与 FF003 并行）
 3. ✅ R002-FB006 — FocusDebugOverlay 调试浮层（无依赖，可与 FF003/FF004 并行）
 4. ✅ R002-FF005 — SmartFocusTraversalPolicy 单元测试（依赖 FF003，验证三层降级 5 条分支）
-5. ⬜ R002-FF006 — FocusableButton widget 测试（依赖 FF004，验证高亮 + enabled + dispose）
+5. 🔧 R002-FF006 — FocusableButton widget 测试（依赖 FF004，验证高亮 + enabled + dispose）
 6. ⬜ R002-FB005 — PersonalCenterDemoPage 页面组装 + main.dart 入口改造（依赖 FF003 + FF004 + FB006）
 7. ⬜ R002-FB007 — 焦点 demo 三场景集成测试（依赖 FB005 + FF005 + FF006，自动化验证 A/B/C）
 8. ⬜ 最后 — 编译验证 + `flutter test` 全量 + 三场景手动验证（依赖 FB007）
@@ -498,7 +498,7 @@ flutter test test/focus/smart_focus_policy_test.dart
 
 ---
 
-## R002-FF006：focusable_button_test.dart — FocusableButton widget 测试 `⬜ 待处理`
+## R002-FF006：focusable_button_test.dart — FocusableButton widget 测试 `✅ 已完成`
 
 > 测试目标：FF004 FocusableButton。本任务不新增功能节点，仅验证 FF004 的高亮与生命周期。
 
@@ -511,7 +511,7 @@ flutter test test/focus/smart_focus_policy_test.dart
 - risk_tags: []
 - smoke_required: true
 - mode: direct
-- status: pending
+- status: done
 - acceptance_criteria:
   - 测试文件位于 `flutter_logic/test/focus/focusable_button_test.dart`
   - 用 `flutter test` 运行，全部通过，无 error
@@ -533,7 +533,7 @@ flutter test test/focus/smart_focus_policy_test.dart
 - decision_refs: [D6]
 - blocked_files: []
 
-### FF006.1 widget 测试骨架 `⬜`
+### FF006.1 widget 测试骨架 `✅`
 
 ```dart
 // flutter_logic/test/focus/focusable_button_test.dart
@@ -544,14 +544,14 @@ import 'package:flutter_logic/focus/focusable_button.dart';
 Widget _wrap(Widget child) => MaterialApp(home: Scaffold(body: child));
 ```
 
-### FF006.2 4 条场景用例编写 `⬜`
+### FF006.2 4 条场景用例编写 `✅`
 
 - **高亮态**：`tester.pumpWidget(_wrap(FocusableButton(label: 'X')))` → 找内部 `Focus` 节点 `requestFocus` → `tester.pumpAndSettle()` → 断言找到 `Container` 且 `decoration` 有 border
 - **非高亮态**：承接上例 → 让另一节点获焦 → 断言此 button 的 decoration 无 border
 - **不可聚焦**：`FocusableButton(label: 'X', enabled: false)` → 在父 Scope 中模拟方向键 → `expect(FocusManager.instance.primaryFocus?.debugLabel, isNot('X'))`
 - **生命周期**：pump 后捕获 `_focusNode` 引用（可暴露测试 only getter 或用 tester 查找）→ pump 新树移除此 widget → 断言 `_focusNode.canRequestFocus == false`（dispose 后此字段变 false）
 
-### FF006.3 运行 `flutter test` 验证全部通过 `⬜`
+### FF006.3 运行 `flutter test` 验证全部通过 `✅`
 
 ```bash
 cd flutter_logic

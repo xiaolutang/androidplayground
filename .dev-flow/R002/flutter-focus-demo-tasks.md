@@ -31,7 +31,7 @@ status: planned
 2. ✅ R002-FF004 — FocusableButton 可聚焦按钮（无依赖，可与 FF003 并行）
 3. ✅ R002-FB006 — FocusDebugOverlay 调试浮层（无依赖，可与 FF003/FF004 并行）
 4. ✅ R002-FF005 — SmartFocusTraversalPolicy 单元测试（依赖 FF003，验证三层降级 5 条分支）
-5. 🔧 R002-FF006 — FocusableButton widget 测试（依赖 FF004，验证高亮 + enabled + dispose）
+5. ✅ R002-FF006 — FocusableButton widget 测试（依赖 FF004，验证高亮 + enabled + dispose）
 6. ✅ R002-FB005 — PersonalCenterDemoPage 页面组装 + main.dart 入口改造（依赖 FF003 + FF004 + FB006）
 7. ✅ R002-FB007 — 焦点 demo 三场景集成测试（依赖 FB005 + FF005 + FF006，自动化验证 A/B/C）
 8. ✅ 最后 — 编译验证 + `flutter test` 全量 + 三场景手动验证（依赖 FB007）

@@ -17,7 +17,8 @@ export type GapType = 'information' | 'facility' | 'pattern' | 'model';
 
 export interface CapabilityGap {
   id: string;
-  gap_type: GapType;
+  /** 后端 GapSummary.gap_type: Optional[str]，可能为 null 或未知值 */
+  gap_type: GapType | null;
   /** 缺口描述（后端 GapSummary.waiting_reason，作为等待原因展示） */
   waiting_reason: string | null;
   estimated_unlock_value: number | null;

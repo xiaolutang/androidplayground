@@ -78,6 +78,30 @@ describe('Service contract — response unpacking', () => {
       expect(gaps).not.toHaveProperty('items');
       expect(gaps).not.toHaveProperty('total');
     });
+
+    it('handles null gap_type without crash (backend Optional[str])', async () => {
+      server.use(
+        http.get('*/gaps', () => {
+          return HttpResponse.json({
+            items: [
+              {
+                id: 'gap-null',
+                gap_type: null,
+                waiting_reason: '测试空类型',
+                estimated_unlock_value: 1.0,
+                status: 'waiting',
+                linked_bug_ids: [],
+              },
+            ],
+            total: 1,
+            page: 1,
+            page_size: 20,
+          });
+        }),
+      );
+      const gaps = await gapApi.list();
+      expect(gaps[0]!.gap_type).toBeNull();
+    });
   });
 
   describe('gapApi.unblock()', () => {

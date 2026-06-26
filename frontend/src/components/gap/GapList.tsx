@@ -42,7 +42,9 @@ export function GapList({ gaps }: GapListProps) {
                 <Tag color={GAP_STATUS_COLOR[gap.status]}>
                   {GAP_STATUS_LABEL[gap.status]}
                 </Tag>
-                <Tag>{GAP_TYPE_LABEL[gap.gap_type]}</Tag>
+                {gap.gap_type && (
+                  <Tag>{GAP_TYPE_LABEL[gap.gap_type] ?? gap.gap_type}</Tag>
+                )}
                 <Text strong>{formatGapValue(gap.estimated_unlock_value)}</Text>
               </Space>
             }

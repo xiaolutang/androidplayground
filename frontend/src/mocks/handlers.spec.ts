@@ -241,7 +241,10 @@ describe('MSW handlers contract', () => {
 
       for (const gap of data.items) {
         expect(typeof gap.id).toBe('string');
-        expect(['information', 'facility', 'pattern', 'model']).toContain(gap.gap_type);
+        // gap_type is Optional[str] on backend, may be null
+        if (gap.gap_type !== null) {
+          expect(['information', 'facility', 'pattern', 'model']).toContain(gap.gap_type);
+        }
         if (gap.waiting_reason !== null) {
           expect(typeof gap.waiting_reason).toBe('string');
         }

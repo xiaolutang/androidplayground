@@ -30,7 +30,7 @@ status: planned
 1. ✅ R002-FF003 — SmartFocusTraversalPolicy 策略引擎（无依赖，核心先行）
 2. ✅ R002-FF004 — FocusableButton 可聚焦按钮（无依赖，可与 FF003 并行）
 3. ✅ R002-FB006 — FocusDebugOverlay 调试浮层（无依赖，可与 FF003/FF004 并行）
-4. ⬜ R002-FF005 — SmartFocusTraversalPolicy 单元测试（依赖 FF003，验证三层降级 5 条分支）
+4. ✅ R002-FF005 — SmartFocusTraversalPolicy 单元测试（依赖 FF003，验证三层降级 5 条分支）
 5. ⬜ R002-FF006 — FocusableButton widget 测试（依赖 FF004，验证高亮 + enabled + dispose）
 6. ⬜ R002-FB005 — PersonalCenterDemoPage 页面组装 + main.dart 入口改造（依赖 FF003 + FF004 + FB006）
 7. ⬜ R002-FB007 — 焦点 demo 三场景集成测试（依赖 FB005 + FF005 + FF006，自动化验证 A/B/C）
@@ -416,7 +416,7 @@ Widget _debugButton(String label, VoidCallback onTap) {
 
 ---
 
-## R002-FF005：smart_focus_policy_test.dart — SmartFocusTraversalPolicy 单元测试 `⬜ 待处理`
+## R002-FF005：smart_focus_policy_test.dart — SmartFocusTraversalPolicy 单元测试 `✅ 已完成`
 
 > 测试目标：FF003 SmartFocusTraversalPolicy。本任务不新增功能节点，仅验证 FF003 的三层降级逻辑。
 

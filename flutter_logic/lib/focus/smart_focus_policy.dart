@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 
 /// 自定义焦点遍历策略：记忆 > 优先级 > 物理兜底三层降级。
@@ -39,6 +40,9 @@ class SmartFocusTraversalPolicy extends FocusTraversalPolicy
   /// 三层降级：记忆 → 优先级 → 物理兜底。命中即返回 true。
   ///
   /// 这是整个 demo 的命脉，每层的命中/未命中判断必须严谨。
+  @visibleForTesting
+  bool smartRequestFocus(FocusScopeNode targetScope) => _smartRequestFocus(targetScope);
+
   bool _smartRequestFocus(FocusScopeNode targetScope) {
     // 1. 记忆层：scope 自动记住的上次焦点子节点
     final FocusNode? remembered = targetScope.focusedChild;
@@ -69,6 +73,9 @@ class SmartFocusTraversalPolicy extends FocusTraversalPolicy
   /// DFS 递归找第一个 [FocusNode.canRequestFocus]=true 的后代节点。
   ///
   /// 跳过 canRequestFocus=false 的节点（含已 dispose 的节点）。
+  @visibleForTesting
+  FocusNode? findFirstFocusableChild(FocusNode node) => _findFirstFocusableChild(node);
+
   FocusNode? _findFirstFocusableChild(FocusNode node) {
     for (final FocusNode child in node.children) {
       if (child.canRequestFocus) {

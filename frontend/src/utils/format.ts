@@ -132,7 +132,8 @@ export const GAP_TYPE_LABEL: Record<GapType, string> = {
 // ---------------------------------------------------------------------------
 
 /** estimated_unlock_value → UI 解锁价值标签 */
-export function formatGapValue(v: number): string {
+export function formatGapValue(v: number | null): string {
+  if (v === null) return '解锁价值 -';
   return `解锁价值 ${v.toFixed(2)}`;
 }
 

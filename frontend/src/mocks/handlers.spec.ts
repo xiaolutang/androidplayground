@@ -21,6 +21,7 @@ import type {
 } from '@/types/report';
 import type {
   CapabilityGap,
+  UnblockResponse,
 } from '@/types/gap';
 
 // ---------------------------------------------------------------------------
@@ -144,28 +145,24 @@ describe('MSW handlers contract', () => {
   });
 
   describe('GET /reports/:id/clarify-options', () => {
-    it('returns ClarifyOption[] with correct fields', async () => {
+    it('returns {options: ClarifyOption[]} with correct fields', async () => {
       const res = await fetch(`${BASE}/reports/rpt-001/clarify-options`);
       expect(res.ok).toBe(true);
-      const data = (await res.json()) as ClarifyOption[];
+      const data = (await res.json()) as { options: ClarifyOption[] };
 
-      expect(Array.isArray(data)).toBe(true);
-      expect(data.length).toBeGreaterThan(0);
+      expect(Array.isArray(data.options)).toBe(true);
+      expect(data.options.length).toBeGreaterThan(0);
 
-      for (const opt of data) {
+      for (const opt of data.options) {
         expect(typeof opt.id).toBe('string');
         expect(typeof opt.question).toBe('string');
-        // source is 'kb' | 'manual' | undefined
-        if (opt.source) {
-          expect(['kb', 'manual']).toContain(opt.source);
-        }
       }
     });
 
-    it('returns empty array for empty-clarify id', async () => {
+    it('returns empty options for empty-clarify id', async () => {
       const res = await fetch(`${BASE}/reports/empty-clarify/clarify-options`);
-      const data = (await res.json()) as ClarifyOption[];
-      expect(data).toEqual([]);
+      const data = (await res.json()) as { options: ClarifyOption[] };
+      expect(data.options).toEqual([]);
     });
   });
 
@@ -232,19 +229,25 @@ describe('MSW handlers contract', () => {
   });
 
   describe('GET /gaps', () => {
-    it('returns CapabilityGap[] with valid fields', async () => {
+    it('returns Paginated<CapabilityGap> with valid fields', async () => {
       const res = await fetch(`${BASE}/gaps`);
       expect(res.ok).toBe(true);
-      const data = (await res.json()) as CapabilityGap[];
+      const data = (await res.json()) as Paginated<CapabilityGap>;
 
-      expect(Array.isArray(data)).toBe(true);
-      expect(data.length).toBeGreaterThan(0);
+      expect(data).toHaveProperty('items');
+      expect(data).toHaveProperty('total');
+      expect(Array.isArray(data.items)).toBe(true);
+      expect(data.items.length).toBeGreaterThan(0);
 
-      for (const gap of data) {
+      for (const gap of data.items) {
         expect(typeof gap.id).toBe('string');
         expect(['information', 'facility', 'pattern', 'model']).toContain(gap.gap_type);
-        expect(typeof gap.unlock_action).toBe('string');
-        expect(typeof gap.estimated_unlock_value).toBe('number');
+        if (gap.waiting_reason !== null) {
+          expect(typeof gap.waiting_reason).toBe('string');
+        }
+        if (gap.estimated_unlock_value !== null) {
+          expect(typeof gap.estimated_unlock_value).toBe('number');
+        }
         expect(VALID_GAP_STATUSES).toContain(gap.status);
         expect(Array.isArray(gap.linked_bug_ids)).toBe(true);
       }
@@ -252,28 +255,32 @@ describe('MSW handlers contract', () => {
 
     it('returns gaps sorted by estimated_unlock_value descending', async () => {
       const res = await fetch(`${BASE}/gaps`);
-      const data = (await res.json()) as CapabilityGap[];
-      for (let i = 1; i < data.length; i++) {
-        expect(data[i]!.estimated_unlock_value).toBeLessThanOrEqual(
-          data[i - 1]!.estimated_unlock_value,
-        );
+      const data = (await res.json()) as Paginated<CapabilityGap>;
+      for (let i = 1; i < data.items.length; i++) {
+        const cur = data.items[i]!.estimated_unlock_value;
+        const prev = data.items[i - 1]!.estimated_unlock_value;
+        if (cur !== null && prev !== null) {
+          expect(cur).toBeLessThanOrEqual(prev);
+        }
       }
     });
   });
 
   describe('POST /gaps/:id/unblock', () => {
-    it('returns CapabilityGap with status=unblocked', async () => {
+    it('returns UnblockResponse with status_after=unblocked', async () => {
       const res = await fetch(`${BASE}/gaps/gap-1/unblock`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          unlock_action: '已补充文档',
+          action_taken: '已补充文档',
           evidence: 'docs/link',
         }),
       });
       expect(res.ok).toBe(true);
-      const data = (await res.json()) as CapabilityGap;
-      expect(data.status).toBe('unblocked');
+      const data = (await res.json()) as UnblockResponse;
+      expect(data.gap_id).toBe('gap-1');
+      expect(data.status_after).toBe('unblocked');
+      expect(typeof data.reflow_scheduled).toBe('boolean');
     });
 
     it('returns 404 for unknown gap', async () => {
@@ -281,7 +288,7 @@ describe('MSW handlers contract', () => {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          unlock_action: 'test',
+          action_taken: 'test',
           evidence: 'test',
         }),
       });
@@ -293,7 +300,7 @@ describe('MSW handlers contract', () => {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          unlock_action: 'test',
+          action_taken: 'test',
           evidence: 'test',
         }),
       });

@@ -7,7 +7,7 @@
  */
 
 import { apiClient } from './apiClient';
-import type { CapabilityGap, UnblockRequest } from '@/types/gap';
+import type { CapabilityGap, UnblockRequest, UnblockResponse } from '@/types/gap';
 
 export const gapApi = {
   async list(): Promise<CapabilityGap[]> {
@@ -16,8 +16,8 @@ export const gapApi = {
     return res.items;
   },
 
-  unblock(id: string, body: UnblockRequest): Promise<CapabilityGap> {
-    return apiClient<CapabilityGap>(`/gaps/${id}/unblock`, {
+  unblock(id: string, body: UnblockRequest): Promise<UnblockResponse> {
+    return apiClient<UnblockResponse>(`/gaps/${id}/unblock`, {
       method: 'POST',
       body: JSON.stringify(body),
     });

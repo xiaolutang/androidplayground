@@ -18,15 +18,22 @@ export type GapType = 'information' | 'facility' | 'pattern' | 'model';
 export interface CapabilityGap {
   id: string;
   gap_type: GapType;
-  unlock_action: string;
-  estimated_unlock_value: number;
+  /** 缺口描述（后端 GapSummary.waiting_reason，作为等待原因展示） */
+  waiting_reason: string | null;
+  estimated_unlock_value: number | null;
   status: CapabilityGapStatus;
   linked_bug_ids: string[];
-  git_commit_anchor: string | null;
 }
 
 export interface UnblockRequest {
-  unlock_action: string;
   evidence: string;
-  git_commit_anchor?: string;
+  action_taken: string;
+}
+
+/** POST /gaps/{id}/unblock 响应（对应 backend UnblockResponse） */
+export interface UnblockResponse {
+  gap_id: string;
+  status_before: string;
+  status_after: string;
+  reflow_scheduled: boolean;
 }

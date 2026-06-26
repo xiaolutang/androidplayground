@@ -10,7 +10,7 @@
  */
 
 import { useState } from 'react';
-import { Form, Radio, Input, Button, Empty, message, Typography } from 'antd';
+import { Form, Input, Button, Empty, message, Typography } from 'antd';
 import type { ClarifyOption, ClarifyAnswerItem } from '@/types/report';
 import { useSubmitClarify } from '@/hooks/useClarify';
 
@@ -91,17 +91,7 @@ export function ClarifyForm({
             label={opt.question}
             rules={[{ required: true, message: '请填写此项' }]}
           >
-            {opt.options && opt.options.length > 0 ? (
-              <Radio.Group>
-                {opt.options.map((choice) => (
-                  <Radio key={choice} value={choice}>
-                    {choice}
-                  </Radio>
-                ))}
-              </Radio.Group>
-            ) : (
-              <Input placeholder="请输入" />
-            )}
+            <Input placeholder={opt.context ?? '请输入'} />
           </Form.Item>
         ))}
         <Form.Item>

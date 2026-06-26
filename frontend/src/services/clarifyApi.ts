@@ -14,8 +14,12 @@ import type {
 } from '@/types/report';
 
 export const clarifyApi = {
-  options(reportId: string): Promise<ClarifyOption[]> {
-    return apiClient<ClarifyOption[]>(`/reports/${reportId}/clarify-options`);
+  async options(reportId: string): Promise<ClarifyOption[]> {
+    // 后端返回 {options: [...]} 包装结构，此处解包
+    const res = await apiClient<{ options: ClarifyOption[] }>(
+      `/reports/${reportId}/clarify-options`,
+    );
+    return res.options;
   },
 
   submit(reportId: string, body: ClarifyRequest): Promise<ClarifyResponse> {

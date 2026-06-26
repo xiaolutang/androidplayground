@@ -48,12 +48,7 @@ export function GapList({ gaps }: GapListProps) {
             }
             description={
               <div>
-                <Text>{gap.unlock_action}</Text>
-                {gap.git_commit_anchor && (
-                  <Text type="secondary" style={{ marginLeft: 8 }}>
-                    anchor: {gap.git_commit_anchor}
-                  </Text>
-                )}
+                {gap.waiting_reason && <Text>{gap.waiting_reason}</Text>}
                 {gap.linked_bug_ids.length > 0 && (
                   <Text type="secondary" style={{ marginLeft: 8 }}>
                     关联: {gap.linked_bug_ids.join(', ')}

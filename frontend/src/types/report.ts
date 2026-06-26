@@ -129,9 +129,6 @@ export interface ClarifyOption {
   id: string;
   question: string;
   context: string | null;
-  field_key?: string;
-  options?: string[];
-  source?: 'kb' | 'manual';
 }
 
 export interface ClarifyAnswerItem {

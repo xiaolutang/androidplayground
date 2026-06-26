@@ -30,6 +30,7 @@ import type {
 import type {
   CapabilityGap,
   UnblockRequest,
+  UnblockResponse,
 } from '@/types/gap';
 import type { Paginated } from '@/types/api';
 
@@ -106,16 +107,11 @@ function makeClarifyOptions(): ClarifyOption[] {
       id: 'opt-1',
       question: '是否在特定版本下复现？',
       context: '需要确认复现环境',
-      field_key: 'version',
-      options: ['v1.0', 'v1.1', 'v2.0'],
-      source: 'kb',
     },
     {
       id: 'opt-2',
       question: '是否有错误日志？',
       context: '日志文件',
-      field_key: 'log',
-      source: 'manual',
     },
   ];
 }
@@ -125,29 +121,26 @@ function makeGaps(): CapabilityGap[] {
     {
       id: 'gap-1',
       gap_type: 'information',
-      unlock_action: '补充版本兼容矩阵',
+      waiting_reason: '补充版本兼容矩阵',
       estimated_unlock_value: 8.5,
       status: 'waiting',
       linked_bug_ids: ['rpt-001'],
-      git_commit_anchor: null,
     },
     {
       id: 'gap-2',
       gap_type: 'facility',
-      unlock_action: '部署 CI 重跑环境',
+      waiting_reason: '部署 CI 重跑环境',
       estimated_unlock_value: 6.2,
       status: 'identified',
       linked_bug_ids: ['rpt-002'],
-      git_commit_anchor: 'abc1234',
     },
     {
       id: 'gap-3',
       gap_type: 'pattern',
-      unlock_action: '补全 KB 模式条目',
+      waiting_reason: '补全 KB 模式条目',
       estimated_unlock_value: 3.1,
       status: 'unblocked',
       linked_bug_ids: [],
-      git_commit_anchor: null,
     },
   ];
 }
@@ -218,16 +211,16 @@ export const handlers = [
     return HttpResponse.json(makeTrajectory(id));
   }),
 
-  // 4. GET /reports/:id/clarify-options — 追问候选
+  // 4. GET /reports/:id/clarify-options — 追问候选（后端 ClarifyOptionsResponse 包裹）
   http.get('*/reports/:id/clarify-options', ({ params }) => {
     const id = params.id as string;
 
     // 特殊 id 返回空候选
     if (id === 'empty-clarify') {
-      return HttpResponse.json([]);
+      return HttpResponse.json({ options: [] });
     }
 
-    return HttpResponse.json(makeClarifyOptions());
+    return HttpResponse.json({ options: makeClarifyOptions() });
   }),
 
   // 5. POST /reports/:id/clarify — 提交追问
@@ -274,9 +267,16 @@ export const handlers = [
     return HttpResponse.json(response);
   }),
 
-  // 7. GET /gaps — 缺口列表
+  // 7. GET /gaps — 缺口列表（后端 GapListResponse 分页结构）
   http.get('*/gaps', () => {
-    return HttpResponse.json(makeGaps());
+    const items = makeGaps();
+    const result: Paginated<CapabilityGap> = {
+      items,
+      total: items.length,
+      page: 1,
+      page_size: 20,
+    };
+    return HttpResponse.json(result);
   }),
 
   // 8. POST /gaps/:id/unblock — 补齐缺口
@@ -301,12 +301,12 @@ export const handlers = [
       );
     }
 
-    const updated: CapabilityGap = {
-      ...gap,
-      status: 'unblocked',
-      unlock_action: body.unlock_action,
-      git_commit_anchor: body.git_commit_anchor ?? gap.git_commit_anchor,
+    const response: UnblockResponse = {
+      gap_id: gap.id,
+      status_before: gap.status,
+      status_after: 'unblocked',
+      reflow_scheduled: false,
     };
-    return HttpResponse.json(updated);
+    return HttpResponse.json(response);
   }),
 ];

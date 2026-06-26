@@ -65,7 +65,7 @@ last_updated: 2026-06-26
 | 后端集成测试 | 49 passed + 3 skipped（Testcontainers PG+pgvector） |
 | Golden set | 7 passed（LLM schema 100% / vision 75% cold start） |
 | 模拟器手动 | 14 case（`@pytest.mark.emulator`，默认 skip） |
-| 前端单测 | 81 passed（vitest） |
+| 前端单测 | 92 passed（vitest，含 11 services 契约测试） |
 | Lint | ruff All checks passed |
 | Sprint Contract | 18/18 agreed（8 条协商验收） |
 
@@ -85,5 +85,19 @@ last_updated: 2026-06-26
 - 分析文档：`.dev-flow/R001/analysis/`（5 份：主文档+backend+frontend+test+brainstorm）
 - Sprint Contract：`.dev-flow/R001/contracts/`（18 条 agreed）
 - 执行证据：`.dev-flow/R001/evidence/`（按 task_id 命名）
+
+### 归档后契约对齐修复（2026-06-26）
+
+> R001 归档后首次真实联调发现前后端契约漂移，根因是 design 阶段跳过导致接口结构未固化。以下为补齐修复。
+
+| Commit | 修复内容 |
+|--------|---------|
+| `f77319f8` | P0：gap types/services 对齐 UnblockResponse + waiting_reason；P1：ClarifyOption 移除多余字段 + MSW 3 handler 结构修正 + ClarifyForm 简化；P2：新增 services 契约测试 11 case |
+| `0ea56c27` | Codex 审查发现 gap_type 后端 Optional[str] vs 前端严格枚举 → 改为 nullable + 未知值回退 |
+| `b1a1a674` | Playwright 前端冒烟测试（/gaps + /clarify + /reports/:id 三页面） |
+
+**新增测试资产**：
+- `frontend/src/services/__tests__/serviceContract.test.ts`（11 case，验证响应解包 + 错误传播）
+- `tests/integration/test_frontend_pages.py`（Playwright 浏览器冒烟，验证页面不崩溃）
 
 ---

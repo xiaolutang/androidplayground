@@ -34,7 +34,7 @@ status: planned
 5. 🔧 R002-FF006 — FocusableButton widget 测试（依赖 FF004，验证高亮 + enabled + dispose）
 6. ✅ R002-FB005 — PersonalCenterDemoPage 页面组装 + main.dart 入口改造（依赖 FF003 + FF004 + FB006）
 7. ✅ R002-FB007 — 焦点 demo 三场景集成测试（依赖 FB005 + FF005 + FF006，自动化验证 A/B/C）
-8. ⬜ 最后 — 编译验证 + `flutter test` 全量 + 三场景手动验证（依赖 FB007）
+8. ✅ 最后 — 编译验证 + `flutter test` 全量 + 三场景手动验证（依赖 FB007）
 
 ---
 
@@ -931,7 +931,7 @@ flutter test integration_test/focus_demo_test.dart
 
 ---
 
-## 最后：编译验证 + flutter test 全量 + 三场景手动验证 `⬜ 待处理`
+## 最后：编译验证 + flutter test 全量 + 三场景手动验证 `✅ 已完成`
 
 依赖 R002-FB007 完成后执行。
 

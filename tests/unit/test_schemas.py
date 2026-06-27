@@ -21,16 +21,13 @@
 from __future__ import annotations
 
 from enum import Enum
-from typing import get_type_hints
 
-import pytest
 from pgvector.sqlalchemy import Vector
 from sqlalchemy import inspect
 
 from agent.schemas import (
     BugReport,
     BugReportStatus,
-    CapabilityGap,
     CapabilityGapStatus,
     ConfidenceScore,
     Hypothesis,

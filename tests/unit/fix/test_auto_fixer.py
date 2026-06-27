@@ -431,7 +431,11 @@ class TestAC2Template:
 
     def test_template_renders_template_variables(self):
         """template 策略产出的 patch_content 为渲染后的 unified diff。"""
-        tmpl = "--- a/{root_cause_location}\n+++ b/{root_cause_location}\n@@ -1 +1 @@\n-old\n+new"
+        tmpl = (
+            "--- a/{root_cause_location}\n"
+            "+++ b/{root_cause_location}\n"
+            "@@ -1 +1 @@\n-old\n+new"
+        )
         kb = make_kb_context(
             entries=[
                 make_retrieved_entry(

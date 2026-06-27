@@ -94,8 +94,15 @@ class _FocusableButtonState extends State<FocusableButton> {
             // 放大后按钮会超出 SingleChildScrollView 的 clip 边界，
             // 导致焦点边框左右被裁剪（"被吃边"）。
             // 焦点高亮仅依赖边框 + 背景色 + 字重，视觉足够明显。
+            //
+            // margin:horizontal:2 — border 不贴 scroll viewport 边缘。
+            // 原因：Border.all(width:2) 画在 rect 边界中心，外侧 1px 外延。
+            // 按钮在 Column(stretch) 下撑满 scroll viewport 宽度，
+            // border 外延被 SingleChildScrollView 的 Clip.hardEdge 裁掉（"吃边"）。
+            // 加 2px margin 让按钮内缩，border 外延不超出 viewport。
             return AnimatedContainer(
               duration: const Duration(milliseconds: 150),
+              margin: const EdgeInsets.symmetric(horizontal: 2),
               padding:
                   const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
               decoration: BoxDecoration(

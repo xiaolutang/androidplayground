@@ -43,7 +43,9 @@ class PersonalCenterDemoPageState extends State<PersonalCenterDemoPage> {
   ];
 
   /// 当前 primaryFocus 的 debugLabel，驱动调试浮层显示。
-  String _primaryFocusLabel = 'null';
+  /// 用 [ValueNotifier] + [ValueListenableBuilder] 局部重建，
+  /// 避免 setState 全树重建触发 AppBar 重新应用 SystemUiOverlayStyle。
+  final ValueNotifier<String> _primaryFocusLabel = ValueNotifier('null');
 
   /// 外层 FocusTraversalGroup 的 SmartFocusTraversalPolicy 实例。
   /// 整个 body 共用此 policy，负责方向键的跨 scope 智能降级。
@@ -61,6 +63,7 @@ class PersonalCenterDemoPageState extends State<PersonalCenterDemoPage> {
   @override
   void dispose() {
     FocusManager.instance.removeListener(_onFocusChange);
+    _primaryFocusLabel.dispose();
     super.dispose();
   }
 
@@ -95,7 +98,7 @@ class PersonalCenterDemoPageState extends State<PersonalCenterDemoPage> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
       // FocusNode dispose 会触发 FocusManager 通知 _onFocusChange；
-      // 此处的 setState 作为双保险（应对 listener 时序遗漏）。
+      // 此处的赋值作为双保险（应对 listener 时序遗漏）。
       _refreshFocusLabel();
     });
   }
@@ -121,23 +124,31 @@ class PersonalCenterDemoPageState extends State<PersonalCenterDemoPage> {
   }
 
   /// 用最新的 primaryFocus.debugLabel 刷新调试浮层（空值过滤）。
-  //
-  // FocusManager 的 listener 通知粒度较粗，可能在 primaryFocus 实际未变时触发；
-  // 此处短路避免无效 setState 导致整树重建。
+  // ValueNotifier 自身对相同值不通知监听器，无需调用方短路。
   void _refreshFocusLabel() {
     if (!mounted) return;
-    final String next =
+    _primaryFocusLabel.value =
         FocusManager.instance.primaryFocus?.debugLabel ?? 'null';
-    if (next == _primaryFocusLabel) return;
-    setState(() {
-      _primaryFocusLabel = next;
-    });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('个人中心')),
+      appBar: AppBar(
+        title: const Text('个人中心'),
+        // scrolledUnderElevation/surfaceTintColor/backgroundColor 由
+        // main.dart 的 appBarTheme 全局关闭，避免 M3 scrolledUnder 让
+        // AppBar 在 body 滚动时变色（iOS 表现为状态栏颜色变化）。
+        // 手动 leading：BackButton 设为不可聚焦。
+        // 方向键（上/左键）默认会跨 scope 跳到 AppBar 的 BackButton，
+        // 干扰 SmartFocusTraversalPolicy 验证；ExcludeFocus 过滤掉它。
+        leading: ExcludeFocus(
+          child: IconButton(
+            icon: const Icon(Icons.arrow_back),
+            onPressed: () => Navigator.maybePop(context),
+          ),
+        ),
+      ),
       // ── 外层 FocusTraversalGroup（FB007 修复）──
       // 整个 body 共用一个 SmartFocusTraversalPolicy：
       // 左导航 + 右内容区的 FocusNode 都属于同一个 FocusTraversalGroup，
@@ -147,9 +158,11 @@ class PersonalCenterDemoPageState extends State<PersonalCenterDemoPage> {
       body: FocusTraversalGroup(
         policy: _parentPolicy,
         child: Stack(
+          fit: StackFit.expand,
           children: [
             Row(
-              children: [
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
                 // ── 左导航（窄列）──
                 // 不创建独立 FocusScope 和 FocusTraversalGroup：
                 // 左导航的 FocusNode 直接属于外层 group + 外层 scope。
@@ -176,6 +189,14 @@ class PersonalCenterDemoPageState extends State<PersonalCenterDemoPage> {
                 // 但不创建独立 FocusTraversalGroup。
                 // 当方向键候选落在右侧 scope 时，_isCrossScope 检测到跨 scope，
                 // 触发 _smartRequestFocus(rightScope) 执行三层降级。
+                //
+                // **布局修复（R002-FIX004）**：
+                // Stack( fit: StackFit.expand ) + Row( crossAxisAlignment.stretch )
+                // 让左右两区撑满 body 高度。
+                // 修复前（默认 loose + center）：
+                //   - 平板：右内容区按内容高度居中显示（问题2）
+                //   - 手机：右内容区内容高度 > body 高度，溢出部分被 Scaffold 裁剪，
+                //     "退出登录"焦点框底部看不到（问题1）
                 Expanded(
                   flex: 2,
                   child: FocusScope(
@@ -186,16 +207,21 @@ class PersonalCenterDemoPageState extends State<PersonalCenterDemoPage> {
                       child: SingleChildScrollView(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.stretch,
-                          children: _rightButtons
-                              .map((item) => Padding(
-                                    padding:
-                                        const EdgeInsets.only(bottom: 12),
-                                    child: FocusableButton(
-                                      label: item.label,
-                                      order: item.order,
-                                    ),
-                                  ))
-                              .toList(),
+                          children: [
+                            ..._rightButtons
+                                .map((item) => Padding(
+                                      padding:
+                                          const EdgeInsets.only(bottom: 12),
+                                      child: FocusableButton(
+                                        label: item.label,
+                                        order: item.order,
+                                      ),
+                                    )),
+                            // 底部余量：最后一个按钮获焦时，focus 系统的
+                            // ensureVisible 不会把节点完全滚入 viewport，
+                            // 需要额外空间确保 border 底部不被 Clip.hardEdge 裁剪。
+                            const SizedBox(height: 24),
+                          ],
                         ),
                       ),
                     ),
@@ -207,11 +233,15 @@ class PersonalCenterDemoPageState extends State<PersonalCenterDemoPage> {
             Positioned(
               right: 12,
               bottom: 12,
-              child: FocusDebugOverlay(
-                primaryFocusLabel: _primaryFocusLabel,
-                onDeleteCurrentFocus: onDeleteCurrentFocus,
-                onResetMemory: _onResetMemory,
-                onPrintRect: _onPrintRect,
+              child: ValueListenableBuilder<String>(
+                valueListenable: _primaryFocusLabel,
+                builder: (BuildContext context, String label, _) =>
+                    FocusDebugOverlay(
+                  primaryFocusLabel: label,
+                  onDeleteCurrentFocus: onDeleteCurrentFocus,
+                  onResetMemory: _onResetMemory,
+                  onPrintRect: _onPrintRect,
+                ),
               ),
             ),
           ],

@@ -41,31 +41,34 @@ class SmartFocusTraversalPolicy extends FocusTraversalPolicy
   ///
   /// 这是整个 demo 的命脉，每层的命中/未命中判断必须严谨。
   @visibleForTesting
-  bool smartRequestFocus(FocusScopeNode targetScope) => _smartRequestFocus(targetScope);
+  bool smartRequestFocus(FocusScopeNode targetScope) =>
+      _smartRequestFocus(targetScope);
 
   bool _smartRequestFocus(FocusScopeNode targetScope) {
     // 1. 记忆层：scope 自动记住的上次焦点子节点
     final FocusNode? remembered = targetScope.focusedChild;
     if (remembered != null && remembered.canRequestFocus) {
-      remembered.requestFocus();
+      requestFocusCallback(remembered, alignment: 0.5);
       return true;
     }
 
     // 2. 优先级层：委托 OrderedTraversalPolicy 找 NumericFocusOrder 最小节点
     final FocusNode? priorityFirst = _orderedPolicy.findFirstFocus(targetScope);
     if (priorityFirst != null && priorityFirst != targetScope) {
-      priorityFirst.requestFocus();
+      requestFocusCallback(priorityFirst, alignment: 0.5);
       return true;
     }
 
     // 3. 物理兜底层：DFS 递归找第一个可聚焦子节点
     final FocusNode? fallback = _findFirstFocusableChild(targetScope);
     if (fallback != null) {
-      fallback.requestFocus();
+      requestFocusCallback(fallback, alignment: 0.5);
       return true;
     }
 
     // 4. 极端兜底：scope 自身持有焦点
+    // 注意：scope 节点 context 可能为 null（attach 在 FocusManager 而非 widget），
+    // 不能走 requestFocusCallback（内部 node.context! 会崩），直接 requestFocus。
     targetScope.requestFocus();
     return true;
   }
@@ -148,8 +151,10 @@ class SmartFocusTraversalPolicy extends FocusTraversalPolicy
           return _smartRequestFocus(candidateScope);
         }
         // 同 scope 或候选在祖先 scope（如右内容区→左导航）：
-        // 直接聚焦候选（几何就近），不走三层降级
-        candidate.requestFocus();
+        // 直接聚焦候选（几何就近），不走三层降级。
+        // alignment:0.5 强制居中（非过度滚动）：底部按钮需绕开 home indicator，
+        // SDK 的 keepVisibleAtEnd 只对齐到视口 bottom，会落进 safe area 被遮挡。
+        requestFocusCallback(candidate, alignment: 0.5);
         return true;
       }
 
@@ -159,7 +164,20 @@ class SmartFocusTraversalPolicy extends FocusTraversalPolicy
       scope = scope.enclosingScope;
     }
 
-    // 所有层级都无候选（例如已在边缘）：交给 super 处理边缘情况
+    // 所有层级都无候选。
+    //
+    // 垂直方向（up/down）：列隔离搜索已确认无同列候选，**禁止回退 super**。
+    // 原因：super（Flutter SDK DirectionalFocusTraversalPolicyMixin）不做 X 轴列隔离，
+    // 会用 beam 算法跨列找到其他区域的节点。复现：左导航"关于"（最底部）按下键，
+    // super 会把焦点跨列移到右内容区"消息中心"，破坏列隔离语义。
+    // 正确行为：焦点停留（已在列内边缘）。
+    //
+    // 水平方向（left/right）：保留 super 回退。水平方向本就允许跨区域（左导航按右键
+    // 进入右内容区是预期行为），且我们的水平搜索无 X 过滤，与 super 行为一致。
+    if (direction == TraversalDirection.up ||
+        direction == TraversalDirection.down) {
+      return false;
+    }
     return super.inDirection(currentNode, direction);
   }
 
@@ -177,9 +195,23 @@ class SmartFocusTraversalPolicy extends FocusTraversalPolicy
     final Rect anchorRect = anchor.rect;
     if (anchorRect.isEmpty) return null;
 
+    // 候选过滤：
+    // - canRequestFocus=true（排除 disabled/disposed 节点）
+    // - 非基准节点本身
+    // - rect 非空
+    // - **排除 FocusScopeNode 容器**（scope 容器 rect 覆盖全屏/半屏，
+    //   X 重叠判断对它们无效，会让方向键把焦点落到 scope 容器而非按钮）
+    // - **排除 debugLabel==null 的容器节点**（如 Navigator push 引入的
+    //   _ModalScope/AppBar 区域 Focus，rect 覆盖全宽且 canRequestFocus=true，
+    //   会让会员签到按上键时焦点跳到这些不可见容器。本 demo 所有
+    //   FocusableButton 的 debugLabel=label，过滤 null 不误伤业务节点）
     final List<FocusNode> nodes = scope.traversalDescendants
         .where((FocusNode node) =>
-            node.canRequestFocus && node != anchor && !node.rect.isEmpty)
+            node.canRequestFocus &&
+            node != anchor &&
+            !node.rect.isEmpty &&
+            node is! FocusScopeNode &&
+            node.debugLabel != null)
         .toList();
 
     if (nodes.isEmpty) return null;
@@ -194,6 +226,9 @@ class SmartFocusTraversalPolicy extends FocusTraversalPolicy
       final double primary; // 方向轴上的距离
       final double secondary; // 正交轴上的距离
 
+      // forward 判断用中心点：候选中心在 anchor 中心的某方向。
+      // 部分重叠的容器类节点（rect 覆盖全宽）已通过上面 debugLabel==null
+      // 过滤排除，中心点判断对正常按钮间距 > 0 不受影响。
       switch (direction) {
         case TraversalDirection.right:
           forward = r.center.dx > anchorRect.center.dx;

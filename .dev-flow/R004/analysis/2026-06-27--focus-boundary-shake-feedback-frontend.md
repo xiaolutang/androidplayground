@@ -19,7 +19,7 @@ architecture_md_updates: false
 本版本交付两个功能节点：
 
 - **FF005 FocusBoundaryNotifier**：在 `SmartFocusTraversalPolicy.inDirection` 返回 false 前，写入受阻方向信号（`ValueNotifier<TraversalDirection?>`），供 widget 订阅响应
-- **FB008 FocusableButton 抖动反馈**：`FocusableButton` 新增可选 `blockedNotifier` 参数；当订阅到方向信号且自身是 primaryFocus 时，按方向感知启动一次水平/垂直轻微抖动动画（约 250ms，±2px，3 周期），受阻期间同方向重复按键重启动画（非堆叠）
+- **FB008 FocusableButton 抖动反馈**：`FocusableButton` 新增可选 `blockedNotifier` 参数；当订阅到方向信号且自身是 primaryFocus 时，按方向感知启动一次水平/垂直轻微抖动动画（约 250ms，±4px，3 周期），受阻期间同方向重复按键重启动画（非堆叠）
 
 不做：触觉反馈（HapticFeedback）、跨页面通用化（InheritedWidget/Provider）、无障碍可配置开关。
 
@@ -161,7 +161,7 @@ graph TD
 | 信号通道类型 | `ValueNotifier<TraversalDirection?>` | Flutter 原生，零依赖；null 表示无受阻，非 null 表示某方向受阻 |
 | 信号生命周期 | 一次性（消费方读取后立即置 null） | 避免重入触发；防抖靠 widget 侧 `forward(from: 0)` 实现，不靠 notifier 状态机 |
 | 抖动方向感知 | `TraversalDirection.up/down → 垂直`；`left/right → 水平` | 与受阻方向物理一致，用户直觉 |
-| 抖动幅度 | ±2px | 足够可见，不突兀，不超出 scroll viewport clip 边界（与 R002-FIX002 教训一致：动画位移不能导致 border 被裁） |
+| 抖动幅度 | ±4px | 足够可见，不突兀，不超出 scroll viewport clip 边界（与 R002-FIX002 教训一致：动画位移不能导致 border 被裁） |
 | 抖动时长 | 约 250ms（3 周期 sin） | 短促可感知，不阻塞下一次按键 |
 | 防抖策略 | 动画进行中再次受阻 → `forward(from: 0)` 重启 | 幂等、无堆叠；与 analysis 场景 3 一致 |
 | 异常路径 | 抖动中按其他方向键 → `_shakeController.stop()` 取消 | 让位给正常焦点切换，避免视觉混乱 |
@@ -291,7 +291,7 @@ flowchart TD
 |------|------|------|
 | 信号通道：policy 持有 ValueNotifier | 选 A（构造注入） | 与现有 `_parentPolicy` 模式一致；显式、可测试；不引入 Provider/InheritedWidget 过度设计 |
 | 抖动曲线：sin 波形 | `Curves.easeInOut` + `Tween(begin:-1,end:1)` 配合 `sin(pi*3*t)` | 3 周期近似 sin；零外部依赖 |
-| 抖动渲染：Transform.translate | 直接对 child 做 translate | 不改 Container margin/decoration，避免与 R002-FIX002 的 border clip 教训冲突；translate 在 clip 内进行（±2px 远小于 margin:2 的内缩空间） |
+| 抖动渲染：Transform.translate | 直接对 child 做 translate | 不改 Container margin/decoration，避免与 R002-FIX002 的 border clip 教训冲突；translate 在 clip 内进行（±4px 远小于 margin:2 的内缩空间） |
 | 防抖实现：forward(from:0) | AnimationController 原生能力 | 幂等，无需自定义状态机 |
 | 其他方向键取消：FocusNode.hasFocus listener | 复用现有 Focus 系统 | 失焦即 stop，无需额外 KeyEvent 拦截 |
 

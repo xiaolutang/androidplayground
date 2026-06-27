@@ -13,7 +13,7 @@ last_updated: 2026-06-27
 
 ### 交付摘要
 
-R002 焦点策略的体验增强补丁。当方向键在焦点边界无候选（到头/到边）时，让当前焦点按钮沿受阻轴向做 ±2px / 250ms / 3 周期 sin 波抖动，给用户"此路不通"的体感反馈。
+R002 焦点策略的体验增强补丁。当方向键在焦点边界无候选（到头/到边）时，让当前焦点按钮沿受阻轴向做 ±4px / 250ms / 3 周期 sin 波抖动，给用户"此路不通"的体感反馈。
 
 **核心能力**：
 - **边界受阻信号通道（FF005）**：`SmartFocusTraversalPolicy.blockedDirectionNotifier`（`ValueNotifier<TraversalDirection?>`），在 `inDirection` 垂直 return-false 路径 + 水平 `super.inDirection` 返回 false 后写入受阻方向
@@ -35,7 +35,7 @@ R002 焦点策略的体验增强补丁。当方向键在焦点边界无候选（
 | 能力 | 来源 | 当前状态 |
 |------|------|---------|
 | 焦点边界受阻信号通道 | FF005 | released（policy → widget 单向 notifier） |
-| 方向感知抖动反馈 | FB008 | released（垂直/水平轴向分离，±2px/250ms/3 周期 sin） |
+| 方向感知抖动反馈 | FB008 | released（垂直/水平轴向分离，±4px/250ms/3 周期 sin） |
 | 抖动防抖 + 失焦即停 | FB008 | released（forward(from:0) 重启 + focus listener stop） |
 
 ### 验收基线

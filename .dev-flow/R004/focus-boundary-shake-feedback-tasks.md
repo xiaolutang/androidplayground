@@ -18,7 +18,7 @@ status: archived
 - 技术栈：Flutter（flutter_logic/ 模块），不引入 MethodChannel/EventChannel
 - 不修改 architecture.md（INV-1 不变量保持）
 - 禁止修改：`lib/main.dart`、`lib/home_page.dart`、`lib/debug/focus_debug_overlay.dart`、SDK 源码
-- 抖动参数硬编码：±2px / 250ms / 3 周期 sin 波（OI-1 留作 visual-verify 后微调）
+- 抖动参数硬编码：±4px / 250ms / 3 周期 sin 波（OI-1 留作 visual-verify 后微调）
 - 全部使用 Flutter SDK 内置 API，不新增第三方依赖
 - 参考已有代码：`lib/focus/smart_focus_policy.dart`（FF003）、`lib/focus/focusable_button.dart`（FF004）
 
@@ -174,8 +174,8 @@ void dispose() {
   - FocusableButton 新增可选入参 `blockedNotifier`（类型 `ValueNotifier<TraversalDirection?>?`，默认 null）
   - 不传 blockedNotifier 时，行为与 R002 完全一致（向后兼容，现有 43 个测试不受影响）
   - 传入 blockedNotifier 且自身 primaryFocus 时：
-    - 收到 up/down → Transform.translate.dy 在 ±2px 振荡，dx=0
-    - 收到 left/right → Transform.translate.dx 在 ±2px 振荡，dy=0
+    - 收到 up/down → Transform.translate.dy 在 ±4px 振荡，dx=0
+    - 收到 left/right → Transform.translate.dx 在 ±4px 振荡，dy=0
     - 抖动持续约 250ms（3 周期 sin 波），结束后 Transform.translate 归零
   - 动画进行中再次收到同方向信号 → forward(from:0) 重启，不堆叠
   - 抖动中失焦（FocusNode.hasFocus 变 false）→ 立即 stop + Transform 归零
@@ -235,7 +235,7 @@ late final AnimationController _shakeController = AnimationController(
   vsync: this,
 );
 // _shakeAnimation.value ∈ [-1, 1]（sin 波归一化）
-// 实际位移在 builder 内乘以 amplitude（2.0）得到 ±2px。
+// 实际位移在 builder 内乘以 amplitude（4.0）得到 ±4px。
 // 关键：value=0（controller 未启动/已结束）时 sin=0 → 位移=0，无 idle 偏移。
 late final Animation<double> _shakeAnimation = _shakeController
     .drive(CurveTween(_ShakeCurve())); // 3 周期 sin 波，见下方
@@ -309,8 +309,8 @@ child: AnimatedBuilder(
   builder: (context, child) {
     // 方向感知：通过 notifier 最近一次的方向判断轴
     // 由于 forward 时方向已 reset，需在 _handleBlocked 内暂存 _shakeAxis
-    // amplitude=2.0（±2px），value∈[-1,1] → 位移∈[-2,2]，idle 时 value=0 → 位移=0
-    const double amplitude = 2.0;
+    // amplitude=4.0（±4px），value∈[-1,1] → 位移∈[-4,4]，idle 时 value=0 → 位移=0
+    const double amplitude = 4.0;
     final dx = _shakeAxis == _ShakeAxis.horizontal ? _shakeAnimation.value * amplitude : 0.0;
     final dy = _shakeAxis == _ShakeAxis.vertical ? _shakeAnimation.value * amplitude : 0.0;
     return Transform.translate(
@@ -337,7 +337,7 @@ _shakeAxis = (dir == TraversalDirection.up || dir == TraversalDirection.down)
     : _ShakeAxis.horizontal;
 ```
 
-理由：±2px 远小于现有 `margin: horizontal:2` 的内缩空间，Transform.translate 不会导致 border 超出 SingleChildScrollView clip 边界（与 R002-FIX002 教训一致）。若 visual-verify 发现 clip，再调小幅度。
+理由：±4px 等于 `margin: horizontal:4` 的内缩空间，Transform.translate 不会导致 border 超出 SingleChildScrollView clip 边界（与 R002-FIX002 教训一致）。OI-1 visual-verify 后由 ±2px/margin:2 调整为 ±4px/margin:4。
 
 ### FB008.5 失焦/其他方向键 stop 抖动 `⬜`
 

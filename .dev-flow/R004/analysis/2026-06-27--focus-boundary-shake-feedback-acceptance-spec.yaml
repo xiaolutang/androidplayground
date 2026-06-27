@@ -50,7 +50,7 @@ visual_acceptance:
     description: 垂直方向受阻抖动（up/down 边界）
     trigger: 焦点在垂直边界按钮（如会员签到顶部按上键）按对应方向键
     conditions:
-      - "Transform.translate 的 dy 在 ±2px 范围内振荡"
+      - "Transform.translate 的 dy 在 ±4px 范围内振荡"
       - "Transform.translate 的 dx 始终为 0"
       - "抖动持续约 250ms（3 周期 sin 波）"
       - "抖动期间焦点边框仍可见（不被 clip 裁掉）"
@@ -60,7 +60,7 @@ visual_acceptance:
     description: 水平方向受阻抖动（left/right 边界）
     trigger: 焦点在水平边界按钮（如个人中心最左按左键）按对应方向键
     conditions:
-      - "Transform.translate 的 dx 在 ±2px 范围内振荡"
+      - "Transform.translate 的 dx 在 ±4px 范围内振荡"
       - "Transform.translate 的 dy 始终为 0"
       - "抖动持续约 250ms"
       - "抖动期间焦点边框仍可见"

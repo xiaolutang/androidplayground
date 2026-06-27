@@ -70,7 +70,7 @@ last_updated: 2026-06-27
 | FB005 | PersonalCenterDemoPage | R002 | released | 掌机个人中心 demo 页面（左导航 + 右内容区，共用 FocusTraversalGroup + 右侧独立 FocusScope） |
 | FB006 | FocusDebugOverlay | R002 | released | 焦点调试浮层（打印 primaryFocus + 删除节点/重置记忆/打印 Rect） |
 | FB007 | HomePage（Playground 入口） | R002 | released | demo 入口页（ListTile 跳转各子 demo） |
-| FB008 | FocusableButtonShake | R004 | released | 受阻抖动反馈：订阅 FF005 notifier，primaryFocus 时启动 ±2px/250ms/3 周期 sin 波方向感知抖动（FB005 体验增强） |
+| FB008 | FocusableButtonShake | R004 | released | 受阻抖动反馈：订阅 FF005 notifier，primaryFocus 时启动 ±4px/250ms/3 周期 sin 波方向感知抖动（FB005 体验增强） |
 
 ---
 

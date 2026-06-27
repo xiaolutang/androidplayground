@@ -10,7 +10,7 @@ import 'package:flutter/material.dart';
 ///
 /// R004-FB008：可选传入 [blockedNotifier] 订阅焦点边界受阻信号，
 /// 当 policy 在 [inDirection] 写入受阻方向且自身是 primaryFocus 时，
-/// 启动方向感知的水平/垂直抖动（±2px，250ms，3 周期 sin 波）。
+/// 启动方向感知的水平/垂直抖动（±4px，250ms，3 周期 sin 波）。
 class FocusableButton extends StatefulWidget {
   /// 按钮显示文字，同时作为 [FocusNode.debugLabel]。
   final String label;
@@ -171,14 +171,16 @@ class _FocusableButtonState extends State<FocusableButton>
             // 导致焦点边框左右被裁剪（"被吃边"）。
             // 焦点高亮仅依赖边框 + 背景色 + 字重，视觉足够明显。
             //
-            // margin:horizontal:2 — border 不贴 scroll viewport 边缘。
+            // margin:horizontal:4 — border 不贴 scroll viewport 边缘。
             // 原因：Border.all(width:2) 画在 rect 边界中心，外侧 1px 外延。
             // 按钮在 Column(stretch) 下撑满 scroll viewport 宽度，
             // border 外延被 SingleChildScrollView 的 Clip.hardEdge 裁掉（"吃边"）。
-            // 加 2px margin 让按钮内缩，border 外延不超出 viewport。
+            // 加 4px margin 让按钮内缩，border 外延不超出 viewport；
+            // 同时为 R004 抖动留出 ±4px 位移空间，避免水平边界按钮抖动时
+            // border 被 SingleChildScrollView 的 Clip.hardEdge 裁掉。
             final container = AnimatedContainer(
               duration: const Duration(milliseconds: 150),
-              margin: const EdgeInsets.symmetric(horizontal: 2),
+              margin: const EdgeInsets.symmetric(horizontal: 4),
               padding:
                   const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
               decoration: BoxDecoration(
@@ -210,15 +212,15 @@ class _FocusableButtonState extends State<FocusableButton>
 
             // R004-FB008：受阻抖动包裹。
             // AnimatedBuilder 只在 _shakeController 变化时重建。
-            // sin 波：t∈[0,1] → sin(3*2π*t) ∈ [-1,1]，配合 amplitude=2.0 得 ±2px。
+            // sin 波：t∈[0,1] → sin(3*2π*t) ∈ [-1,1]，配合 amplitude=4.0 得 ±4px。
             // idle（controller 未启动，value=0）时 sin(0)=0 → 位移=0，无 idle 偏移。
             // 动画结束（value=1）时 sin(6π)=0 → 归零，按钮回到原位。
-            // ±2px 远小于 margin:horizontal:2 的内缩空间，Transform.translate
+            // ±4px 等于 margin:horizontal:4 的内缩空间，Transform.translate
             // 不会导致 border 超出 SingleChildScrollView clip 边界（R002-FIX002 教训）。
             return AnimatedBuilder(
               animation: _shakeController,
               builder: (context, child) {
-                const double amplitude = 2.0;
+                const double amplitude = 4.0;
                 final double sinValue = _shakeSin(_shakeController.value);
                 final double dx =
                     _shakeAxis == _ShakeAxis.horizontal
@@ -250,7 +252,7 @@ class _FocusableButtonState extends State<FocusableButton>
 
 /// 3 周期 sin 波形：t∈[0,1] → sin(3*2π*t) ∈ [-1, 1]。
 ///
-/// 配合 amplitude=2.0 得到 ±2px 位移。
+/// 配合 amplitude=4.0 得到 ±4px 位移。
 /// idle（controller 未启动，value=0）时 sin(0)=0 → 位移=0，无 idle 偏移。
 /// 动画结束（value=1）时 sin(6π)≈0 → 归零。
 ///

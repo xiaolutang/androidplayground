@@ -33,7 +33,7 @@ source: user_direct
 操作过程：
 1. 焦点在右内容区"会员签到"（最顶部按钮）
 2. 按上键
-3. "会员签到"按钮向上轻微抖动（±2px 垂直方向，3 次循环，~250ms）
+3. "会员签到"按钮向上轻微抖动（±4px 垂直方向，3 次循环，~250ms）
 4. 抖动期间忽略同方向重复按键
 5. 焦点保持不变
 
@@ -58,7 +58,7 @@ flowchart LR
 2. 按左键
 3. `super.inDirection`（SDK 默认水平算法）找不到候选 → 返回 false
 4. policy 在 return false 前写入 `blockedDirectionNotifier.value = left`
-5. "个人中心"按钮向左轻微抖动（±2px 水平方向，3 次循环，~250ms）
+5. "个人中心"按钮向左轻微抖动（±4px 水平方向，3 次循环，~250ms）
 6. 焦点保持不变
 
 ```mermaid
@@ -167,7 +167,7 @@ flowchart LR
 
 | ID | 问题 | 当前处理 | 建议决策点 |
 |----|------|---------|-----------|
-| OI-1 | 抖动动画的最终参数（幅度 ±2px / 时长 250ms / 曲线 sin）是否需要用户视觉确认 | analysis 给默认值，design 阶段可视觉验收后微调 | design 阶段 visual-verify |
+| OI-1 | 抖动动画的最终参数（幅度 ±4px / 时长 250ms / 曲线 sin）是否需要用户视觉确认 | analysis 给默认值，design 阶段可视觉验收后微调 | design 阶段 visual-verify |
 | OI-2 | 是否同时触发触觉反馈（HapticFeedback.lightImpact） | 本 RC 不实现，iOS/Android 差异大 | 后续 RC（如 R00X 触觉反馈） |
 | OI-3 | 抖动反馈是否需要可配置开关（无障碍场景下应可关闭） | 本 RC 默认开启，不暴露开关 | 后续 RC（无障碍配置） |
 | OI-4 | 多 policy 实例场景下，widget 如何知道订阅哪个 notifier | 当前通过构造函数注入，单 policy 够用 | 若将来多页面多 policy，再考虑 InheritedWidget |
@@ -207,7 +207,7 @@ return result;
 
 ### 3. 抖动动画参数
 
-- **幅度**：±2px（足够可见，不突兀）
+- **幅度**：±4px（足够可见，不突兀）
 - **方向**：
   - 受阻 direction ∈ {up, down} → 垂直抖动（Transform.translate.dy）
   - 受阻 direction ∈ {left, right} → 水平抖动（Transform.translate.dx）

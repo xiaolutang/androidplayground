@@ -37,6 +37,16 @@ class SmartFocusTraversalPolicy extends FocusTraversalPolicy
   /// 内部复用一个 [OrderedTraversalPolicy] 实例做优先级层委托与排序。
   final OrderedTraversalPolicy _orderedPolicy = OrderedTraversalPolicy();
 
+  /// 焦点边界受阻信号通道（R004-FF005）。
+  ///
+  /// 在 [inDirection] 判定无候选（垂直列聚类无结果 / 水平 super 无结果）
+  /// 即将 return false 之前写入受阻方向；widget 订阅后据此触发抖动反馈。
+  ///
+  /// 消费方（FocusableButton._onBlocked）读取后立即置 null，保证单次按键
+  /// 只触发一次抖动。
+  final ValueNotifier<TraversalDirection?> blockedDirectionNotifier =
+      ValueNotifier<TraversalDirection?>(null);
+
   /// 三层降级：记忆 → 优先级 → 物理兜底。命中即返回 true。
   ///
   /// 这是整个 demo 的命脉，每层的命中/未命中判断必须严谨。
@@ -176,9 +186,14 @@ class SmartFocusTraversalPolicy extends FocusTraversalPolicy
     // 进入右内容区是预期行为），且我们的水平搜索无 X 过滤，与 super 行为一致。
     if (direction == TraversalDirection.up ||
         direction == TraversalDirection.down) {
+      blockedDirectionNotifier.value = direction; // 受阻信号（R004-FF005）
       return false;
     }
-    return super.inDirection(currentNode, direction);
+    final result = super.inDirection(currentNode, direction);
+    if (!result) {
+      blockedDirectionNotifier.value = direction; // 受阻信号（R004-FF005）
+    }
+    return result;
   }
 
   /// 在 scope 的可聚焦节点中，按 [direction] 方向做几何排序找候选。

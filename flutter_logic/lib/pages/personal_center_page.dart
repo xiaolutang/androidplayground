@@ -63,6 +63,7 @@ class PersonalCenterDemoPageState extends State<PersonalCenterDemoPage> {
   @override
   void dispose() {
     FocusManager.instance.removeListener(_onFocusChange);
+    _parentPolicy.blockedDirectionNotifier.dispose();
     _primaryFocusLabel.dispose();
     super.dispose();
   }
@@ -174,12 +175,25 @@ class PersonalCenterDemoPageState extends State<PersonalCenterDemoPage> {
                         horizontal: 16, vertical: 24),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: const <Widget>[
-                        FocusableButton(label: '个人中心', autofocus: true),
-                        SizedBox(height: 12),
-                        FocusableButton(label: '设置'),
-                        SizedBox(height: 12),
-                        FocusableButton(label: '关于'),
+                      children: <Widget>[
+                        FocusableButton(
+                          label: '个人中心',
+                          autofocus: true,
+                          blockedNotifier:
+                              _parentPolicy.blockedDirectionNotifier,
+                        ),
+                        const SizedBox(height: 12),
+                        FocusableButton(
+                          label: '设置',
+                          blockedNotifier:
+                              _parentPolicy.blockedDirectionNotifier,
+                        ),
+                        const SizedBox(height: 12),
+                        FocusableButton(
+                          label: '关于',
+                          blockedNotifier:
+                              _parentPolicy.blockedDirectionNotifier,
+                        ),
                       ],
                     ),
                   ),
@@ -215,6 +229,8 @@ class PersonalCenterDemoPageState extends State<PersonalCenterDemoPage> {
                                       child: FocusableButton(
                                         label: item.label,
                                         order: item.order,
+                                        blockedNotifier: _parentPolicy
+                                            .blockedDirectionNotifier,
                                       ),
                                     )),
                             // 底部余量：最后一个按钮获焦时，focus 系统的

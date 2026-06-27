@@ -5,15 +5,24 @@ requirement_cycle: R004
 topic: focus-boundary-shake-feedback
 date: 2026-06-27
 related_rc: R002
+source: user_direct
 ---
 
 # 焦点边界受阻抖动反馈 — 功能分析
 
 ## 概述
 
+> **来源**：2026-06-27 由用户在 R002 归档后的对话中直接提出（"如果我要给元素 加一个找不到下一个焦点的 抖动反馈效果 应该怎么做"）。无 brainstorm 文档，本分析为该需求的首次结构化整理。
+
 当用户按方向键导航到焦点区域的边界（如右内容区顶部按上键、左导航底部按下键）时，当前 `SmartFocusTraversalPolicy.inDirection` 返回 false，焦点不变。**用户感知不到任何反馈**，不知道"已经到边了，再按也没用"。
 
 本功能为：焦点受阻时，当前持有焦点的元素触发一次轻微抖动动画（水平/垂直方向感知），告知用户"此方向已无下一个目标"。
+
+### 架构约束识别
+
+- **遵循 INV-1（Flutter Add-to-App 不变量）**：本功能完全在 `flutter_logic/` 模块内，不引入 MethodChannel/EventChannel 跨层通信
+- **不涉及 agent 系统不变量（INV-2/INV-3）**：纯客户端 UI 增强，与 R001 agent 架构无关
+- **不修改 architecture.md**：本 RC 是已有 FF003/FF004 的增量能力，不引入新的架构层或模块边界
 
 ## 一、交互链
 
@@ -44,14 +53,53 @@ flowchart LR
 
 **用户故事**：作为掌机用户，我在左导航最左边按左键时，想看到当前按钮向左抖动一下，以便知道"已经到最左了"。
 
-操作过程同场景 1，但抖动方向为水平。
+操作过程：
+1. 焦点在左导航"个人中心"（最顶部、最左侧按钮）
+2. 按左键
+3. `super.inDirection`（SDK 默认水平算法）找不到候选 → 返回 false
+4. policy 在 return false 前写入 `blockedDirectionNotifier.value = left`
+5. "个人中心"按钮向左轻微抖动（±2px 水平方向，3 次循环，~250ms）
+6. 焦点保持不变
+
+```mermaid
+flowchart LR
+    A[焦点在左导航] --> B[按左键]
+    B --> C[super.inDirection 无候选]
+    C --> D[写入受阻信号 left]
+    D --> E[FocusableButton 收到信号]
+    E --> F{自己是否 primaryFocus?}
+    F -->|是| G[启动水平抖动]
+    F -->|否| H[忽略]
+    G --> I[250ms 后恢复 idle]
+```
+
+**与场景 1 的差异**：场景 1 的"无候选"来自 `_findDirectionalCandidate` 返回 null（垂直方向列聚类过滤后无同列节点）；场景 2 的"无候选"来自 SDK 水平算法（`super.inDirection`）的几何查找失败。两条路径都要写入 notifier。
 
 ### 场景 3：连续按键防抖
 
-**用户故事**：作为掌机用户，我连按方向键时不想看到抖动卡顿堆叠。
+**用户故事**：作为掌机用户，我在边界连按方向键时，想看到连续平滑的抖动反馈，以便确认按键被收到且系统在响应，而不是卡顿或堆叠。
 
-- 抖动动画期间再按同方向键 → 重启动画（从头开始，不堆叠）
-- 抖动期间按其他方向键 → 立即取消抖动，正常走焦点逻辑
+操作过程：
+1. 焦点在右内容区"会员签到"（最顶部按钮）
+2. 第 1 次按上键 → 启动垂直抖动（250ms 计时开始）
+3. 100ms 时第 2 次按上键 → 抖动**重启**（从 t=0 重新播放，非叠加，非中断）
+4. 100ms 时第 3 次按上键 → 再次重启
+5. 用户停止按键 → 最后一次重启后 250ms 自然结束
+6. 用户感知：按钮在按键节奏下持续抖动，松手后短促收尾，无堆叠动画队列
+
+```mermaid
+flowchart LR
+    A[焦点在边界元素] --> B[第1次按方向键]
+    B --> C[启动抖动 t=0]
+    C --> D{动画中?}
+    D -->|是,再次按同方向键| E[forward from 0]
+    E --> D
+    D -->|动画结束| F[恢复 idle]
+    D -->|按其他方向键| G[取消抖动,正常焦点逻辑]
+```
+
+**异常路径**：
+- 抖动期间按相反方向或其他方向键：立即停止抖动（`_shakeController.stop()`），让位给正常焦点逻辑，避免动画与焦点切换同时发生造成视觉混乱
 
 ## 二、逻辑树
 
@@ -89,8 +137,10 @@ flowchart LR
 
 | 编号 | 功能节点 | 前缀含义 | 简介 |
 |------|---------|---------|------|
-| FF008 | FocusBoundaryNotifier | 前端基础 | 焦点受阻信号通道：policy 写入方向，widget 订阅响应。`ValueNotifier<TraversalDirection?>` 类型 |
+| FF005 | FocusBoundaryNotifier | 前端基础 | 焦点受阻信号通道：policy 写入方向，widget 订阅响应。`ValueNotifier<TraversalDirection?>` 类型 |
 | FB008 | FocusableButton 抖动反馈 | 前端业务 | FocusableButton 订阅 notifier，primaryFocus 时启动方向感知的水平/垂直抖动 |
+
+> **编号说明**：FF 段当前已用到 FF004（R002），本 RC 新增 FF005；FB 段当前已用到 FB007（R002 HomePage），本 RC 新增 FB008。
 
 ### UI 功能稳定标识预清单
 
@@ -109,7 +159,18 @@ flowchart LR
 
 | 接口/协议 | 定义方 | 消费方 | 敏感度 |
 |-----------|--------|--------|--------|
-| `FocusBoundaryNotifier`（`ValueNotifier<TraversalDirection?>`） | FF008 | FB008 / 后续其他反馈消费者 | **中**：value 写入时机必须严格在 `inDirection` return 之前；reset 必须在动画启动后立即执行 |
+| `FocusBoundaryNotifier`（`ValueNotifier<TraversalDirection?>`） | FF005 | FB008 / 后续其他反馈消费者 | **中**：value 写入时机必须严格在 `inDirection` return 之前；reset 必须在动画启动后立即执行 |
+
+### Open Issues
+
+> 本需求由用户直接提出，未走 brainstorm。以下为待 design 阶段确认或留作后续 RC 的开放问题：
+
+| ID | 问题 | 当前处理 | 建议决策点 |
+|----|------|---------|-----------|
+| OI-1 | 抖动动画的最终参数（幅度 ±2px / 时长 250ms / 曲线 sin）是否需要用户视觉确认 | analysis 给默认值，design 阶段可视觉验收后微调 | design 阶段 visual-verify |
+| OI-2 | 是否同时触发触觉反馈（HapticFeedback.lightImpact） | 本 RC 不实现，iOS/Android 差异大 | 后续 RC（如 R00X 触觉反馈） |
+| OI-3 | 抖动反馈是否需要可配置开关（无障碍场景下应可关闭） | 本 RC 默认开启，不暴露开关 | 后续 RC（无障碍配置） |
+| OI-4 | 多 policy 实例场景下，widget 如何知道订阅哪个 notifier | 当前通过构造函数注入，单 policy 够用 | 若将来多页面多 policy，再考虑 InheritedWidget |
 
 ## 四、设计要点
 
@@ -170,10 +231,10 @@ void _onBlocked() {
 
 ## 五、结论
 
-- **开发顺序**：FF008（信号通道）→ FB008（动画订阅），FF008 是 FB008 的硬依赖
+- **开发顺序**：FF005（信号通道）→ FB008（动画订阅），FF005 是 FB008 的硬依赖
 - **复杂度集中**：信号通道的时序协调（写入时机 + reset 时机 + 防抖），动画本身简单
 - **暂不实现**：
   - 跨页面通用化（InheritedWidget）：当前 demo 单页面够用，不引入 Provider 体系
   - 触觉反馈（HapticFeedback）：iOS/Android 差异大，留作后续 RC
-- **功能节点数**：2 个（FF008 + FB008），≤ 15，无需拆分 RC
+- **功能节点数**：2 个（FF005 + FB008），≤ 15，无需拆分 RC
 - **建议归入新 RC**：R004（焦点受阻抖动反馈），无前置 RC 依赖，可独立开发验证

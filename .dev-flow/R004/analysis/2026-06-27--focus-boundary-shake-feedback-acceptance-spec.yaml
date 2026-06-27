@@ -1,0 +1,135 @@
+# AcceptanceSpec — 焦点边界受阻抖动反馈
+# 关联设计：2026-06-27--focus-boundary-shake-feedback-frontend.md
+# 功能编号：FF005（FocusBoundaryNotifier）+ FB008（FocusableButton 抖动反馈）
+
+spec_id: R004-focus-boundary-shake
+version: 1.0
+date: 2026-06-27
+requirement_cycle: R004
+page: personal_center
+tech_stack: flutter
+
+# ─────────────────────────────────────────────────────────────
+# 1. 稳定标识清单（stable_identifiers）
+#    命名规范：{page}.{module}.{element}
+#    只描述"这个元素需要一个稳定 ID"，不绑定具体技术栈
+# ─────────────────────────────────────────────────────────────
+stable_identifiers:
+  - id: personal_center.left_nav.button
+    description: 左导航区域的 FocusableButton 实例（个人中心/设置/关于）
+    locator_hint: label 文本 = 按钮显示文字
+    count: 3
+
+  - id: personal_center.right_content.button
+    description: 右内容区的 FocusableButton 实例（会员签到/账户信息/我的钱包/消息中心/退出登录）
+    locator_hint: label 文本 = 按钮显示文字
+    count: 5
+
+  - id: personal_center.button.shake_transform
+    description: 任一 FocusableButton 内的 Transform.translate 节点（抖动驱动位）
+    locator_hint: "FocusableButton build 输出的 Transform（find.byType Transform，ancestor=FocusableButton）"
+    multiple: true
+
+  - id: personal_center.policy.blocked_notifier
+    description: SmartFocusTraversalPolicy.blockedDirectionNotifier 信号通道
+    locator_hint: 通过 _parentPolicy 字段访问，测试用 tester.element 拿 state
+
+# ─────────────────────────────────────────────────────────────
+# 2. 视觉验收标准（visual_acceptance）
+#    可量化的视觉判定条件，供 visual-verify 多模态对照
+# ─────────────────────────────────────────────────────────────
+visual_acceptance:
+  idle_state:
+    description: 非受阻、非抖动状态
+    conditions:
+      - "所有 FocusableButton 无 Transform.translate 位移（dx=0, dy=0）"
+      - "焦点按钮显示蓝色边框（Border.all color=blue width=2）—— 与 R002 一致"
+      - "非焦点按钮无边框高亮"
+
+  shaking_vertical:
+    description: 垂直方向受阻抖动（up/down 边界）
+    trigger: 焦点在垂直边界按钮（如会员签到顶部按上键）按对应方向键
+    conditions:
+      - "Transform.translate 的 dy 在 ±2px 范围内振荡"
+      - "Transform.translate 的 dx 始终为 0"
+      - "抖动持续约 250ms（3 周期 sin 波）"
+      - "抖动期间焦点边框仍可见（不被 clip 裁掉）"
+      - "抖动结束后 Transform.translate 归零（dx=0, dy=0）"
+
+  shaking_horizontal:
+    description: 水平方向受阻抖动（left/right 边界）
+    trigger: 焦点在水平边界按钮（如个人中心最左按左键）按对应方向键
+    conditions:
+      - "Transform.translate 的 dx 在 ±2px 范围内振荡"
+      - "Transform.translate 的 dy 始终为 0"
+      - "抖动持续约 250ms"
+      - "抖动期间焦点边框仍可见"
+      - "抖动结束后 Transform.translate 归零"
+
+  no_shake_when_not_focused:
+    description: 非焦点按钮收到信号不应抖动
+    trigger: 焦点在 A 按钮，policy 写入信号，B 按钮（非焦点）订阅同一 notifier
+    conditions:
+      - "A 按钮 Transform.translate 振荡"
+      - "B 按钮 Transform.translate 保持 0"
+
+# ─────────────────────────────────────────────────────────────
+# 3. 交互断言（interaction_assertions）
+#    状态同源断言 + 路由/焦点跳转断言
+# ─────────────────────────────────────────────────────────────
+interaction_assertions:
+  - id: shake-vertical-boundary-up
+    given: "焦点在右内容区会员签到（最顶部按钮）"
+    when: "按上键"
+    then:
+      - "primaryFocus.debugLabel == '会员签到'（焦点不变）"
+      - "blockedDirectionNotifier.value 经历 up → null"
+      - "会员签到 Transform.translate.dy 在 250ms 内出现非零值"
+      - "250ms 后 Transform.translate 归零"
+
+  - id: shake-vertical-boundary-down
+    given: "焦点在右内容区退出登录（最底部按钮）"
+    when: "按下键"
+    then:
+      - "primaryFocus.debugLabel == '退出登录'"
+      - "blockedDirectionNotifier.value 经历 down → null"
+      - "退出登录 Transform.translate.dy 振荡"
+
+  - id: shake-horizontal-boundary-left
+    given: "焦点在左导航个人中心（最左按钮）"
+    when: "按左键"
+    then:
+      - "primaryFocus.debugLabel == '个人中心'"
+      - "blockedDirectionNotifier.value 经历 left → null"
+      - "个人中心 Transform.translate.dx 振荡"
+
+  - id: shake-debounce-restart
+    given: "焦点在垂直边界按钮，第 1 次受阻抖动进行中（t=100ms）"
+    when: "再次按同方向键"
+    then:
+      - "抖动从 t=0 重启（forward from 0）"
+      - "不创建第二个 AnimationController 实例"
+      - "无动画堆叠队列"
+
+  - id: shake-cancel-on-blur
+    given: "抖动进行中"
+    when: "按其他方向键导致焦点切换到其他按钮"
+    then:
+      - "原按钮 _shakeController.stop() 被调用"
+      - "Transform.translate 立即归零"
+      - "新焦点按钮不继承抖动状态"
+
+  - id: no-shake-when-blocked-notifier-null
+    given: "FocusableButton 未传入 blockedNotifier（默认 null）"
+    when: "按方向键到边界"
+    then:
+      - "无 Transform.translate 振荡"
+      - "行为与 R002 完全一致（向后兼容）"
+
+  - id: dispose-no-leak
+    given: "FocusableButton 在抖动中 unmount（如页面 pop）"
+    when: "widget dispose"
+    then:
+      - "_shakeController.dispose() 被调用"
+      - "blockedNotifier.removeListener(_onBlocked) 被调用"
+      - "无 'AnimationController disposed' 断言失败"

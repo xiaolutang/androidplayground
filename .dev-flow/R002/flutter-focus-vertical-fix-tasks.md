@@ -6,7 +6,7 @@ requirement_cycle: R002
 workflow:
   evaluate_provider: local
   mode: auto
-status: planned
+status: archived
 ---
 
 # Flutter 焦点垂直键列隔离 Bug Fix — 任务清单

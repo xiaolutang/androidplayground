@@ -1,10 +1,16 @@
 {
-  "active_rc": "R002",
+  "active_rc": null,
   "archived_requirement_cycles": [
     {
       "rc_id": "R001",
       "name": "客户端 Bug 自动修复 Agent",
       "archived_at": "2026-06-26",
+      "status": "archived"
+    },
+    {
+      "rc_id": "R002",
+      "name": "Flutter 焦点进阶 Demo",
+      "archived_at": "2026-06-27",
       "status": "archived"
     }
   ],

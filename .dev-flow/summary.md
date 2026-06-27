@@ -1,11 +1,75 @@
 ---
 type: summary
-last_updated: 2026-06-26
+last_updated: 2026-06-27
 ---
 
 # 变更记录（Summary）
 
 > 全局变更历史。按 RC 归档时间倒序追加。每条记录含：交付摘要 + 模块清单 + 能力清单 + 证据链接。
+
+---
+
+## R002 Flutter 焦点进阶 Demo（2026-06-27 归档）
+
+### 交付摘要
+
+纯 Flutter 前端 demo，验证自定义焦点策略在 TV/掌机类设备（方向键导航）下的工程实践。位于 `flutter_logic/` 模块，遵循 R001 Add-to-App 模式。
+
+**核心能力**：
+- **三层焦点降级策略**：`记忆（focusedChild）→ 优先级（NumericFocusOrder）→ 物理兜底（DFS）`，命中即返回
+- **跨 FocusScope 智能导航**：方向键跨区域（左导航↔右内容区）时自动走三层降级进入目标区域，同区域走几何就近
+- **垂直方向键列聚类隔离**：up/down 方向只在 X 轴区间相交的候选中排序，防止跨列跳转
+- **requestFocusCallback 接入 SDK ensureVisible 链路**：跨 scope 路径用 hook 而非裸 `.requestFocus()`，免费拿到 `Scrollable.ensureVisible` 滚动；alignment:0.5 适配 home indicator 安全区
+- **M3 scrolledUnder 全局关闭**：appBarTheme 三属性（scrolledUnderElevation:0 + surfaceTintColor:transparent + backgroundColor 固定），消除 body 滚动时 AppBar 变色导致的 iOS 状态栏闪烁
+
+**五个修复（FIX001-FIX005）**：
+- FIX001：垂直方向 X 重叠过滤（列聚类）
+- FIX002：移除 AnimatedScale 修复焦点框左右裁剪
+- FIX003：appBarTheme 全局关闭 M3 scrolledUnder（状态栏闪烁修复）
+- FIX004：StackFit.expand + Row stretch 修复右内容区高度塌陷
+- FIX005：SmartFocusTraversalPolicy 跨 scope 改用 requestFocusCallback，恢复 SDK ensureVisible 链路（系统性修复，删除 widget 层 `_handleFocusChange` 补丁）
+
+### 模块清单
+
+| 模块 | 任务 ID | 关键产物 |
+|------|---------|---------|
+| 焦点策略 FF | FF003-FF004 | SmartFocusTraversalPolicy（三层降级 + 列聚类）/ FocusableButton（统一封装 + 边框高亮） |
+| 焦点页面 FB | FB005-FB006 | PersonalCenterDemoPage（左导航 + 右内容区）/ FocusDebugOverlay（调试浮层） |
+| 入口页 | — | HomePage（Playground 入口 + 跳转 demo） |
+| 测试 | — | 43 widget test（含 ensureVisible 回归捕获） + iPhone 16 横屏模拟器集成诊断 |
+
+### 能力清单
+
+| 能力 | 来源 | 当前状态 |
+|------|------|---------|
+| 自定义焦点遍历策略（三层降级） | FF003 | released（记忆 > 优先级 > 兜底） |
+| 跨 FocusScope 方向键导航 | FF003 | released（左导航 ↔ 右内容区） |
+| 垂直方向列聚类隔离 | FF003 FIX001 | released（X 重叠过滤） |
+| requestFocusCallback ensureVisible 链路 | FF003 FIX005 | released（alignment:0.5 绕开 safe area） |
+| M3 scrolledUnder 全局关闭 | Theme | released（消除状态栏闪烁） |
+| 焦点调试浮层 | FB006 | released（primaryFocus 显示 + 节点删除/重置记忆/打印 Rect） |
+
+### 验收基线
+
+| 维度 | 数据 |
+|------|------|
+| Widget 测试 | 43 passed（含 layout/focus/home_page 三组） |
+| 回归捕获 | 记忆层 ensureVisible 测试（重置 scrollOffset 后断言 >0） — 对照实验验证有效 |
+| 视觉验收 | GLM-5V-Turbo 分析 iPhone 16 模拟器横屏截图 — 焦点框无裁剪 / 列隔离生效 / 状态栏不闪烁 |
+| Lint | `flutter analyze` 无 error |
+
+### visual-verify 接入范围
+
+- **页面**：HomePage、PersonalCenterDemoPage
+- **技术栈**：Flutter（flutter_logic 模块）
+- **采集方式**：手动截图 + GLM-5V-Turbo 视觉分析（无自动化采集层；后续若引入自动化采集器再回写此节）
+
+### 证据链接
+
+- 任务清单：`.dev-flow/R002/flutter-focus-demo-tasks.md` + `flutter-focus-vertical-fix-tasks.md`（FIX001-FIX005 全部 archived）
+- 分析文档：`.dev-flow/R002/analysis/`（3 份：需求分析 + frontend 投影 + FIX005 根因分析）
+- 执行证据：`.dev-flow/R002/evidence/r002-evaluation.md`
+- 关键 commit：`cd265e12`（FIX003/004/005 系统性修复）+ `ce475376`（FIX005 根因分析与 tasks 登记）
 
 ---
 

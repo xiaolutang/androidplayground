@@ -1,5 +1,5 @@
 {
-  "active_rc": "R004",
+  "active_rc": null,
   "archived_requirement_cycles": [
     {
       "rc_id": "R001",
@@ -10,6 +10,12 @@
     {
       "rc_id": "R002",
       "name": "Flutter 焦点进阶 Demo",
+      "archived_at": "2026-06-27",
+      "status": "archived"
+    },
+    {
+      "rc_id": "R004",
+      "name": "焦点边界受阻抖动反馈",
       "archived_at": "2026-06-27",
       "status": "archived"
     }

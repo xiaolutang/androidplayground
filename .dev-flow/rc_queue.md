@@ -14,7 +14,7 @@ last_updated: 2026-06-27
 | R001 | 客户端 Bug 自动修复 Agent | archived | 已归档 | 2026-06-16 | 首个 RC；72 任务全部完成（56 后端 + 16 前端，BB014 deferred）|
 | R002 | Flutter 焦点进阶 Demo | archived | 已归档 | 2026-06-26 | 焦点策略 + 5 个修复全部完成；43 widget test 全绿 |
 | R003 | Flutter Playground 入口页 | planned | plan | 2026-06-27 | 基于 R002 焦点 demo 加 Playground 总入口；待 execute |
-| R004 | 焦点边界受阻抖动反馈 | active | analysis | 2026-06-27 | 在 FocusableButton 加方向感知抖动；2 节点（FF008 + FB008），依赖 R002 已 released 的 FF003/FF004 |
+| R004 | 焦点边界受阻抖动反馈 | archived | 已归档 | 2026-06-27 | 2 节点（FF005 + FB008）+ FF009 集成测试；56 测试全绿 |
 
 ## 待规划
 
@@ -34,5 +34,6 @@ last_updated: 2026-06-27
 
 ## 历史归档
 
+- **R004**（2026-06-27）：焦点边界受阻抖动反馈。policy→widget notifier 信号通道 + 方向感知 sin 波抖动。详见 `.dev-flow/summary.md`。
 - **R002**（2026-06-27）：Flutter 焦点进阶 Demo。三层焦点降级 + 跨 scope 导航 + 5 个修复。详见 `.dev-flow/summary.md`。
 - **R001**（2026-06-26）：客户端 Bug 自动修复 Agent。详见 `.dev-flow/summary.md`。

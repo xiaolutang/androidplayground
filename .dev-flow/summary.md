@@ -9,6 +9,60 @@ last_updated: 2026-06-27
 
 ---
 
+## R004 焦点边界受阻抖动反馈（2026-06-27 归档）
+
+### 交付摘要
+
+R002 焦点策略的体验增强补丁。当方向键在焦点边界无候选（到头/到边）时，让当前焦点按钮沿受阻轴向做 ±2px / 250ms / 3 周期 sin 波抖动，给用户"此路不通"的体感反馈。
+
+**核心能力**：
+- **边界受阻信号通道（FF005）**：`SmartFocusTraversalPolicy.blockedDirectionNotifier`（`ValueNotifier<TraversalDirection?>`），在 `inDirection` 垂直 return-false 路径 + 水平 `super.inDirection` 返回 false 后写入受阻方向
+- **方向感知抖动（FB008）**：`FocusableButton` 订阅 notifier，当自身是 primaryFocus 时启动抖动 — 垂直受阻（up/down）→ dy 振荡 dx=0；水平受阻（left/right）→ dx 振荡 dy=0
+- **防抖幂等**：动画中再次收到信号 `forward(from:0)` 重启，不堆叠
+- **失焦即停**：抖动中失焦立即 `stop()`，让位给正常焦点切换
+- **三个 Flutter 坑位规避**：(1) `Curve.transform` 端点短路导致 sin(6π)≠0 → 改用裸 `math.sin`；(2) `CurveTween` 要求输出 ∈[0,1] 违反 sin → 不用 tween；(3) `forward(from:0)` 首帧 Ticker 未启动 → 双 pump 模式
+
+### 模块清单
+
+| 模块 | 任务 ID | 关键产物 |
+|------|---------|---------|
+| 焦点策略 FF | FF005 | `blockedDirectionNotifier` 字段 + 2 个写入点（垂直/水平 return-false 路径） |
+| 抖动按钮 FB | FB008 | `FocusableButton.blockedNotifier` 入参 + `AnimationController` + `AnimatedBuilder` + `Transform.translate` 方向感知抖动 |
+| 集成测试 FF | FF009 | 真实 `PersonalCenterDemoPage` + `sendKeyEvent` 端到端验证（垂直/水平/连续防抖/失焦取消 4 场景） |
+
+### 能力清单
+
+| 能力 | 来源 | 当前状态 |
+|------|------|---------|
+| 焦点边界受阻信号通道 | FF005 | released（policy → widget 单向 notifier） |
+| 方向感知抖动反馈 | FB008 | released（垂直/水平轴向分离，±2px/250ms/3 周期 sin） |
+| 抖动防抖 + 失焦即停 | FB008 | released（forward(from:0) 重启 + focus listener stop） |
+
+### 验收基线
+
+| 维度 | 数据 |
+|------|------|
+| 单元测试 | FF005×4 + FB008×5 = 9 passed |
+| 集成测试 | FF009×4 passed（真实页面 + 真实按键） |
+| 全量回归 | 56 tests passed（R002 既有 35 + R004 新增 13 + 其他 8） |
+| Lint | `flutter analyze` 无 error |
+| simplify | routing=none（测试 helper 重复已收敛到 focus_test_helpers.dart） |
+
+### visual-verify 接入范围
+
+- **页面**：PersonalCenterDemoPage（已在 R002 接入范围）
+- **技术栈**：Flutter（flutter_logic 模块）
+- **采集方式**：widget test 对 Transform.translate dx/dy 的断言作为视觉门控代理（抖动位移量程可量化验证）
+- **稳定标识**：`personal_center.button.shake_transform`、`personal_center.policy.blocked_notifier`（见 R004 acceptance-spec.yaml）
+
+### 证据链接
+
+- 任务清单：`.dev-flow/R004/focus-boundary-shake-feedback-tasks.md`
+- 分析文档：`.dev-flow/R004/analysis/`（需求分析 + frontend 设计 + acceptance-spec.yaml）
+- 关键 commit：`a32e85cb`（FF005+FB008+FF009 完整实现）
+
+---
+
 ## R002 Flutter 焦点进阶 Demo（2026-06-27 归档）
 
 ### 交付摘要

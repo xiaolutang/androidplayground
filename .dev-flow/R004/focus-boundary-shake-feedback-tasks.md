@@ -6,7 +6,7 @@ requirement_cycle: R004
 workflow:
   evaluate_provider: local
   mode: auto
-status: planned
+status: archived
 ---
 
 # 焦点边界受阻抖动反馈 — 前端任务清单

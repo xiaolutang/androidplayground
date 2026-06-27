@@ -57,6 +57,7 @@ last_updated: 2026-06-27
 | FF002 | 缺口视图 API | R001 | released | 缺口列表、解锁价值排序、补齐动作提交 |
 | FF003 | SmartFocusTraversalPolicy | R002 | released | 掌机焦点策略引擎：记忆 > 优先级 > 物理兜底三层降级 + 列聚类 + requestFocusCallback hook |
 | FF004 | FocusableButton | R002 | released | 统一封装的可聚焦按钮组件（FocusNode + 边框高亮，无 AnimatedScale 避免裁剪） |
+| FF005 | FocusBoundaryNotifier | R004 | released | policy.inDirection return-false 路径写入受阻方向到 ValueNotifier（信号通道，FF003 扩展） |
 
 ## 前端业务 FB
 
@@ -69,6 +70,7 @@ last_updated: 2026-06-27
 | FB005 | PersonalCenterDemoPage | R002 | released | 掌机个人中心 demo 页面（左导航 + 右内容区，共用 FocusTraversalGroup + 右侧独立 FocusScope） |
 | FB006 | FocusDebugOverlay | R002 | released | 焦点调试浮层（打印 primaryFocus + 删除节点/重置记忆/打印 Rect） |
 | FB007 | HomePage（Playground 入口） | R002 | released | demo 入口页（ListTile 跳转各子 demo） |
+| FB008 | FocusableButtonShake | R004 | released | 受阻抖动反馈：订阅 FF005 notifier，primaryFocus 时启动 ±2px/250ms/3 周期 sin 波方向感知抖动（FB005 体验增强） |
 
 ---
 
@@ -95,3 +97,12 @@ BF001 → BB001 → BB002 → BF006 → BB003 → BB004 → BB005 → BB006
 ```
 
 反思与沉淀横切所有完成态：BB013 → BF005；BB015 → BF005（模式层）
+
+## R004 焦点边界受阻抖动反馈链路
+
+```
+FF003 (SFTP) ──延展─► FF005 (blockedDirectionNotifier)
+                          │ ValueNotifier<TraversalDirection?>
+                          ▼
+FF004 (FocusableButton) ──延展─► FB008 (订阅 notifier → 方向感知抖动)
+```

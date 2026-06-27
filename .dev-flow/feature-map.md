@@ -55,6 +55,8 @@ last_updated: 2026-06-26
 |------|---------|--------|------|------|
 | FF001 | 报告与工单 API | R001 | released | 报告/工单/trajectory/PR 查询接口 |
 | FF002 | 缺口视图 API | R001 | released | 缺口列表、解锁价值排序、补齐动作提交 |
+| FF003 | SmartFocusTraversalPolicy | R002 | planned | 掌机焦点策略引擎：记忆 > 优先级 > 物理兜底三层降级 |
+| FF004 | FocusableButton | R002 | planned | 统一封装的可聚焦按钮组件（FocusNode + 高亮样式） |
 
 ## 前端业务 FB
 
@@ -64,6 +66,8 @@ last_updated: 2026-06-26
 | FB002 | PR 审核界面 | R001 | released | 复用 GitHub/GitLab PR 界面 |
 | FB003 | 缺口视图 | R001 | released | 按解锁价值排序的缺口列表 + 补齐操作 |
 | FB004 | 信息追问表单 | R001 | released | 结构化选项追问 |
+| FB005 | PersonalCenterDemoPage | R002 | planned | 掌机个人中心 demo 页面（左导航 + 右内容区，FocusTraversalGroup 嵌套） |
+| FB006 | FocusDebugOverlay | R002 | planned | 焦点调试浮层（打印 primaryFocus + 删除节点/重置记忆/打印 Rect） |
 
 ---
 

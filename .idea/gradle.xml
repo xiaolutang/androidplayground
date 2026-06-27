@@ -24,6 +24,7 @@
             <option value="$PROJECT_DIR$/app" />
             <option value="$PROJECT_DIR$/flutter_logic/.android/Flutter" />
             <option value="$PROJECT_DIR$/../../ohos/flutter_flutter/packages/flutter_tools/gradle" />
+            <option value="$PROJECT_DIR$/../../ohos/flutter_flutter/packages/integration_test/android" />
           </set>
         </option>
       </GradleProjectSettings>

@@ -23,7 +23,10 @@ status: planned
 
 1. ✅ R002-FIX001 — `_findDirectionalCandidate` 垂直方向 X 重叠过滤
 2. ✅ R002-FIX002 — FocusableButton 移除 AnimatedScale（焦点框裁剪修复）
-3. ⬜ 最后 — 全量测试验证
+3. ✅ R002-FIX003 — AppBar 全局 appBarTheme 关闭 M3 scrolledUnder（状态栏闪烁修复）
+4. ✅ R002-FIX004 — `Stack(fit: StackFit.expand)` + `Row(crossAxisAlignment: stretch)` 修复右内容区高度塌陷
+5. ✅ R002-FIX005 — `SmartFocusTraversalPolicy` 跨 scope 路径改用 `requestFocusCallback` 恢复 SDK ensureVisible 链路（删 `FocusableButton._handleFocusChange` widget 层补丁）
+6. ⬜ 最后 — 全量测试验证
 
 ---
 
@@ -161,6 +164,99 @@ flutter test integration_test/
 ```
 
 **验收**：全部通过，无 regression。
+
+---
+
+## R002-FIX003：main.dart — AppBar 全局 appBarTheme 关闭 M3 scrolledUnder `✅ 已完成`
+
+- 文件：`flutter_logic/lib/main.dart`
+- 改动类型：修改（ThemeData.appBarTheme 新增三属性）
+- domain: ui
+- task_layer: foundation
+- depends_on: []
+- priority: 3
+- risk_tags: []
+- smoke_required: true
+- mode: direct
+- status: completed
+- 背景：Flutter M3 下 AppBar 默认开启 scrolledUnderElevation，body 内
+  `Scrollable` 滚动时 AppBar 触发 tonal overlay 变色（iOS 表现为状态栏
+  背景色跟随变化，反复闪烁）。
+- 修复：ThemeData.appBarTheme 全局声明
+  - `scrolledUnderElevation: 0`（关闭滚动叠加高度差）
+  - `surfaceTintColor: Colors.transparent`（关闭 M3 tonal overlay）
+  - `backgroundColor: Color(0xFFF6F2F8)`（显式固定避免受 colorScheme 影响）
+- acceptance_criteria:
+  - body 滚动时 AppBar 背景色无变化（状态栏不闪烁）
+  - `Theme.of(ctx).appBarTheme.scrolledUnderElevation == 0`
+  - `Theme.of(ctx).appBarTheme.surfaceTintColor == Colors.transparent`
+  - `Theme.of(ctx).appBarTheme.backgroundColor == Color(0xFFF6F2F8)`
+  - 全量测试通过
+- 测试：`test/home_page_test.dart` + `integration_test/diag_status_bar_pixel_test.dart` 已加 appBarTheme 断言
+
+---
+
+## R002-FIX004：personal_center_page.dart — StackFit.expand 修复右内容区高度塌陷 `✅ 已完成`
+
+- 文件：`flutter_logic/lib/pages/personal_center_page.dart`
+- 改动类型：修改
+- domain: ui
+- task_layer: foundation
+- depends_on: []
+- priority: 3
+- risk_tags: []
+- smoke_required: true
+- mode: direct
+- status: completed
+- 背景：默认 `Stack(loose)` + `Row(default crossAxisAlignment=center)`，
+  右内容区按内容高度居中显示：
+  - 平板/大屏：右内容区悬浮居中，下方留白
+  - 手机：内容高度 > body 高度，溢出被 Scaffold 裁剪，"退出登录"焦点框底部看不到
+- 修复：`Stack(fit: StackFit.expand)` + `Row(crossAxisAlignment: stretch)`
+  让左右两区撑满 body 高度，右内容区 SingleChildScrollView 接管溢出滚动。
+- acceptance_criteria:
+  - 右内容区在平板/手机尺寸下均撑满 body 高度
+  - "退出登录"可通过 SingleChildScrollView 滚动进入 viewport
+  - 全量测试通过
+- 测试：`test/layout/personal_center_layout_test.dart`
+
+---
+
+## R002-FIX005：smart_focus_policy.dart — 跨 scope 路径改用 requestFocusCallback 恢复 ensureVisible 链路 `✅ 已完成`
+
+- 文件：`flutter_logic/lib/focus/smart_focus_policy.dart`（+ 删除 `focusable_button.dart` 的 `_handleFocusChange` widget 层补丁）
+- 改动类型：修改
+- domain: ui
+- task_layer: foundation
+- depends_on: []
+- priority: 2
+- risk_tags: []
+- smoke_required: true
+- mode: direct
+- status: completed
+- 背景：自定义 `SmartFocusTraversalPolicy` 在 `_smartRequestFocus`（三层降级）
+  和同 scope 候选路径中直接调用 `node.requestFocus()`，绕过了 SDK 的
+  `requestFocusCallback` hook，导致 `Scrollable.ensureVisible` 链路被切断。
+  之前用 `FocusableButton._handleFocusChange` 在 widget 层手动补
+  `Scrollable.ensureVisible` 是局部打补丁，掩盖了根因。
+- 修复：
+  - `_smartRequestFocus` 的记忆层 / 优先级层 / 物理兜底层共 3 处
+    `.requestFocus()` → `requestFocusCallback(node, alignment: 0.5)`
+  - `inDirection` 同 scope 候选路径 1 处
+    `requestFocus()` → `requestFocusCallback(candidate, alignment: 0.5)`
+  - 删除 `FocusableButton._handleFocusChange` 及其在 initState/dispose 的注册
+  - 保留第 4 层极端兜底 `targetScope.requestFocus()`：scope 节点 context 可能为 null，
+    走 requestFocusCallback 会触发 `node.context!` 崩溃
+- alignment 选择：`alignment: 0.5`（强制居中），非 SDK 默认的 `keepVisibleAtEnd`。
+  原因：底部"退出登录"需绕开 home indicator 安全区，SDK 的 keepVisibleAtEnd
+  只对齐到视口 bottom，会落进 safe area 被遮挡 10px。
+- 根因分析文档：`analysis/2026-06-27--focus-ensurevisible-policy-lift.md`
+- acceptance_criteria:
+  - 退出登录获焦后 `scrollState.position.pixels > 0`（ensureVisible 自动触发）
+  - 退出登录 border 完全在 viewport 内（不被 Clip 裁）
+  - 退出登录 border 底部在 home indicator 上方（不被安全区遮挡）
+  - 全量测试通过
+- 测试：`test/focus/focus_ensure_visible_test.dart`（文档注释已更新为 policy 层描述）
 
 ---
 

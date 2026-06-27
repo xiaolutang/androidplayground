@@ -90,38 +90,36 @@ class _FocusableButtonState extends State<FocusableButton> {
         child: Builder(
           builder: (context) {
             final bool focused = Focus.of(context).hasFocus;
-            return AnimatedScale(
-              scale: focused ? 1.05 : 1.0,
+            // 注意：不使用 AnimatedScale 放大。
+            // 放大后按钮会超出 SingleChildScrollView 的 clip 边界，
+            // 导致焦点边框左右被裁剪（"被吃边"）。
+            // 焦点高亮仅依赖边框 + 背景色 + 字重，视觉足够明显。
+            return AnimatedContainer(
               duration: const Duration(milliseconds: 150),
-              curve: Curves.easeOut,
-              child: AnimatedContainer(
-                duration: const Duration(milliseconds: 150),
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-                decoration: BoxDecoration(
-                  color: widget.enabled
-                      ? (focused
-                          ? Colors.blue.withValues(alpha: 0.12)
-                          : Colors.grey.withValues(alpha: 0.06))
-                      : Colors.grey.withValues(alpha: 0.04),
-                  borderRadius: BorderRadius.circular(8),
-                  border: focused
-                      ? Border.all(color: Colors.blue, width: 2)
-                      : Border.all(color: Colors.transparent, width: 2),
-                ),
-                child: InkWell(
-                  onTap: widget.enabled ? widget.onTap : null,
-                  borderRadius: BorderRadius.circular(8),
-                  child: Text(
-                    widget.label,
-                    style: TextStyle(
-                      fontSize: 16,
-                      color: widget.enabled
-                          ? (focused ? Colors.blue : Colors.black87)
-                          : Colors.black38,
-                      fontWeight:
-                          focused ? FontWeight.w600 : FontWeight.normal,
-                    ),
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+              decoration: BoxDecoration(
+                color: widget.enabled
+                    ? (focused
+                        ? Colors.blue.withValues(alpha: 0.12)
+                        : Colors.grey.withValues(alpha: 0.06))
+                    : Colors.grey.withValues(alpha: 0.04),
+                borderRadius: BorderRadius.circular(8),
+                border: focused
+                    ? Border.all(color: Colors.blue, width: 2)
+                    : Border.all(color: Colors.transparent, width: 2),
+              ),
+              child: InkWell(
+                onTap: widget.enabled ? widget.onTap : null,
+                borderRadius: BorderRadius.circular(8),
+                child: Text(
+                  widget.label,
+                  style: TextStyle(
+                    fontSize: 16,
+                    color: widget.enabled
+                        ? (focused ? Colors.blue : Colors.black87)
+                        : Colors.black38,
+                    fontWeight: focused ? FontWeight.w600 : FontWeight.normal,
                   ),
                 ),
               ),

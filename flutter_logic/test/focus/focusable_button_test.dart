@@ -6,8 +6,11 @@ import 'package:flutter_logic/focus/focusable_button.dart';
 /// FocusableButton（FF004）widget 测试。
 ///
 /// 覆盖 4 条验收场景 + Finding 5.9/5.10/5.15b 补强：
-/// 1. 高亮态：获得焦点 → Container 边框为蓝色 + AnimatedScale 终态 scale = 1.05
-/// 2. 非高亮态：失去焦点 → 边框透明 + scale = 1.0
+/// 1. 高亮态：获得焦点 → Container 边框为蓝色（宽度 2）
+/// 2. 非高亮态：失去焦点 → 边框透明
+///
+/// 注意：R002-FIX002 移除了 AnimatedScale（放大导致焦点边框被
+/// SingleChildScrollView 裁剪），焦点高亮仅依赖边框+背景色+字重。
 /// 3. enabled=false → FocusNode.canRequestFocus=false（primaryFocus 不会落到此节点）
 /// 4. 生命周期：widget unmount 后 FocusNode.dispose 被调用（通过 isDisposed 验证）
 ///
@@ -68,7 +71,7 @@ void main() {
   }
 
   testWidgets(
-    '场景1: 获得焦点时 Container 有蓝色边框 + Transform.scale > 1.0',
+    '场景1: 获得焦点时 Container 有蓝色边框（宽度 2）',
     (WidgetTester tester) async {
       await tester.pumpWidget(
         wrap(FocusableButton(label: 'Confirm')),
@@ -79,28 +82,18 @@ void main() {
       node.requestFocus();
       await tester.pumpAndSettle();
 
-      // 断言 1：边框颜色为蓝色，宽度为 2
+      // 断言：边框颜色为蓝色，宽度为 2
       final BoxDecoration? deco = decorationOf(tester);
       expect(deco, isNotNull);
       final Border? border = deco?.border as Border?;
       expect(border, isNotNull);
       expect(border!.top.color, equals(Colors.blue));
       expect(border.top.width, equals(2.0));
-
-      // 断言 2：AnimatedScale 终态 scale = 1.05（> 1.0）
-      final AnimatedScale scaleWidget = tester.widget<AnimatedScale>(
-        find.descendant(
-          of: find.byType(FocusableButton),
-          matching: find.byType(AnimatedScale),
-        ),
-      );
-      expect(scaleWidget.scale, greaterThan(1.0));
-      expect(scaleWidget.scale, closeTo(1.05, 1e-9));
     },
   );
 
   testWidgets(
-    '场景2: 失去焦点时边框透明 + scale = 1.0',
+    '场景2: 失去焦点时边框透明',
     (WidgetTester tester) async {
       // 用一个 FocusScope 同时承载 FocusableButton 和另一个可聚焦占位 widget，
       // 通过让占位节点抢焦，触发 FocusableButton 失焦。
@@ -129,21 +122,12 @@ void main() {
 
       expect(buttonNode.hasFocus, isFalse);
 
-      // 断言 1：边框颜色为透明（FF004 实现中始终有 Border.all，颜色为 transparent）
+      // 断言：边框颜色为透明（FF004 实现中始终有 Border.all，颜色为 transparent）
       final BoxDecoration? deco = decorationOf(tester);
       expect(deco, isNotNull);
       final Border? border = deco?.border as Border?;
       expect(border, isNotNull);
       expect(border!.top.color, equals(Colors.transparent));
-
-      // 断言 2：scale 回到 1.0
-      final AnimatedScale scaleWidget = tester.widget<AnimatedScale>(
-        find.descendant(
-          of: find.byType(FocusableButton),
-          matching: find.byType(AnimatedScale),
-        ),
-      );
-      expect(scaleWidget.scale, equals(1.0));
 
       otherNode.dispose();
     },

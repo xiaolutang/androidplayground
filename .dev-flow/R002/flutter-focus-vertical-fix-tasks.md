@@ -21,12 +21,13 @@ status: planned
 
 ## 执行顺序
 
-1. ⬜ R002-FIX001 — `_findDirectionalCandidate` 垂直方向 X 重叠过滤
-2. ⬜ 最后 — 全量测试验证
+1. ✅ R002-FIX001 — `_findDirectionalCandidate` 垂直方向 X 重叠过滤
+2. ✅ R002-FIX002 — FocusableButton 移除 AnimatedScale（焦点框裁剪修复）
+3. ⬜ 最后 — 全量测试验证
 
 ---
 
-## R002-FIX001：smart_focus_policy.dart — 垂直方向列聚类过滤 `⬜ 待处理`
+## R002-FIX001：smart_focus_policy.dart — 垂直方向列聚类过滤 `✅ 已完成`
 
 - 文件：`flutter_logic/lib/focus/smart_focus_policy.dart`
 - 改动类型：修改
@@ -46,7 +47,40 @@ status: planned
   - 右内容区上下键行为不变（已有 FocusScope，本身就在同列）
   - `flutter analyze` 无 error
   - `flutter test` 28+ 用例全通过
-  - `flutter test integration_test/` 3 场景全通过
+  - `flutter test integration_test/` 4 场景全通过
+- status: completed
+- commit: 95025850（fix）/ e8691fde（场景 D 测试）
+- evidence: iPhone 16 模拟器集成测试诊断日志验证 — "设置"rect=[16,268]，
+  右侧按钮 left≈316 ≥ 268 → 被 X 重叠过滤跳过，候选正确命中"关于"
+
+---
+
+## R002-FIX002：focusable_button.dart — 移除 AnimatedScale 修复焦点框裁剪 `✅ 已完成`
+
+- 文件：`flutter_logic/lib/focus/focusable_button.dart`
+- 改动类型：修改
+- domain: ui
+- task_layer: foundation
+- depends_on: []
+- priority: 4
+- risk_tags: []
+- smoke_required: true
+- mode: direct
+- status: completed
+- 背景：右内容区按钮被 `CrossAxisAlignment.stretch` 拉到
+  `SingleChildScrollView` 全宽，`AnimatedScale(1.05)` 放大后左右各超出 2.5%，
+  被 `SingleChildScrollView` 默认 `Clip.hardEdge` 裁剪 → 焦点蓝色边框左右"被吃"。
+- 修复：移除 `AnimatedScale`，焦点高亮仅依赖边框(2px blue) + 背景色(0.12 alpha) +
+  字重(FontWeight.w600)。视觉足够明显且零裁剪风险。
+- acceptance_criteria:
+  - 焦点态边框完整显示，无左右裁剪
+  - 非焦点态边框透明（无边框残留）
+  - `flutter analyze` 无 error
+  - 场景1/场景2 widget 测试更新（去掉 scale 断言，保留边框断言）
+  - 全量测试通过
+- test_updates:
+  - focusable_button_test.dart 场景1：标题改为"获得焦点时 Container 有蓝色边框（宽度 2）"，去掉 AnimatedScale 断言
+  - focusable_button_test.dart 场景2：标题改为"失去焦点时边框透明"，去掉 scale 断言
 - test_tasks:
   - type: unit
     description: 垂直方向 X 重叠过滤验证
@@ -130,22 +164,26 @@ flutter test integration_test/
 
 ---
 
-## 最后：全量测试验证 `⬜ 待处理`
+## 最后：全量测试验证 `✅ 已完成`
 
-依赖 R002-FIX001 完成后执行。
-
-### 验证步骤
+### 自动化测试
 
 ```bash
 cd flutter_logic
 flutter analyze                        # 无 error
-flutter test                           # 单元 + widget 测试全通过（含新增用例）
-flutter test integration_test/         # 集成测试 3 场景全通过
+flutter test                           # 30 单元 + widget 测试全通过
+flutter test integration_test/         # 4 场景集成测试全通过
 ```
 
-### 手动验证（iOS 模拟器横屏）
+### 手动验证（iPhone 16 模拟器横屏，GLM-5V-Turbo 视觉验收）
 
-1. 焦点在左导航"设置" → 按下键 → 焦点到"关于"（不到右内容区）
-2. 焦点在左导航"关于" → 按下键 → 焦点停留不动
-3. 焦点在左导航"个人中心" → 按右键 → 焦点到右内容区"会员签到"（三层降级不变）
-4. 场景 B 记忆、场景 C 兜底行为不变
+- **FIX001（垂直列隔离）**：从"个人中心"按下键 ×2 → 焦点依次到"设置"→"关于"，全程留在左导航列，**未跳到右内容区**。✅
+- **FIX002（焦点框无裁剪）**：右侧"会员签到"获得焦点时，蓝色边框（2px）四周完整显示，**左右无被吃边**。✅
+- 三层降级（左导航"个人中心"按右键 → 右内容区"会员签到"）行为不变。✅
+
+### Evidence
+
+- FIX001 集成测试诊断日志：iPhone 16 "设置"rect=[16,268]，右侧按钮 left≈316 ≥ 268 → X 重叠过滤跳过，候选正确命中"关于"。
+- FIX002 视觉验收截图（GLM-5V-Turbo 分析）：
+  - `https://litter.catbox.moe/oa75v9.png` — 右侧焦点态，边框完整
+  - `https://litter.catbox.moe/erasi5.png` — 左导航"关于"焦点态，列隔离生效

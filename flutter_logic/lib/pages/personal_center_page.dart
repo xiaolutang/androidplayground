@@ -37,6 +37,8 @@ class PersonalCenterDemoPageState extends State<PersonalCenterDemoPage> {
   List<_ButtonItem> _rightButtons = const <_ButtonItem>[
     _ButtonItem(label: '会员签到', order: NumericFocusOrder(1.0)),
     _ButtonItem(label: '账户信息', order: NumericFocusOrder(2.0)),
+    _ButtonItem(label: '我的钱包', order: NumericFocusOrder(3.0)),
+    _ButtonItem(label: '消息中心', order: NumericFocusOrder(4.0)),
     _ButtonItem(label: '退出登录', order: null),
   ];
 
@@ -181,18 +183,20 @@ class PersonalCenterDemoPageState extends State<PersonalCenterDemoPage> {
                     child: Container(
                       padding: const EdgeInsets.symmetric(
                           horizontal: 32, vertical: 24),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: _rightButtons
-                            .map((item) => Padding(
-                                  padding:
-                                      const EdgeInsets.only(bottom: 12),
-                                  child: FocusableButton(
-                                    label: item.label,
-                                    order: item.order,
-                                  ),
-                                ))
-                            .toList(),
+                      child: SingleChildScrollView(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: _rightButtons
+                              .map((item) => Padding(
+                                    padding:
+                                        const EdgeInsets.only(bottom: 12),
+                                    child: FocusableButton(
+                                      label: item.label,
+                                      order: item.order,
+                                    ),
+                                  ))
+                              .toList(),
+                        ),
                       ),
                     ),
                   ),

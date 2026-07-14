@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import 'claudeui/claude_ui_demo_page.dart';
+import 'claudeui/nes_home_page.dart';
+import 'codexui/codex_ui_demo_page.dart';
+import 'doudouui/doudou_home_page.dart';
 
 /// Playground 总入口页（R003-HM001）
 ///
@@ -12,6 +16,10 @@ class HomePage extends StatelessWidget {
   static const List<({String title, String route})> _demos =
       <({String title, String route})>[
     (title: 'Flutter 焦点 Demo', route: '/focus-demo'),
+    (title: 'Codex UI 还原 Demo', route: codexUiRoute),
+    (title: 'Claude UI 还原 Demo', route: claudeUiRoute),
+    (title: 'NES 首页还原 Demo', route: nesHomeRoute),
+    (title: '豆豆首页还原 Demo', route: doudouHomeRoute),
   ];
 
   @override

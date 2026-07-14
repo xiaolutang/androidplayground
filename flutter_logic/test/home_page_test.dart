@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:flutter_logic/codexui/codex_ui_demo_page.dart';
+import 'package:flutter_logic/doudouui/doudou_home_page.dart';
 import 'package:flutter_logic/main.dart';
 import 'package:flutter_logic/pages/personal_center_page.dart';
 
@@ -16,7 +18,38 @@ void main() {
 
     expect(find.text('Playground'), findsOneWidget);
     expect(find.text('Flutter 焦点 Demo'), findsOneWidget);
-    expect(find.byType(ListTile), findsOneWidget);
+    expect(find.text('Codex UI 还原 Demo'), findsOneWidget);
+    expect(find.text('Claude UI 还原 Demo'), findsOneWidget);
+    expect(find.text('NES 首页还原 Demo'), findsOneWidget);
+    expect(find.text('豆豆首页还原 Demo'), findsOneWidget);
+    expect(find.byType(ListTile), findsNWidgets(5));
+  });
+
+  testWidgets('点击豆豆首页入口 → 跳到豆豆 Figma 首页', (tester) async {
+    await tester.pumpWidget(const MyApp());
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('豆豆首页还原 Demo'));
+    await tester.pumpAndSettle();
+
+    expect(find.byType(DoudouHomePage), findsOneWidget);
+    expect(find.byType(DoudouHomeCanvas), findsOneWidget);
+    expect(find.text('绿豆豆乐园'), findsOneWidget);
+    expect(find.text('模块名称'), findsOneWidget);
+    expect(find.text('一行2个'), findsOneWidget);
+    expect(find.text('一行3个'), findsOneWidget);
+    expect(
+      find.byWidgetPredicate(
+        (Widget widget) =>
+            widget is Image &&
+            widget.image is AssetImage &&
+            (widget.image as AssetImage).assetName ==
+                '${DoudouHomeCanvas.assetRoot}hero_banner_exact.png',
+      ),
+      findsOneWidget,
+    );
+
+    await tester.pumpWidget(const SizedBox.shrink());
   });
 
   testWidgets('点击焦点 demo 入口 → 跳到个人中心页（带返回箭头）', (tester) async {
@@ -55,6 +88,30 @@ void main() {
       appBarTheme.backgroundColor,
       const Color(0xFFF6F2F8),
       reason: 'appBarTheme.backgroundColor 显式固定避免受 colorScheme 影响',
+    );
+  });
+
+  testWidgets('点击 Codex UI 入口 → 跳到 Figma 还原页', (tester) async {
+    await tester.pumpWidget(const MyApp());
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('Codex UI 还原 Demo'));
+    await tester.pumpAndSettle();
+
+    expect(find.byType(CodexUiDemoPage), findsOneWidget);
+    expect(find.byType(CodexUiDesignFrame), findsOneWidget);
+    expect(
+      find.byWidgetPredicate(
+        (Widget widget) =>
+            widget is Image &&
+            widget.image is AssetImage &&
+            (widget.image as AssetImage).assetName ==
+                CodexUiDesignFrame.backgroundAsset &&
+            widget.fit == BoxFit.fill &&
+            widget.filterQuality == FilterQuality.low &&
+            widget.isAntiAlias == false,
+      ),
+      findsOneWidget,
     );
   });
 

@@ -1,5 +1,4 @@
 import 'dart:io';
-import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -26,15 +25,14 @@ void main() {
     expect(find.byType(PersonalCenterDemoPage), findsOneWidget);
 
     // 回归守卫：appBarTheme 必须配置（否则 scrolledUnder 会触发状态栏闪烁）
-    final AppBarTheme appBarTheme =
+    final appBarTheme =
         Theme.of(tester.element(find.byType(AppBar))).appBarTheme;
     expect(appBarTheme.scrolledUnderElevation, 0);
     expect(appBarTheme.surfaceTintColor, Colors.transparent);
     expect(appBarTheme.backgroundColor, const Color(0xFFF6F2F8));
 
     Future<void> snap(int n) async {
-      final List<int> raw = await IntegrationTestWidgetsFlutterBinding
-          .instance
+      final List<int> raw = await IntegrationTestWidgetsFlutterBinding.instance
           .takeScreenshot('sb_step_$n');
       final Uint8List bytes = Uint8List.fromList(raw);
       final File f = File('/tmp/sb_step_$n.png');

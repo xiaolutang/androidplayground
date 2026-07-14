@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_logic/focus/focusable_button.dart';
 
@@ -41,8 +40,7 @@ void main() {
       // 验证 controller 已启动
       final state = tester.state(find.byType(FocusableButton)) as dynamic;
       final controller = state.shakeControllerForTest as AnimationController;
-      expect(controller.isAnimating, isTrue,
-          reason: '受阻信号后 controller 应启动动画');
+      expect(controller.isAnimating, isTrue, reason: '受阻信号后 controller 应启动动画');
 
       // 先 pump 一帧让 Ticker 启动，再推进时间
       await tester.pump();
@@ -50,10 +48,8 @@ void main() {
 
       final translate = getTranslateOffset(tester, 'A');
 
-      expect(translate.dy, isNot(equals(0.0)),
-          reason: '垂直受阻时 dy 应振荡非零');
-      expect(translate.dx, equals(0.0),
-          reason: '垂直受阻时 dx 应保持 0');
+      expect(translate.dy, isNot(equals(0.0)), reason: '垂直受阻时 dy 应振荡非零');
+      expect(translate.dx, equals(0.0), reason: '垂直受阻时 dx 应保持 0');
 
       // 等待抖动结束
       await tester.pumpAndSettle();
@@ -90,15 +86,11 @@ void main() {
       await tester.pump(const Duration(milliseconds: 30));
 
       final translate = getTranslateOffset(tester, 'A');
-      expect(translate.dx, isNot(equals(0.0)),
-          reason: '水平受阻时 dx 应振荡非零');
-      expect(translate.dy, equals(0.0),
-          reason: '水平受阻时 dy 应保持 0');
+      expect(translate.dx, isNot(equals(0.0)), reason: '水平受阻时 dx 应振荡非零');
+      expect(translate.dy, equals(0.0), reason: '水平受阻时 dy 应保持 0');
     });
 
-    testWidgets(
-        '[非焦点不抖] 非 primaryFocus 收到信号 → Transform 保持 0',
-        (tester) async {
+    testWidgets('[非焦点不抖] 非 primaryFocus 收到信号 → Transform 保持 0', (tester) async {
       final notifier = ValueNotifier<TraversalDirection?>(null);
       addTearDown(() => notifier.dispose());
 
@@ -134,9 +126,7 @@ void main() {
           reason: '非 primaryFocus 按钮收到信号不应抖动');
     });
 
-    testWidgets(
-        '[防抖重启] 动画中再次收到信号 → forward(from:0) 重启',
-        (tester) async {
+    testWidgets('[防抖重启] 动画中再次收到信号 → forward(from:0) 重启', (tester) async {
       final notifier = ValueNotifier<TraversalDirection?>(null);
       addTearDown(() => notifier.dispose());
 
@@ -155,8 +145,7 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      final state = tester.state(find.byType(FocusableButton))
-          as dynamic;
+      final state = tester.state(find.byType(FocusableButton)) as dynamic;
       final controller = state.shakeControllerForTest as AnimationController;
 
       // 第一次触发

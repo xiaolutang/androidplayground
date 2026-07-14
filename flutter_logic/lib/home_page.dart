@@ -9,7 +9,8 @@ class HomePage extends StatelessWidget {
   const HomePage({super.key});
 
   /// demo 入口清单。新增 demo 时在此追加即可。
-  static const List<({String title, String route})> _demos = <({String title, String route})>[
+  static const List<({String title, String route})> _demos =
+      <({String title, String route})>[
     (title: 'Flutter 焦点 Demo', route: '/focus-demo'),
   ];
 

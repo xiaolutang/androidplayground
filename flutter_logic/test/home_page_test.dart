@@ -39,7 +39,7 @@ void main() {
 
     // R002 状态栏闪烁修复：AppBar 通过 appBarTheme 全局关闭 M3 scrolledUnder。
     // 三属性在 main.dart 的 appBarTheme 定义，body 滚动时不再让 AppBar 变色。
-    final AppBarTheme appBarTheme =
+    final appBarTheme =
         Theme.of(tester.element(find.byType(AppBar))).appBarTheme;
     expect(
       appBarTheme.scrolledUnderElevation,

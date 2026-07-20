@@ -26,6 +26,7 @@ dependencies:
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
+  flutter_svg: ^2.0.10+1
   cupertino_icons: ^1.0.8
 
 dev_dependencies:
@@ -49,6 +50,8 @@ flutter:
     - assets/claudeui/
     - assets/claudeui/nes/
     - assets/doudouui/
+    - assets/doudouui/study/
+    - assets/gamepad_app/
 
   fonts:
     # Alibaba PuHuiTi — typeface used by the Figma source (weights 55 Regular /

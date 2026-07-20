@@ -3,6 +3,8 @@ import 'claudeui/claude_ui_demo_page.dart';
 import 'claudeui/nes_home_page.dart';
 import 'codexui/codex_ui_demo_page.dart';
 import 'doudouui/doudou_home_page.dart';
+import 'doudouui/study_page.dart';
+import 'gamepad_app/portrait_page.dart';
 
 /// Playground 总入口页（R003-HM001）
 ///
@@ -16,10 +18,12 @@ class HomePage extends StatelessWidget {
   static const List<({String title, String route})> _demos =
       <({String title, String route})>[
     (title: 'Flutter 焦点 Demo', route: '/focus-demo'),
-    (title: 'Codex UI 还原 Demo', route: codexUiRoute),
-    (title: 'Claude UI 还原 Demo', route: claudeUiRoute),
-    (title: 'NES 首页还原 Demo', route: nesHomeRoute),
+    (title: '[Codex] 手柄贴图还原', route: codexUiRoute),
+    (title: '[Claude] gamepad 手柄还原', route: claudeUiRoute),
+    (title: '[Claude] NES 首页还原', route: nesHomeRoute),
     (title: '豆豆首页还原 Demo', route: doudouHomeRoute),
+    (title: '[Claude] 豆豆思维课时页', route: doudouStudyRoute),
+    (title: '[Claude] 竖版手柄(DPad)', route: gamepadPortraitRoute),
   ];
 
   @override

@@ -18,11 +18,12 @@ void main() {
 
     expect(find.text('Playground'), findsOneWidget);
     expect(find.text('Flutter 焦点 Demo'), findsOneWidget);
-    expect(find.text('Codex UI 还原 Demo'), findsOneWidget);
-    expect(find.text('Claude UI 还原 Demo'), findsOneWidget);
-    expect(find.text('NES 首页还原 Demo'), findsOneWidget);
+    expect(find.text('[Codex] 手柄贴图还原'), findsOneWidget);
+    expect(find.text('[Claude] gamepad 手柄还原'), findsOneWidget);
+    expect(find.text('[Claude] NES 首页还原'), findsOneWidget);
     expect(find.text('豆豆首页还原 Demo'), findsOneWidget);
-    expect(find.byType(ListTile), findsNWidgets(5));
+    expect(find.text('[Claude] 豆豆思维课时页'), findsOneWidget);
+    expect(find.byType(ListTile), findsNWidgets(6));
   });
 
   testWidgets('点击豆豆首页入口 → 跳到豆豆 Figma 首页', (tester) async {
@@ -44,9 +45,9 @@ void main() {
             widget is Image &&
             widget.image is AssetImage &&
             (widget.image as AssetImage).assetName ==
-                '${DoudouHomeCanvas.assetRoot}hero_banner_exact.png',
+                '${DoudouHomeCanvas.assetRoot}card_01.png',
       ),
-      findsOneWidget,
+      findsWidgets,
     );
 
     await tester.pumpWidget(const SizedBox.shrink());
@@ -95,7 +96,7 @@ void main() {
     await tester.pumpWidget(const MyApp());
     await tester.pumpAndSettle();
 
-    await tester.tap(find.text('Codex UI 还原 Demo'));
+    await tester.tap(find.text('[Codex] 手柄贴图还原'));
     await tester.pumpAndSettle();
 
     expect(find.byType(CodexUiDemoPage), findsOneWidget);

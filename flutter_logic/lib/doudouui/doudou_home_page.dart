@@ -104,7 +104,7 @@ class DoudouHomeCanvas extends StatelessWidget {
                 width: 164,
                 height: 163,
                 radius: 10,
-                asset: 'feature_left_exact.png',
+                asset: 'card_01.png',
               ),
               _ExactImage(
                 left: 191,
@@ -112,7 +112,7 @@ class DoudouHomeCanvas extends StatelessWidget {
                 width: 164,
                 height: 163,
                 radius: 10,
-                asset: 'feature_right_exact.png',
+                asset: 'card_02.png',
               ),
               _ExactImage(
                 left: 20,
@@ -120,7 +120,7 @@ class DoudouHomeCanvas extends StatelessWidget {
                 width: 106,
                 height: 106,
                 radius: 8,
-                asset: 'mini_left_exact.png',
+                asset: 'card_03.png',
               ),
               _ExactImage(
                 left: 135,
@@ -128,7 +128,7 @@ class DoudouHomeCanvas extends StatelessWidget {
                 width: 106,
                 height: 106,
                 radius: 8,
-                asset: 'mini_mid_exact.png',
+                asset: 'card_01.png',
               ),
               _ExactImage(
                 left: 249,
@@ -136,7 +136,7 @@ class DoudouHomeCanvas extends StatelessWidget {
                 width: 106,
                 height: 106,
                 radius: 8,
-                asset: 'mini_right_exact.png',
+                asset: 'card_02.png',
               ),
               _SectionHeader(top: 673, title: '一行2个'),
               _TwoColumnResources(),
@@ -380,7 +380,7 @@ class _ExactImage extends StatelessWidget {
         borderRadius: BorderRadius.circular(radius),
         child: Image.asset(
           '${DoudouHomeCanvas.assetRoot}$asset',
-          fit: BoxFit.fill,
+          fit: BoxFit.cover,
           filterQuality: FilterQuality.low,
         ),
       ),
@@ -399,17 +399,19 @@ class _TwoColumnResources extends StatelessWidget {
           left: 20,
           top: 703,
           size: 164,
-          cover: 'resource_two_left_exact.png',
+          cover: 'resource_cover_base.png',
           title: '古诗故事2则',
           tags: <String>['认知'],
+          showTopRightFree: true,
         ),
         _ResourceTile(
           left: 191,
           top: 703,
           size: 164,
-          cover: 'resource_two_right_exact.png',
+          cover: 'resource_cover_base.png',
           title: '古诗故事2则',
           tags: <String>['寓言故事', '认知'],
+          bottomBadge: _CoverBadge.update,
         ),
       ],
     );
@@ -426,44 +428,53 @@ class _ThreeColumnResources extends StatelessWidget {
         _SmallResourceTile(
           left: 20,
           top: 980,
-          cover: 'resource_three_01_exact.png',
+          cover: 'resource_01.png',
           title: '毛毛镇冰雪加油队',
           tags: <String>['寓言故事'],
+          bottomBadge: _CoverBadge.subscribe,
         ),
         _SmallResourceTile(
           left: 135,
           top: 980,
-          cover: 'resource_three_02_exact.png',
+          cover: 'resource_02.png',
           title: '多多罗财商启蒙',
           tags: <String>['认知'],
+          showTopRightFree: true,
         ),
         _SmallResourceTile(
           left: 249,
           top: 980,
-          cover: 'resource_three_03_exact.png',
+          cover: 'resource_03_base.png',
+          coverOverlay: 'resource_03_overlay.png',
           title: '一二三四五六七',
           tags: <String>['寓言故事'],
+          bottomBadge: _CoverBadge.subscribe,
         ),
         _SmallResourceTile(
           left: 20,
           top: 1147,
-          cover: 'resource_three_04_exact.png',
+          cover: 'resource_01.png',
           title: '毛毛镇冰雪加油队',
           tags: <String>['寓言故事'],
+          bottomBadge: _CoverBadge.subscribe,
         ),
         _SmallResourceTile(
           left: 135,
           top: 1147,
-          cover: 'resource_three_05_exact.png',
+          cover: 'resource_02.png',
           title: '多多罗财商启蒙',
           tags: <String>['认知'],
+          showTopRightFree: true,
         ),
         _SmallResourceTile(
           left: 249,
           top: 1147,
-          cover: 'resource_three_06_exact.png',
+          cover: 'resource_03_base.png',
+          coverOverlay: 'resource_03_overlay.png',
           title: '一二三四五六七',
           tags: <String>['寓言故事'],
+          bottomBadge: _CoverBadge.subscribe,
+          locked: true,
         ),
       ],
     );
@@ -475,16 +486,24 @@ class _ResourceTile extends StatelessWidget {
   final double top;
   final double size;
   final String cover;
+  final String? coverOverlay;
   final String title;
   final List<String> tags;
+  final _CoverBadge? bottomBadge;
+  final bool showTopRightFree;
+  final bool locked;
 
   const _ResourceTile({
     required this.left,
     required this.top,
     required this.size,
     required this.cover,
+    this.coverOverlay,
     required this.title,
     required this.tags,
+    this.bottomBadge,
+    this.showTopRightFree = false,
+    this.locked = false,
   });
 
   @override
@@ -500,6 +519,10 @@ class _ResourceTile extends StatelessWidget {
           _CoverBox(
             size: size,
             cover: cover,
+            coverOverlay: coverOverlay,
+            bottomBadge: bottomBadge,
+            showTopRightFree: showTopRightFree,
+            locked: locked,
           ),
           const SizedBox(height: 8),
           Padding(
@@ -531,15 +554,23 @@ class _SmallResourceTile extends StatelessWidget {
   final double left;
   final double top;
   final String cover;
+  final String? coverOverlay;
   final String title;
   final List<String> tags;
+  final _CoverBadge? bottomBadge;
+  final bool showTopRightFree;
+  final bool locked;
 
   const _SmallResourceTile({
     required this.left,
     required this.top,
     required this.cover,
+    this.coverOverlay,
     required this.title,
     required this.tags,
+    this.bottomBadge,
+    this.showTopRightFree = false,
+    this.locked = false,
   });
 
   @override
@@ -549,19 +580,33 @@ class _SmallResourceTile extends StatelessWidget {
       top: top,
       size: 106,
       cover: cover,
+      coverOverlay: coverOverlay,
       title: title,
       tags: tags,
+      bottomBadge: bottomBadge,
+      showTopRightFree: showTopRightFree,
+      locked: locked,
     );
   }
 }
 
+enum _CoverBadge { subscribe, update }
+
 class _CoverBox extends StatelessWidget {
   final double size;
   final String cover;
+  final String? coverOverlay;
+  final _CoverBadge? bottomBadge;
+  final bool showTopRightFree;
+  final bool locked;
 
   const _CoverBox({
     required this.size,
     required this.cover,
+    this.coverOverlay,
+    this.bottomBadge,
+    this.showTopRightFree = false,
+    this.locked = false,
   });
 
   @override
@@ -580,7 +625,121 @@ class _CoverBox extends StatelessWidget {
                 filterQuality: FilterQuality.low,
               ),
             ),
+            if (coverOverlay != null)
+              Positioned.fill(
+                child: Image.asset(
+                  '${DoudouHomeCanvas.assetRoot}$coverOverlay',
+                  fit: BoxFit.cover,
+                  filterQuality: FilterQuality.low,
+                ),
+              ),
+            const Positioned(
+              right: 6,
+              bottom: 6,
+              width: 16,
+              height: 16,
+              child: Image(
+                image:
+                    AssetImage('${DoudouHomeCanvas.assetRoot}icon_video.png'),
+                fit: BoxFit.fill,
+                filterQuality: FilterQuality.low,
+              ),
+            ),
+            if (showTopRightFree)
+              Positioned(
+                right: 0,
+                top: 0,
+                width: size >= 160 ? 40 : 32,
+                height: size >= 160 ? 20 : 16,
+                child: _FreeBadge(isLarge: size >= 160),
+              ),
+            if (locked)
+              Positioned.fill(
+                child: ColoredBox(
+                  color: const Color(0x4D222222),
+                  child: Align(
+                    alignment: Alignment.bottomRight,
+                    child: Image.asset(
+                      '${DoudouHomeCanvas.assetRoot}icon_lock.png',
+                      width: 44,
+                      height: 44,
+                      filterQuality: FilterQuality.low,
+                    ),
+                  ),
+                ),
+              ),
+            if (bottomBadge != null)
+              Positioned(
+                left: 6,
+                bottom: 6,
+                child: _BottomBadge(type: bottomBadge!),
+              ),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+class _FreeBadge extends StatelessWidget {
+  final bool isLarge;
+
+  const _FreeBadge({required this.isLarge});
+
+  @override
+  Widget build(BuildContext context) {
+    return DecoratedBox(
+      decoration: const BoxDecoration(
+        color: Color(0xFF40A12D),
+        border: Border(
+          left: BorderSide(color: Colors.white, width: 0.5),
+          bottom: BorderSide(color: Colors.white, width: 0.5),
+        ),
+        borderRadius: BorderRadius.only(
+          bottomLeft: Radius.circular(8),
+        ),
+      ),
+      child: Center(
+        child: Text(
+          '限免',
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: isLarge ? 13 : 10,
+            height: 1,
+            fontWeight: FontWeight.w700,
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _BottomBadge extends StatelessWidget {
+  final _CoverBadge type;
+
+  const _BottomBadge({required this.type});
+
+  @override
+  Widget build(BuildContext context) {
+    final bool isUpdate = type == _CoverBadge.update;
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        color: isUpdate ? const Color(0xCC40A12D) : const Color(0xCCFF9045),
+        borderRadius: BorderRadius.circular(6),
+      ),
+      child: SizedBox(
+        width: 30,
+        height: 16,
+        child: Center(
+          child: Text(
+            isUpdate ? '更新' : '订阅',
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 10,
+              height: 1,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
         ),
       ),
     );

@@ -23,7 +23,8 @@ void main() {
     expect(find.text('[Claude] NES 首页还原'), findsOneWidget);
     expect(find.text('豆豆首页还原 Demo'), findsOneWidget);
     expect(find.text('[Claude] 豆豆思维课时页'), findsOneWidget);
-    expect(find.byType(ListTile), findsNWidgets(6));
+    expect(find.text('[Claude] 竖版手柄(DPad)'), findsOneWidget);
+    expect(find.byType(ListTile), findsNWidgets(7));
   });
 
   testWidgets('点击豆豆首页入口 → 跳到豆豆 Figma 首页', (tester) async {
@@ -45,9 +46,23 @@ void main() {
             widget is Image &&
             widget.image is AssetImage &&
             (widget.image as AssetImage).assetName ==
-                '${DoudouHomeCanvas.assetRoot}card_01.png',
+                '${DoudouHomeCanvas.assetRoot}card_01.png' &&
+            widget.fit == BoxFit.cover,
       ),
       findsWidgets,
+    );
+    expect(find.text('限免'), findsNWidgets(3));
+    expect(find.text('订阅'), findsNWidgets(4));
+    expect(find.text('更新'), findsOneWidget);
+    expect(
+      find.byWidgetPredicate(
+        (Widget widget) =>
+            widget is Image &&
+            widget.image is AssetImage &&
+            (widget.image as AssetImage).assetName ==
+                '${DoudouHomeCanvas.assetRoot}icon_lock.png',
+      ),
+      findsOneWidget,
     );
 
     await tester.pumpWidget(const SizedBox.shrink());

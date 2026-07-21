@@ -5,6 +5,7 @@ import 'codexui/codex_ui_demo_page.dart';
 import 'doudouui/doudou_home_page.dart';
 import 'doudouui/study_page.dart';
 import 'gamepad_app/portrait_page.dart';
+import 'gamepad_app/landscape_page.dart';
 
 /// Playground 总入口页（R003-HM001）
 ///
@@ -24,6 +25,7 @@ class HomePage extends StatelessWidget {
     (title: '豆豆首页还原 Demo', route: doudouHomeRoute),
     (title: '[Claude] 豆豆思维课时页', route: doudouStudyRoute),
     (title: '[Claude] 竖版手柄(DPad)', route: gamepadPortraitRoute),
+    (title: '[Codex] 横版手柄(DPad)', route: gamepadLandscapeRoute),
   ];
 
   @override

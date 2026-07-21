@@ -5,6 +5,7 @@ import 'codexui/codex_ui_demo_page.dart';
 import 'doudouui/doudou_home_page.dart';
 import 'doudouui/study_page.dart';
 import 'gamepad_app/portrait_page.dart';
+import 'gamepad_app/landscape_page.dart';
 import 'home_page.dart';
 import 'pages/personal_center_page.dart';
 
@@ -47,6 +48,7 @@ class MyApp extends StatelessWidget {
         doudouHomeRoute: (_) => const DoudouHomePage(),
         doudouStudyRoute: (_) => const DoudouStudyPage(),
         gamepadPortraitRoute: (_) => const GamepadPortraitPage(),
+        gamepadLandscapeRoute: (_) => const GamepadLandscapePage(),
       },
     );
   }

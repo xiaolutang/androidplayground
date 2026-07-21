@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_logic/codexui/codex_ui_demo_page.dart';
 import 'package:flutter_logic/doudouui/doudou_home_page.dart';
+import 'package:flutter_logic/gamepad_app/landscape_page.dart';
 import 'package:flutter_logic/main.dart';
 import 'package:flutter_logic/pages/personal_center_page.dart';
 
@@ -24,7 +25,33 @@ void main() {
     expect(find.text('豆豆首页还原 Demo'), findsOneWidget);
     expect(find.text('[Claude] 豆豆思维课时页'), findsOneWidget);
     expect(find.text('[Claude] 竖版手柄(DPad)'), findsOneWidget);
-    expect(find.byType(ListTile), findsNWidgets(7));
+    expect(find.text('[Codex] 横版手柄(DPad)'), findsOneWidget);
+    expect(find.byType(ListTile), findsNWidgets(8));
+  });
+
+  testWidgets('点击横版手柄入口 → 跳到横版操作页', (tester) async {
+    await tester.pumpWidget(const MyApp());
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('[Codex] 横版手柄(DPad)'));
+    await tester.pumpAndSettle();
+
+    expect(find.byType(GamepadLandscapePage), findsOneWidget);
+    expect(
+      find.byKey(const ValueKey<String>('landscape-left-dpad')),
+      findsOneWidget,
+    );
+    expect(
+      find.byKey(const ValueKey<String>('landscape-right-action-pad')),
+      findsOneWidget,
+    );
+    expect(
+      find.byKey(const ValueKey<String>('landscape-key-output')),
+      findsOneWidget,
+      reason: 'playground 横版页默认显示按键数据，供人工逐键验证',
+    );
+
+    await tester.pumpWidget(const SizedBox.shrink());
   });
 
   testWidgets('点击豆豆首页入口 → 跳到豆豆 Figma 首页', (tester) async {

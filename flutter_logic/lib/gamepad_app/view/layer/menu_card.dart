@@ -9,6 +9,8 @@ enum MenuAction {
   speed,
   quickLoad,
   continueGame,
+  keyPosition,
+  switchLayout,
 }
 
 /// 菜单卡片规格：显示、行为和初始状态全部由数据描述。
@@ -19,6 +21,7 @@ class MenuItem {
     required this.icon,
     this.caption,
     this.initiallyFocused = false,
+    this.iconRenderSize = 24,
   });
 
   final MenuAction action;
@@ -26,6 +29,7 @@ class MenuItem {
   final String icon;
   final String? caption;
   final bool initiallyFocused;
+  final double iconRenderSize;
 }
 
 /// 公共菜单卡片：icon + 双行文字（纯内容，不含 Focus 系统/FocusRing）。
@@ -57,14 +61,20 @@ class MenuCard extends StatelessWidget {
             height: 34,
             padding: const EdgeInsets.all(5),
             decoration: BoxDecoration(borderRadius: BorderRadius.circular(4)),
-            child: SvgPicture.asset(
-              item.icon,
-              width: 24,
-              height: 24,
-              fit: BoxFit.contain,
-              colorFilter: ColorFilter.mode(
-                f ? const Color(0xFF774FEF) : const Color(0xFF333333),
-                BlendMode.srcIn,
+            child: OverflowBox(
+              minWidth: item.iconRenderSize,
+              maxWidth: item.iconRenderSize,
+              minHeight: item.iconRenderSize,
+              maxHeight: item.iconRenderSize,
+              child: SvgPicture.asset(
+                item.icon,
+                width: item.iconRenderSize,
+                height: item.iconRenderSize,
+                fit: BoxFit.contain,
+                colorFilter: ColorFilter.mode(
+                  f ? const Color(0xFF774FEF) : const Color(0xFF333333),
+                  BlendMode.srcIn,
+                ),
               ),
             ),
           ),
@@ -76,6 +86,9 @@ class MenuCard extends StatelessWidget {
               children: [
                 Text(
                   item.title,
+                  maxLines: 1,
+                  softWrap: false,
+                  overflow: TextOverflow.visible,
                   style: TextStyle(
                     color:
                         f ? const Color(0xFF774FEF) : const Color(0xFF121A29),
@@ -89,6 +102,9 @@ class MenuCard extends StatelessWidget {
                 if (item.caption != null)
                   Text(
                     item.caption!,
+                    maxLines: 1,
+                    softWrap: false,
+                    overflow: TextOverflow.visible,
                     style: TextStyle(
                       color:
                           f ? const Color(0xFF774FEF) : const Color(0xFF6A7691),

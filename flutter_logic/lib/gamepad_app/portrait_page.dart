@@ -1,9 +1,9 @@
-import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'domain/models.dart';
 import 'view/layer/capsule_button.dart';
 import 'view/layer/gamepad_cluster.dart';
+import 'view/layer/game_scene_background.dart';
 import 'view/layer/start_select.dart';
 import 'view/layer/diamond_pad.dart';
 import 'view/layer/dpad.dart';
@@ -152,7 +152,7 @@ class _PortraitCanvas extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Stack(fit: StackFit.expand, children: [
-      const _Background(),
+      const GameSceneBackground.portrait(),
       // 手柄核心 + L/R（收起态隐藏）
       if (expanded)
         Positioned(
@@ -303,37 +303,6 @@ class _DebugBar extends StatelessWidget {
           ),
         ],
       ),
-    );
-  }
-}
-
-class _Background extends StatelessWidget {
-  const _Background();
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-      width: _kW,
-      height: _kH,
-      child: ClipRect(
-          child: OverflowBox(
-              minWidth: 844,
-              minHeight: 390,
-              maxWidth: 844,
-              maxHeight: 390,
-              child: Transform.rotate(
-                  angle: math.pi / 2,
-                  child: SizedBox(
-                      width: 844,
-                      height: 390,
-                      child: Stack(children: [
-                        Positioned(
-                            left: -0.253,
-                            top: -85,
-                            width: 844.4,
-                            height: 475,
-                            child: Image.asset('assets/gamepad_app/bg.png',
-                                fit: BoxFit.fill)),
-                      ]))))),
     );
   }
 }

@@ -5,6 +5,7 @@ import 'package:flutter_logic/gamepad_app/domain/models.dart';
 import 'package:flutter_logic/gamepad_app/landscape_page.dart';
 import 'package:flutter_logic/gamepad_app/view/layer/focus_ring.dart';
 import 'package:flutter_logic/gamepad_app/view/layer/menu_card.dart';
+import 'package:flutter_logic/gamepad_app/view/layout_switch_overlay.dart';
 import 'package:flutter_logic/gamepad_app/view/menu_overlay.dart';
 
 Future<void> main() async {
@@ -18,8 +19,11 @@ Future<void> main() async {
     WidgetTester tester, {
     ValueChanged<GamepadKey>? onKey,
     ValueChanged<MenuAction>? onMenuSelected,
+    ValueChanged<GamepadLayout>? onLayoutSelected,
     bool showKeyLog = false,
     bool initialMenuOpen = false,
+    bool initialLayoutOpen = false,
+    GamepadLayout initialLayout = GamepadLayout.siliconePad,
   }) async {
     tester.view.physicalSize = const Size(844, 390);
     tester.view.devicePixelRatio = 1;
@@ -32,8 +36,11 @@ Future<void> main() async {
         home: GamepadLandscapePage(
           onKey: onKey,
           onMenuSelected: onMenuSelected,
+          onLayoutSelected: onLayoutSelected,
           showKeyLog: showKeyLog,
           initialMenuOpen: initialMenuOpen,
+          initialLayoutOpen: initialLayoutOpen,
+          initialLayout: initialLayout,
         ),
       ),
     );
@@ -133,7 +140,15 @@ Future<void> main() async {
       await tester.sendKeyEvent(LogicalKeyboardKey.enter);
       await tester.pump();
       expect(selected, expected);
-      if (expected != MenuAction.continueGame) {
+      if (expected == MenuAction.switchLayout) {
+        expect(find.byType(LayoutSwitchOverlay), findsOneWidget);
+        await tester.tap(find.text('切换布局'));
+        await tester.pump();
+        expect(find.byType(MenuOverlay), findsOneWidget);
+        await tester.sendKeyEvent(LogicalKeyboardKey.arrowRight);
+        await tester.pump();
+        expect(focusedAction(), MenuAction.switchLayout);
+      } else if (expected != MenuAction.continueGame) {
         expect(find.byType(MenuOverlay), findsOneWidget);
       }
     }
@@ -189,6 +204,108 @@ Future<void> main() async {
     await tester.tap(logo);
     await tester.pump();
     expect(find.byType(MenuOverlay), findsNothing);
+  });
+
+  testWidgets('switch layout menu action opens the Figma secondary overlay',
+      (WidgetTester tester) async {
+    await pumpLandscape(tester, initialMenuOpen: true);
+
+    await tester.tap(
+      find.byKey(const ValueKey<MenuAction>(MenuAction.switchLayout)),
+    );
+    await tester.pump();
+
+    expect(find.byType(MenuOverlay), findsNothing);
+    expect(find.byType(LayoutSwitchOverlay), findsOneWidget);
+    expect(find.byType(LayoutChoiceCard), findsNWidgets(4));
+    expect(
+      tester
+          .widget<LayoutChoiceCard>(
+            find.byKey(
+              const ValueKey<GamepadLayout>(GamepadLayout.siliconePad),
+            ),
+          )
+          .selected,
+      isTrue,
+    );
+  });
+
+  testWidgets('landscape layout switch matches the 844x390 Figma frame',
+      (WidgetTester tester) async {
+    await pumpLandscape(tester, initialLayoutOpen: true);
+
+    expect(find.byType(LayoutSwitchOverlay), findsOneWidget);
+    expect(find.byType(LayoutChoiceCard), findsNWidgets(4));
+    expect(find.byType(FocusRing), findsOneWidget);
+    expect(find.byKey(const ValueKey<String>('landscape-key-output')),
+        findsNothing);
+
+    await expectLater(
+      find.byType(GamepadLandscapePage),
+      matchesGoldenFile('landscape_layout_switch.png'),
+    );
+  });
+
+  testWidgets('layout cards separate directional focus from selected state',
+      (WidgetTester tester) async {
+    GamepadLayout? selected;
+    await pumpLandscape(
+      tester,
+      initialLayoutOpen: true,
+      onLayoutSelected: (GamepadLayout layout) => selected = layout,
+    );
+
+    Finder card(GamepadLayout layout) => find.byKey(
+          ValueKey<GamepadLayout>(layout),
+        );
+    bool isFocused(GamepadLayout layout) => find
+        .descendant(of: card(layout), matching: find.byType(FocusRing))
+        .evaluate()
+        .isNotEmpty;
+    bool isSelected(GamepadLayout layout) =>
+        tester.widget<LayoutChoiceCard>(card(layout)).selected;
+
+    expect(isFocused(GamepadLayout.retroClassic), isTrue);
+    expect(isSelected(GamepadLayout.siliconePad), isTrue);
+
+    await tester.sendKeyEvent(LogicalKeyboardKey.arrowRight);
+    await tester.pump();
+    expect(isFocused(GamepadLayout.siliconePad), isTrue);
+
+    await tester.sendKeyEvent(LogicalKeyboardKey.arrowDown);
+    await tester.pump();
+    expect(isFocused(GamepadLayout.modernAsymmetric), isTrue);
+
+    await tester.sendKeyEvent(LogicalKeyboardKey.enter);
+    await tester.pump();
+    expect(selected, GamepadLayout.modernAsymmetric);
+    expect(isSelected(GamepadLayout.modernAsymmetric), isTrue);
+    expect(isSelected(GamepadLayout.siliconePad), isFalse);
+
+    await tester.sendKeyEvent(LogicalKeyboardKey.arrowLeft);
+    await tester.pump();
+    expect(isFocused(GamepadLayout.modernSymmetric), isTrue);
+
+    await tester.tap(card(GamepadLayout.retroClassic));
+    await tester.pump();
+    expect(selected, GamepadLayout.retroClassic);
+    expect(isSelected(GamepadLayout.retroClassic), isTrue);
+  });
+
+  testWidgets('layout back returns to menu and logo dismisses all overlays',
+      (WidgetTester tester) async {
+    await pumpLandscape(tester, initialLayoutOpen: true);
+
+    await tester.tap(find.text('切换布局'));
+    await tester.pump();
+    expect(find.byType(LayoutSwitchOverlay), findsNothing);
+    expect(find.byType(MenuOverlay), findsOneWidget);
+
+    await tester
+        .tap(find.byKey(const ValueKey<String>('landscape-logo-button')));
+    await tester.pump();
+    expect(find.byType(MenuOverlay), findsNothing);
+    expect(find.byType(LayoutSwitchOverlay), findsNothing);
   });
 
   testWidgets('all landscape operation slots emit configured gamepad keys',

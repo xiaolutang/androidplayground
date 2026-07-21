@@ -9,6 +9,7 @@ import 'view/layer/game_scene_background.dart';
 import 'view/layer/menu_card.dart';
 import 'view/layer/round_button.dart';
 import 'view/layer/triangle_diamond_pad.dart';
+import 'view/layout_switch_overlay.dart';
 import 'view/menu_overlay.dart';
 
 const String gamepadLandscapeRoute = '/gamepad-landscape';
@@ -16,6 +17,10 @@ const double _canvasWidth = 844;
 const double _canvasHeight = 390;
 const bool _initialLandscapeMenuOpen = bool.fromEnvironment(
   'gamepadLandscapeMenuOpen',
+  defaultValue: false,
+);
+const bool _initialLandscapeLayoutOpen = bool.fromEnvironment(
+  'gamepadLandscapeLayoutOpen',
   defaultValue: false,
 );
 
@@ -80,17 +85,23 @@ class GamepadLandscapePage extends StatefulWidget {
     super.key,
     this.onKey,
     this.onMenuSelected,
+    this.onLayoutSelected,
     this.showKeyLog = true,
     this.initialMenuOpen = _initialLandscapeMenuOpen,
+    this.initialLayoutOpen = _initialLandscapeLayoutOpen,
+    this.initialLayout = GamepadLayout.siliconePad,
   });
 
   /// Connects the visual controls to an emulator/game input adapter.
   final ValueChanged<GamepadKey>? onKey;
   final ValueChanged<MenuAction>? onMenuSelected;
+  final ValueChanged<GamepadLayout>? onLayoutSelected;
 
   /// Shows the latest key payloads on the playground page for manual testing.
   final bool showKeyLog;
   final bool initialMenuOpen;
+  final bool initialLayoutOpen;
+  final GamepadLayout initialLayout;
 
   @override
   State<GamepadLandscapePage> createState() => _GamepadLandscapePageState();
@@ -99,12 +110,16 @@ class GamepadLandscapePage extends StatefulWidget {
 class _GamepadLandscapePageState extends State<GamepadLandscapePage> {
   bool _expanded = true;
   late bool _menuOpen;
+  late bool _layoutOpen;
+  late GamepadLayout _selectedLayout;
   final List<GamepadKey> _keyLog = <GamepadKey>[];
 
   @override
   void initState() {
     super.initState();
-    _menuOpen = widget.initialMenuOpen;
+    _layoutOpen = widget.initialLayoutOpen;
+    _menuOpen = widget.initialMenuOpen && !_layoutOpen;
+    _selectedLayout = widget.initialLayout;
     SystemChrome.setPreferredOrientations(const <DeviceOrientation>[
       DeviceOrientation.landscapeLeft,
       DeviceOrientation.landscapeRight,
@@ -137,16 +152,40 @@ class _GamepadLandscapePageState extends State<GamepadLandscapePage> {
   void _toggleMenu() {
     setState(() {
       if (widget.showKeyLog) _recordKey(GamepadKey.se);
-      _menuOpen = !_menuOpen;
+      final bool openMenu = !_menuOpen && !_layoutOpen;
+      _layoutOpen = false;
+      _menuOpen = openMenu;
     });
     widget.onKey?.call(GamepadKey.se);
   }
 
   void _closeMenu() => setState(() => _menuOpen = false);
 
+  void _dismissOverlays() => setState(() {
+        _menuOpen = false;
+        _layoutOpen = false;
+      });
+
+  void _backToMenu() => setState(() {
+        _layoutOpen = false;
+        _menuOpen = true;
+      });
+
+  void _selectLayout(GamepadLayout layout) {
+    setState(() => _selectedLayout = layout);
+    widget.onLayoutSelected?.call(layout);
+  }
+
   void _selectMenuItem(MenuAction action) {
     widget.onMenuSelected?.call(action);
-    if (action == MenuAction.continueGame) _closeMenu();
+    if (action == MenuAction.switchLayout) {
+      setState(() {
+        _menuOpen = false;
+        _layoutOpen = true;
+      });
+    } else if (action == MenuAction.continueGame) {
+      _closeMenu();
+    }
   }
 
   @override
@@ -162,6 +201,8 @@ class _GamepadLandscapePageState extends State<GamepadLandscapePage> {
             child: _LandscapeCanvas(
               expanded: _expanded,
               menuOpen: _menuOpen,
+              layoutOpen: _layoutOpen,
+              selectedLayout: _selectedLayout,
               keyLog: _keyLog,
               showKeyLog: widget.showKeyLog,
               onKey: _onKey,
@@ -169,6 +210,9 @@ class _GamepadLandscapePageState extends State<GamepadLandscapePage> {
               onToggleMenu: _toggleMenu,
               onCloseMenu: _closeMenu,
               onSelectMenuItem: _selectMenuItem,
+              onDismissOverlays: _dismissOverlays,
+              onBackToMenu: _backToMenu,
+              onSelectLayout: _selectLayout,
             ),
           ),
         ),
@@ -181,6 +225,8 @@ class _LandscapeCanvas extends StatelessWidget {
   const _LandscapeCanvas({
     required this.expanded,
     required this.menuOpen,
+    required this.layoutOpen,
+    required this.selectedLayout,
     required this.keyLog,
     required this.showKeyLog,
     required this.onKey,
@@ -188,10 +234,15 @@ class _LandscapeCanvas extends StatelessWidget {
     required this.onToggleMenu,
     required this.onCloseMenu,
     required this.onSelectMenuItem,
+    required this.onDismissOverlays,
+    required this.onBackToMenu,
+    required this.onSelectLayout,
   });
 
   final bool expanded;
   final bool menuOpen;
+  final bool layoutOpen;
+  final GamepadLayout selectedLayout;
   final List<GamepadKey> keyLog;
   final bool showKeyLog;
   final ValueChanged<GamepadKey> onKey;
@@ -199,6 +250,9 @@ class _LandscapeCanvas extends StatelessWidget {
   final VoidCallback onToggleMenu;
   final VoidCallback onCloseMenu;
   final ValueChanged<MenuAction> onSelectMenuItem;
+  final VoidCallback onDismissOverlays;
+  final VoidCallback onBackToMenu;
+  final ValueChanged<GamepadLayout> onSelectLayout;
 
   static const PadKey _up =
       PadKey(GamepadKey.up, svgAsset: 'assets/gamepad_app/btn_up.svg');
@@ -219,6 +273,7 @@ class _LandscapeCanvas extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final bool overlayOpen = menuOpen || layoutOpen;
     return Stack(
       fit: StackFit.expand,
       children: <Widget>[
@@ -282,7 +337,7 @@ class _LandscapeCanvas extends StatelessWidget {
           _capsule(484, 51.25, GamepadKey.r2, 'R2'),
         ],
         Positioned(
-          left: menuOpen ? 514 : 499,
+          left: overlayOpen ? 514 : 499,
           top: 336,
           child: RoundButton(
             key: const ValueKey<String>('landscape-expand-toggle'),
@@ -309,12 +364,21 @@ class _LandscapeCanvas extends StatelessWidget {
               normalCardTrailingInset: 1,
             ),
           ),
+        if (layoutOpen)
+          Positioned.fill(
+            child: LayoutSwitchOverlay(
+              selectedLayout: selectedLayout,
+              onSelected: onSelectLayout,
+              onBack: onBackToMenu,
+              onDismiss: onDismissOverlays,
+            ),
+          ),
         if (expanded)
           Positioned(
             left: 303,
             top: 336,
             child: Opacity(
-              opacity: menuOpen ? 1 : 0.4,
+              opacity: overlayOpen ? 1 : 0.4,
               child: RoundButton(
                 key: const ValueKey<String>('landscape-logo-button'),
                 data: const PadKey(
@@ -326,7 +390,7 @@ class _LandscapeCanvas extends StatelessWidget {
               ),
             ),
           ),
-        if (showKeyLog && !menuOpen)
+        if (showKeyLog && !overlayOpen)
           Positioned(
             left: 242,
             top: 144,

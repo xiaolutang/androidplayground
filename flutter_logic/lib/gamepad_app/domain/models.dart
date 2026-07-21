@@ -26,6 +26,14 @@ enum GamepadKey {
   start,
 }
 
+/// 横版虚拟手柄可切换的四种布局。
+enum GamepadLayout {
+  retroClassic,
+  siliconePad,
+  modernSymmetric,
+  modernAsymmetric,
+}
+
 /// 单个按键的「显示数据」。
 ///
 /// [key] 是这个按键"是谁"（up / a / l1… 任意）；[icon] 是它的显示资源

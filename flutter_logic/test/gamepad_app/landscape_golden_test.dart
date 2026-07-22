@@ -7,6 +7,8 @@ import 'package:flutter_logic/gamepad_app/view/layer/focus_ring.dart';
 import 'package:flutter_logic/gamepad_app/view/layer/menu_card.dart';
 import 'package:flutter_logic/gamepad_app/view/layout_switch_overlay.dart';
 import 'package:flutter_logic/gamepad_app/view/menu_overlay.dart';
+import 'package:flutter_logic/gamepad_app/view/save_management_overlay.dart';
+import 'package:flutter_logic/gamepad_app/view/layer/save_slot_card.dart';
 
 Future<void> main() async {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -23,6 +25,7 @@ Future<void> main() async {
     bool showKeyLog = false,
     bool initialMenuOpen = false,
     bool initialLayoutOpen = false,
+    bool initialSaveManagementOpen = false,
     GamepadLayout initialLayout = GamepadLayout.siliconePad,
   }) async {
     tester.view.physicalSize = const Size(844, 390);
@@ -40,6 +43,7 @@ Future<void> main() async {
           showKeyLog: showKeyLog,
           initialMenuOpen: initialMenuOpen,
           initialLayoutOpen: initialLayoutOpen,
+          initialSaveManagementOpen: initialSaveManagementOpen,
           initialLayout: initialLayout,
         ),
       ),
@@ -49,6 +53,14 @@ Future<void> main() async {
           tester.element(find.byType(GamepadLandscapePage));
       await precacheImage(
         const AssetImage('assets/gamepad_app/bg.png'),
+        context,
+      );
+      await precacheImage(
+        const AssetImage('assets/gamepad_app/save_thumb_a.png'),
+        context,
+      );
+      await precacheImage(
+        const AssetImage('assets/gamepad_app/save_thumb_b.png'),
         context,
       );
     });
@@ -148,6 +160,19 @@ Future<void> main() async {
         await tester.sendKeyEvent(LogicalKeyboardKey.arrowRight);
         await tester.pump();
         expect(focusedAction(), MenuAction.switchLayout);
+      } else if (expected == MenuAction.saveManagement) {
+        expect(find.byType(SaveManagementOverlay), findsOneWidget);
+        await tester.tap(find.text('存档管理'));
+        await tester.pump();
+        expect(find.byType(MenuOverlay), findsOneWidget);
+        // 返回后焦点回到默认 continueGame，导航回 saveManagement(行1列2)
+        await tester.sendKeyEvent(LogicalKeyboardKey.arrowUp);
+        await tester.pump();
+        await tester.sendKeyEvent(LogicalKeyboardKey.arrowUp);
+        await tester.pump();
+        await tester.sendKeyEvent(LogicalKeyboardKey.arrowRight);
+        await tester.pump();
+        expect(focusedAction(), MenuAction.saveManagement);
       } else if (expected != MenuAction.continueGame) {
         expect(find.byType(MenuOverlay), findsOneWidget);
       }
@@ -369,5 +394,100 @@ Future<void> main() async {
     await tester.pump();
 
     expect(pressed.last, GamepadKey.se);
+  });
+
+  // ===== R005 存档管理 =====
+  testWidgets('save management menu action opens the overlay',
+      (WidgetTester tester) async {
+    await pumpLandscape(tester, initialMenuOpen: true);
+
+    await tester.tap(
+      find.byKey(const ValueKey<MenuAction>(MenuAction.saveManagement)),
+    );
+    await tester.pump();
+
+    expect(find.byType(MenuOverlay), findsNothing);
+    expect(find.byType(SaveManagementOverlay), findsOneWidget);
+    expect(find.byType(SaveSlotCard), findsNWidgets(5)); // 1 quick + 4 manual
+  });
+
+  testWidgets('save management matches the 844x390 Figma frame',
+      (WidgetTester tester) async {
+    await pumpLandscape(tester, initialSaveManagementOpen: true);
+
+    expect(find.byType(SaveManagementOverlay), findsOneWidget);
+    expect(find.byType(SaveSlotCard), findsNWidgets(5));
+    expect(find.byKey(const ValueKey<String>('landscape-key-output')),
+        findsNothing);
+
+    await expectLater(
+      find.byType(GamepadLandscapePage),
+      matchesGoldenFile('landscape_save_management.png'),
+    );
+  });
+
+  testWidgets('delete removes a manual save slot',
+      (WidgetTester tester) async {
+    await pumpLandscape(tester, initialSaveManagementOpen: true);
+
+    expect(find.byType(SaveSlotCard), findsNWidgets(5));
+    await tester.tap(
+      find.byKey(const ValueKey<String>('save_mgmt.slot.delete')).at(1),
+    );
+    await tester.pump();
+
+    expect(find.byType(SaveSlotCard), findsNWidgets(4));
+  });
+
+  testWidgets('save action refreshes the slot time',
+      (WidgetTester tester) async {
+    await pumpLandscape(tester, initialSaveManagementOpen: true);
+
+    expect(find.text('2026-07-02 14:32'), findsNWidgets(2)); // quick + m1
+    await tester.tap(
+      find.byKey(const ValueKey<String>('save_mgmt.slot.save')).first,
+    );
+    await tester.pump();
+
+    expect(find.text('刚刚'), findsOneWidget); // m1
+    expect(find.text('2026-07-02 14:32'), findsOneWidget); // quick
+  });
+
+  testWidgets('save management back returns to menu and logo dismisses all',
+      (WidgetTester tester) async {
+    await pumpLandscape(tester, initialSaveManagementOpen: true);
+
+    await tester.tap(find.text('存档管理'));
+    await tester.pump();
+    expect(find.byType(MenuOverlay), findsOneWidget);
+    expect(find.byType(SaveManagementOverlay), findsNothing);
+
+    // 从菜单重新打开，再用 logo dismiss 全部 overlay
+    await tester.tap(
+      find.byKey(const ValueKey<MenuAction>(MenuAction.saveManagement)),
+    );
+    await tester.pump();
+    expect(find.byType(SaveManagementOverlay), findsOneWidget);
+
+    await tester
+        .tap(find.byKey(const ValueKey<String>('landscape-logo-button')));
+    await tester.pump();
+    expect(find.byType(MenuOverlay), findsNothing);
+    expect(find.byType(SaveManagementOverlay), findsNothing);
+  });
+
+  testWidgets('deleting the quick slot shows the empty state',
+      (WidgetTester tester) async {
+    await pumpLandscape(tester, initialSaveManagementOpen: true);
+
+    expect(find.text('最近快存'), findsOneWidget);
+    // 第一个 delete 按钮属于快速存档槽
+    await tester.tap(
+      find.byKey(const ValueKey<String>('save_mgmt.slot.delete')).at(0),
+    );
+    await tester.pump();
+
+    expect(find.text('暂无快存'), findsOneWidget);
+    expect(find.byType(SaveSlotCard), findsNWidgets(4)); // 只剩 4 个手动槽
   });
 }

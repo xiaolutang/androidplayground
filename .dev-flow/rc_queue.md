@@ -5,7 +5,7 @@ last_updated: 2026-06-27
 
 # RC 队列（Requirement Cycle Queue）
 
-> 跟踪所有需求周期的状态。新增 RC 从 R005 起编号（R001/R002 已归档）。
+> 跟踪所有需求周期的状态。新增 RC 从 R006 起编号（R001/R002/R004/R005 已归档）。
 
 ## 队列状态
 
@@ -15,10 +15,11 @@ last_updated: 2026-06-27
 | R002 | Flutter 焦点进阶 Demo | archived | 已归档 | 2026-06-26 | 焦点策略 + 5 个修复全部完成；43 widget test 全绿 |
 | R003 | Flutter Playground 入口页 | planned | plan | 2026-06-27 | 基于 R002 焦点 demo 加 Playground 总入口；待 execute |
 | R004 | 焦点边界受阻抖动反馈 | archived | 已归档 | 2026-06-27 | 2 节点（FF005 + FB008）+ FF009 集成测试；56 测试全绿 |
+| R005 | 横版手柄存档管理二级页 | archived | 已归档 | 2026-07-21 | 续接 codex 横版框架；SaveManagementOverlay + 挂载 + 5 测试；81 测试全绿 |
 
 ## 待规划
 
-（暂无 queued RC。新 RC 从 R005 起编号，需先完成 brainstorm → analysis → design → plan。）
+（暂无 queued RC。新 RC 从 R006 起编号，需先完成 brainstorm → analysis → design → plan。）
 
 ## 状态图例
 
@@ -34,6 +35,7 @@ last_updated: 2026-06-27
 
 ## 历史归档
 
+- **R005**（2026-07-22）：横版手柄存档管理二级页。续接 codex 横版框架，实现存档管理 overlay（蒙层+径向渐变面板+两区+有状态增删）。详见 `.dev-flow/summary.md`。
 - **R004**（2026-06-27）：焦点边界受阻抖动反馈。policy→widget notifier 信号通道 + 方向感知 sin 波抖动。详见 `.dev-flow/summary.md`。
 - **R002**（2026-06-27）：Flutter 焦点进阶 Demo。三层焦点降级 + 跨 scope 导航 + 5 个修复。详见 `.dev-flow/summary.md`。
 - **R001**（2026-06-26）：客户端 Bug 自动修复 Agent。详见 `.dev-flow/summary.md`。

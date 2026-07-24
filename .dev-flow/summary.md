@@ -9,6 +9,48 @@ last_updated: 2026-06-27
 
 ---
 
+## R005 横版手柄「存档管理」二级页面（2026-07-22 归档）
+
+### 交付摘要
+
+续接 codex 横版手柄框架，实现横版菜单「存档管理」(`MenuAction.saveManagement`) 的二级页 overlay。点击弹出浅色 picker-panel（443×282@(201,26) 圆角24 径向渐变），含返回按钮、快速存档区（1 槽）、手动存档区（2 槽 save/load/delete），有状态 demo（删除真移除、保存刷新时间）。严格对齐 Figma 3448:30090，复用 `LayoutSwitchOverlay` 范式。
+
+**核心能力**：
+- 存档管理二级 overlay（蒙层 + 径向渐变面板 + 两区 + 滚动条）
+- 有状态增删保存读取（StatefulWidget 维护 quick/manual 列表）
+- 槽位操作按钮焦点 + FocusRing（Enter/Space 激活）
+- 横版三态互斥（menu / layout / saveMgmt）
+
+### 模块清单
+
+| 模块 | 任务 ID | 关键产物 |
+|------|---------|---------|
+| 领域模型 | FB001.1 | `SaveSlot` + `SaveSlotKind` |
+| 存档槽卡片 | FB002 | `SaveSlotCard` + `_SlotIconButton` |
+| 存档管理 overlay | FB001 | `SaveManagementOverlay` + `_BackTitle` + `_SectionHeader` |
+| 横版挂载 + 测试 | FF002 | landscape_page `saveManagementOpen` 状态 + 5 测试 + 1 回归修复 |
+
+### 验收基线
+
+| 维度 | 数据 |
+|------|------|
+| 全量测试 | 81 passed |
+| Lint | `flutter analyze` 0 issue |
+| Golden | `landscape_save_management.png` 用户对照 Figma 确认 |
+
+### 已知缺口
+
+- load 图标（读取按钮）：Figma `imgUnion2` asset 404、`use_figma` 导不出，复用软盘（= save）
+- 竖版存档管理：不在本次范围
+
+### 证据链接
+
+- 验收：`.dev-flow/R005/evidence/r005-evaluation.md`
+- 任务清单：`.dev-flow/R005/landscape-save-management-tasks.md`
+- analysis：`.dev-flow/R005/analysis/2026-07-21--landscape-save-management.md`
+
+---
+
 ## R004 焦点边界受阻抖动反馈（2026-06-27 归档）
 
 ### 交付摘要

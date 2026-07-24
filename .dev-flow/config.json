@@ -18,6 +18,12 @@
       "name": "焦点边界受阻抖动反馈",
       "archived_at": "2026-06-27",
       "status": "archived"
+    },
+    {
+      "rc_id": "R005",
+      "name": "横版手柄存档管理二级页",
+      "archived_at": "2026-07-22",
+      "status": "archived"
     }
   ],
   "design_diagram_colors": {

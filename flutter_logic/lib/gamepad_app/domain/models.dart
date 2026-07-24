@@ -85,3 +85,36 @@ class PadKey {
     );
   }
 }
+
+/// 存档槽类型。quick = 最近快存（仅删除）；manual = 手动存档（保存/读取/删除）。
+enum SaveSlotKind { quick, manual }
+
+/// 单个存档槽的显示数据（demo 用，无持久化）。
+///
+/// 对照 Figma 3448:30090：title(最近快存/存档1) + time(2026-07-02 14:32)
+/// + thumbAsset(缩略图) + kind(决定操作按钮集合)。
+@immutable
+class SaveSlot {
+  const SaveSlot({
+    required this.id,
+    required this.title,
+    required this.kind,
+    required this.time,
+    required this.thumbAsset,
+  });
+
+  final String id;
+  final String title;
+  final SaveSlotKind kind;
+  final String time;
+  final String thumbAsset;
+
+  SaveSlot copyWith({String? title, String? time, String? thumbAsset}) =>
+      SaveSlot(
+        id: id,
+        title: title ?? this.title,
+        kind: kind,
+        time: time ?? this.time,
+        thumbAsset: thumbAsset ?? this.thumbAsset,
+      );
+}

@@ -9,6 +9,7 @@ import com.example.androidplayground.adapter.DemoAdapter
 import com.example.androidplayground.demos.coroutines.CoroutinesDemoActivity
 import com.example.androidplayground.demos.coroutines.UserListActivity
 import com.example.androidplayground.demos.glide.GlideTestActivity
+import com.example.androidplayground.demos.infrared.InfraredTransmitActivity
 import com.example.androidplayground.model.DemoItem
 import io.flutter.embedding.android.FlutterActivity
 
@@ -44,6 +45,11 @@ class MainActivity : AppCompatActivity() {
                 title = "Glide 内存坑验证",
                 description = "观察 wrap_content + centerCrop 导致的小图被放大的现象",
                 targetActivity = GlideTestActivity::class.java
+            ),
+            DemoItem(
+                title = "红外发射测试",
+                description = "检测手机红外能力，并发送 TCL 65V8H Pro 电源码",
+                targetActivity = InfraredTransmitActivity::class.java
             )
         )
 
